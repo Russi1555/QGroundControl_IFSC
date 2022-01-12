@@ -148,11 +148,13 @@ Item {
         id: videoControl
     }
 
-    QGCPipOverlay {
+    QGCPipOverlay { //Retangulo da camera
         id:                     _pipOverlay
-        anchors.left:           parent.left
-        anchors.bottom:         parent.bottom
-        anchors.margins:        _toolsMargin
+       // anchors.right:           parent.right
+       // anchors.bottom:         QGCColoredImage.top
+       // anchors.margins:        _toolsMargin
+        x: (parent.width / 10) * 8
+        y: parent.height / 6
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
         item1:                  mapControl
         item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
