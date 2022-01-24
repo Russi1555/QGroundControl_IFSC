@@ -150,11 +150,9 @@ Item {
 
     QGCPipOverlay { //Retangulo da camera
         id:                     _pipOverlay
-       // anchors.right:           parent.right
-       // anchors.bottom:         QGCColoredImage.top
-       // anchors.margins:        _toolsMargin
-        x: (parent.width / 10) * 8
-        y: parent.height / 6
+       anchors.left:           parent.left
+       anchors.bottom:         parent.bottom
+       anchors.margins:        _toolsMargin
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
         item1:                  mapControl
         item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
@@ -163,4 +161,112 @@ Item {
         show:                   !QGroundControl.videoManager.fullScreen &&
                                     (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
     }
+
+  /* Rectangle { //Circulo de exemplo pra evento de hover
+         id: motores
+         width: parent.width/10
+         height: parent.width/10
+         x: parent.width/2
+         y: parent.height/2
+         color: teste.containsMouse ? "green" : "red"
+         border.color: "black"
+         border.width: 1
+         radius: width*0.5
+
+
+
+         MouseArea {
+            id: teste
+            anchors.fill: motores
+            hoverEnabled: true
+         }
+
+    }*/
+
+    QGCColoredImage {
+            id: monitor_motores
+            //x: (parent.width * 4)/5
+            anchors.right : parent.right
+            y: 160
+            width: 983 * 0.15
+            height: 857 * 0.15
+            color: white
+            source: "/res/QGCLogoWhite"
+
+            Rectangle {
+                id: motor1
+                x: monitor_motores.width * 0.8
+                y: monitor_motores.height * 0.44
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+
+            Rectangle {
+                id: motor2
+                x: monitor_motores.width * 0.1
+                y: monitor_motores.height * 0.44
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+
+            Rectangle {
+                id: motor3
+                x: monitor_motores.width * 0.28
+                y: monitor_motores.height * 0.1
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+
+            Rectangle {
+                id: motor4
+                x: monitor_motores.width * 0.63
+                y: monitor_motores.height * 0.8
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+
+            Rectangle {
+                id: motor5
+                x: monitor_motores.width * 0.63
+                y: monitor_motores.height * 0.1
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+
+            Rectangle {
+                id: motor6
+                x: monitor_motores.width * 0.28
+                y: monitor_motores.height * 0.8
+                width: monitor_motores.width/10
+                height: monitor_motores.width/10
+                radius: width* 0.5
+                border.color: monitor_motores.color
+                border.width: 1
+                color: "green"
+            }
+        }
+
+
+
+
 }
