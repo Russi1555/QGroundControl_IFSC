@@ -1,316 +1,229 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2019 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
- ****************************************************************************/
+ * @file
+ *   @author Gus Grubba <gus@auterion.com>
+ */
 
-import QtQuick                  2.12
-import QtQuick.Controls         2.4
-import QtQuick.Dialogs          1.3
-import QtQuick.Layouts          1.12
-
-import QtLocation               5.3
-import QtPositioning            5.3
-import QtQuick.Window           2.2
-import QtQml.Models             2.1
+import QtQuick          2.12
+import QtQuick.Controls 2.4
+import QtQuick.Layouts  1.11
 
 import QGroundControl               1.0
-import QGroundControl.Airspace      1.0
-import QGroundControl.Airmap        1.0
-import QGroundControl.Controllers   1.0
 import QGroundControl.Controls      1.0
-import QGroundControl.FactSystem    1.0
-import QGroundControl.FlightDisplay 1.0
-import QGroundControl.FlightMap     1.0
 import QGroundControl.Palette       1.0
 import QGroundControl.ScreenTools   1.0
-import QGroundControl.Vehicle       1.0
+
+import Custom.Widgets 1.0
 
 Item {
-    id: _root
+    property var parentToolInsets                       // These insets tell you what screen real estate is available for positioning the controls in your overlay
+    property var totalToolInsets:   _totalToolInsets    // The insets updated for the custom overlay additions
+    property var mapControl
 
-    // These should only be used by MainRootWindow
-    property var planController:    _planController
-    property var guidedController:  _guidedController
+    readonly property string noGPS:         qsTr("NO GPS")
+    readonly property real   indicatorValueWidth:   ScreenTools.defaultFontPixelWidth * 7
 
-    PlanMasterController {
-        id:                     _planController
-        flyView:                true
-        Component.onCompleted:  start()
-    }
-
-    property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
-    property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
-    property var    _missionController:     _planController.missionController
-    property var    _geoFenceController:    _planController.geoFenceController
-    property var    _rallyPointController:  _planController.rallyPointController
-    property real   _margins:               ScreenTools.defaultFontPixelWidth / 2
-    property var    _guidedController:      guidedActionsController
-    property var    _guidedActionList:      guidedActionList
-    property var    _guidedAltSlider:       guidedAltSlider
+    property real   _indicatorDiameter:     ScreenTools.defaultFontPixelWidth * 18
+    property real   _indicatorsHeight:      ScreenTools.defaultFontPixelHeight
+    property var    _sepColor:              qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(0,0,0,0.5) : Qt.rgba(1,1,1,0.5)
+    property color  _indicatorsColor:       qgcPal.text
+    property bool   _isVehicleGps:          _activeVehicle ? _activeVehicle.gps.count.rawValue > 1 && _activeVehicle.gps.hdop.rawValue < 1.4 : false
+    property string _altitude:              _activeVehicle ? (isNaN(_activeVehicle.altitudeRelative.value) ? "0.0" : _activeVehicle.altitudeRelative.value.toFixed(1)) + ' ' + _activeVehicle.altitudeRelative.units : "0.0"
+    property string _distanceStr:           isNaN(_distance) ? "0" : _distance.toFixed(0) + ' ' + QGroundControl.unitsConversion.appSettingsHorizontalDistanceUnitsString
+    property real   _heading:               _activeVehicle   ? _activeVehicle.heading.rawValue : 0
+    property real   _distance:              _activeVehicle ? _activeVehicle.distanceToHome.rawValue : 0
+    property string _messageTitle:          ""
+    property string _messageText:           ""
     property real   _toolsMargin:           ScreenTools.defaultFontPixelWidth * 0.75
-    property rect   _centerViewport:        Qt.rect(0, 0, width, height)
-    property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
-    property var    _mapControl:            mapControl
 
-    property real   _fullItemZorder:    0
-    property real   _pipItemZorder:     QGroundControl.zOrderWidgets
-
-    function _calcCenterViewPort() {
-        var newToolInset = Qt.rect(0, 0, width, height)
-        toolstrip.adjustToolInset(newToolInset)
-        if (QGroundControl.corePlugin.options.instrumentWidget) {
-            flightDisplayViewWidgets.adjustToolInset(newToolInset)
-        }
+    function secondsToHHMMSS(timeS) {
+        var sec_num = parseInt(timeS, 10);
+        var hours   = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+        if (hours   < 10) {hours   = "0"+hours;}
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) {seconds = "0"+seconds;}
+        return hours+':'+minutes+':'+seconds;
     }
 
     QGCToolInsets {
-        id:                     _toolInsets
-        leftEdgeBottomInset:    _pipOverlay.visible ? _pipOverlay.x + _pipOverlay.width : 0
-        bottomEdgeLeftInset:    _pipOverlay.visible ? parent.height - _pipOverlay.y : 0
+        id:                     _totalToolInsets
+        topEdgeCenterInset:     compassArrowIndicator.y + compassArrowIndicator.height
+        rightEdgeBottomInset:   parent.width - compassBackground.x
     }
 
-    FlyViewWidgetLayer {
-        id:                     widgetLayer
-        anchors.top:            parent.top
-        anchors.bottom:         parent.bottom
-        anchors.left:           parent.left
-        anchors.right:          guidedAltSlider.visible ? guidedAltSlider.left : parent.right
-        z:                      _fullItemZorder + 1
-        parentToolInsets:       _toolInsets
-        mapControl:             _mapControl
-        visible:                !QGroundControl.videoManager.fullScreen
-    }
-
-    FlyViewCustomLayer {
-        id:                 customOverlay
-        anchors.fill:       widgetLayer
-        z:                  _fullItemZorder + 2
-        parentToolInsets:   widgetLayer.totalToolInsets
-        mapControl:         _mapControl
-        visible:            !QGroundControl.videoManager.fullScreen
-    }
-
-    GuidedActionsController {
-        id:                 guidedActionsController
-        missionController:  _missionController
-        actionList:         _guidedActionList
-        altitudeSlider:     _guidedAltSlider
-    }
-
-    /*GuidedActionConfirm {
-        id:                         guidedActionConfirm
-        anchors.margins:            _margins
-        anchors.bottom:             parent.bottom
+    //-------------------------------------------------------------------------
+    //-- Heading Indicator
+    Rectangle {
+        id:                         compassBar
+        height:                     ScreenTools.defaultFontPixelHeight * 1.5
+        width:                      ScreenTools.defaultFontPixelWidth  * 50
+        color:                      "#DEDEDE"
+        radius:                     2
+        clip:                       true
+        anchors.top:                headingIndicator.bottom
+        anchors.topMargin:          -headingIndicator.height / 2
         anchors.horizontalCenter:   parent.horizontalCenter
-        z:                          QGroundControl.zOrderTopMost
-        guidedController:           _guidedController
-        altitudeSlider:             _guidedAltSlider
-    }*/
-
-    GuidedActionList {
-        id:                         guidedActionList
-        anchors.margins:            _margins
-        anchors.bottom:             parent.bottom
-        anchors.horizontalCenter:   parent.horizontalCenter
-        z:                          QGroundControl.zOrderTopMost
-        guidedController:           _guidedController
-    }
-
-    //-- Altitude slider
-    GuidedAltitudeSlider {
-        id:                 guidedAltSlider
-        anchors.margins:    _toolsMargin
-        anchors.right:      parent.right
-        anchors.top:        parent.top
-        anchors.bottom:     parent.bottom
-        z:                  QGroundControl.zOrderTopMost
-        radius:             ScreenTools.defaultFontPixelWidth / 2
-        width:              ScreenTools.defaultFontPixelWidth * 10
-        color:              qgcPal.window
-        visible:            false
-    }
-
-    FlyViewMap {
-        id:                     mapControl
-        planMasterController:   _planController
-        rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        pipMode:                !_mainWindowIsMap
-        toolInsets:             customOverlay.totalToolInsets
-        mapName:                "FlightDisplayView"
-    }
-
-    FlyViewVideo {
-        id: videoControl
-    }
-
-    QGCPipOverlay { //Retangulo da camera
-        id:                     _pipOverlay
-       anchors.left:           parent.left
-       anchors.bottom:         parent.bottom
-       anchors.margins:        _toolsMargin
-        item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
-        fullZOrder:             _fullItemZorder
-        pipZOrder:              _pipItemZorder
-        show:                   !QGroundControl.videoManager.fullScreen &&
-                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
-    }
-
-  /* Rectangle { //Circulo de exemplo pra evento de hover
-         id: motores
-         width: parent.width/10
-         height: parent.width/10
-         x: parent.width/2
-         y: parent.height/2
-         color: teste.containsMouse ? "green" : "red"
-         border.color: "black"
-         border.width: 1
-         radius: width*0.5
-
-
-
-         MouseArea {
-            id: teste
-            anchors.fill: motores
-            hoverEnabled: true
-         }
-
-    }*/
-
-    Text{
-        x: 500
-        y: 400
-        text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue
-        font.family: "Helvetica"
-        font.pointSize: 24
-        color: "red"
-    }
-
-
-    Rectangle{
-        id: area_info_sliders
-        x: parent.width - 205
-        y: 1.8 * (parent.height/3)
-        width: 200
-        height:200
-        color: "black"
-
-
+        Repeater {
+            model: 720
+            QGCLabel {
+                function _normalize(degrees) {
+                    var a = degrees % 360
+                    if (a < 0) a += 360
+                    return a
+                }
+                property int _startAngle: modelData + 180 + _heading
+                property int _angle: _normalize(_startAngle)
+                anchors.verticalCenter: parent.verticalCenter
+                x:              visible ? ((modelData * (compassBar.width / 360)) - (width * 0.5)) : 0
+                visible:        _angle % 45 == 0
+                color:          "#75505565"
+                font.pointSize: ScreenTools.smallFontPointSize
+                text: {
+                    switch(_angle) {
+                    case 0:     return "N"
+                    case 45:    return "NE"
+                    case 90:    return "E"
+                    case 135:   return "SE"
+                    case 180:   return "S"
+                    case 225:   return "SW"
+                    case 270:   return "W"
+                    case 315:   return "NW"
+                    }
+                    return ""
+                }
+            }
+        }
     }
     Rectangle {
-        id: slider_pitch
-        x: area_info_sliders.x + 5
-        y: area_info_sliders.y + 5
-        width: 50
-        height: area_info_sliders.height - 10
-        color: _activeVehicle.pitch.rawValue < 45 ? "green" : "red"
-
+        id:                         headingIndicator
+        height:                     ScreenTools.defaultFontPixelHeight
+        width:                      ScreenTools.defaultFontPixelWidth * 4
+        color:                      qgcPal.windowShadeDark
+        anchors.top:                parent.top
+        anchors.topMargin:          _toolsMargin
+        anchors.horizontalCenter:   parent.horizontalCenter
+        QGCLabel {
+            text:                   _heading
+            color:                  qgcPal.text
+            font.pointSize:         ScreenTools.smallFontPointSize
+            anchors.centerIn:       parent
+        }
+    }
+    Image {
+        id:                         compassArrowIndicator
+        height:                     _indicatorsHeight
+        width:                      height
+        source:                     "/custom/img/compass_pointer.svg"
+        fillMode:                   Image.PreserveAspectFit
+        sourceSize.height:          height
+        anchors.top:                compassBar.bottom
+        anchors.topMargin:          -height / 2
+        anchors.horizontalCenter:   parent.horizontalCenter
     }
 
+    Rectangle {
+        id:                     compassBackground
+        anchors.bottom:         attitudeIndicator.bottom
+        anchors.right:          attitudeIndicator.left
+        anchors.rightMargin:    -attitudeIndicator.width / 2
+        width:                  -anchors.rightMargin + compassBezel.width + (_toolsMargin * 2)
+        height:                 attitudeIndicator.height * 0.75
+        radius:                 2
+        color:                  qgcPal.window
 
-   Rectangle {
-        x: slider_pitch.x
-        y: slider_pitch.y
-        width: 50
-        height: 2*(_activeVehicle.pitch.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
-        color: "black"
+        Rectangle {
+            id:                     compassBezel
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin:     _toolsMargin
+            anchors.left:           parent.left
+            width:                  height
+            height:                 parent.height - (northLabelBackground.height / 2) - (headingLabelBackground.height / 2)
+            radius:                 height / 2
+            border.color:           qgcPal.text
+            border.width:           1
+            color:                  Qt.rgba(0,0,0,0)
+        }
 
-    }
+        Rectangle {
+            id:                         northLabelBackground
+            anchors.top:                compassBezel.top
+            anchors.topMargin:          -height / 2
+            anchors.horizontalCenter:   compassBezel.horizontalCenter
+            width:                      northLabel.contentWidth * 1.5
+            height:                     northLabel.contentHeight * 1.5
+            radius:                     ScreenTools.defaultFontPixelWidth  * 0.25
+            color:                      qgcPal.windowShade
 
-
-
-
-
-    QGCColoredImage {
-            id: monitor_motores
-            //x: (parent.width * 4)/5
-            anchors.right : parent.right
-            y: 160
-            width: 983 * 0.15
-            height: 857 * 0.15
-            color: white
-            source: "/res/QGCLogoWhite"
-
-            Rectangle {
-                id: motor1
-                x: monitor_motores.width * 0.8
-                y: monitor_motores.height * 0.44
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
-            }
-
-            Rectangle {
-                id: motor2
-                x: monitor_motores.width * 0.1
-                y: monitor_motores.height * 0.44
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
-            }
-
-            Rectangle {
-                id: motor3
-                x: monitor_motores.width * 0.28
-                y: monitor_motores.height * 0.1
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
-            }
-
-            Rectangle {
-                id: motor4
-                x: monitor_motores.width * 0.63
-                y: monitor_motores.height * 0.8
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
-            }
-
-            Rectangle {
-                id: motor5
-                x: monitor_motores.width * 0.63
-                y: monitor_motores.height * 0.1
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
-            }
-
-            Rectangle {
-                id: motor6
-                x: monitor_motores.width * 0.28
-                y: monitor_motores.height * 0.8
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
-                radius: width* 0.5
-                border.color: monitor_motores.color
-                border.width: 1
-                color: "green"
+            QGCLabel {
+                id:                 northLabel
+                anchors.centerIn:   parent
+                text:               "N"
+                color:              qgcPal.text
+                font.pointSize:     ScreenTools.smallFontPointSize
             }
         }
 
+        Image {
+            id:                 headingNeedle
+            anchors.centerIn:   compassBezel
+            height:             compassBezel.height * 0.75
+            width:              height
+            source:             "/custom/img/compass_needle.svg"
+            fillMode:           Image.PreserveAspectFit
+            sourceSize.height:  height
+            transform: [
+                Rotation {
+                    origin.x:   headingNeedle.width  / 2
+                    origin.y:   headingNeedle.height / 2
+                    angle:      _heading
+                }]
+        }
 
+        Rectangle {
+            id:                         headingLabelBackground
+            anchors.top:                compassBezel.bottom
+            anchors.topMargin:          -height / 2
+            anchors.horizontalCenter:   compassBezel.horizontalCenter
+            width:                      headingLabel.contentWidth * 1.5
+            height:                     headingLabel.contentHeight * 1.5
+            radius:                     ScreenTools.defaultFontPixelWidth  * 0.25
+            color:                      qgcPal.windowShade
 
+            QGCLabel {
+                id:                 headingLabel
+                anchors.centerIn:   parent
+                text:               _heading
+                color:              qgcPal.text
+                font.pointSize:     ScreenTools.smallFontPointSize
+            }
+        }
+    }
 
+    Rectangle {
+
+        id:                     attitudeIndicator //indicador de angulo
+        anchors.topMargin:   _toolsMargin
+        anchors.rightMargin:    _toolsMargin
+        anchors.top:         parent.top
+        anchors.right:          parent.right
+        height:                 ScreenTools.defaultFontPixelHeight * 8 //valor padrão: 6
+        width:                  height
+        radius:                 height * 0.5
+        color:                  qgcPal.windowShade
+
+        CustomAttitudeWidget {
+            size:               parent.height * 0.95
+            vehicle:            _activeVehicle
+            showHeading:        false
+            anchors.centerIn:   parent
+        }
+    }
 }
