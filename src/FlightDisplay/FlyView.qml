@@ -183,6 +183,50 @@ Item {
 
     }*/
 
+    Text{
+        x: 500
+        y: 400
+        text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue
+        font.family: "Helvetica"
+        font.pointSize: 24
+        color: "red"
+    }
+
+
+    Rectangle{
+        id: area_info_sliders
+        x: parent.width - 205
+        y: 1.8 * (parent.height/3)
+        width: 200
+        height:200
+        color: "black"
+
+
+    }
+    Rectangle {
+        id: slider_pitch
+        x: area_info_sliders.x + 5
+        y: area_info_sliders.y + 5
+        width: 50
+        height: area_info_sliders.height - 10
+        color: _activeVehicle.pitch.rawValue < 45 ? "green" : "red"
+
+    }
+
+
+   Rectangle {
+        x: slider_pitch.x
+        y: slider_pitch.y
+        width: 50
+        height: 2*(_activeVehicle.pitch.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+        color: "black"
+
+    }
+
+
+
+
+
     QGCColoredImage {
             id: monitor_motores
             //x: (parent.width * 4)/5
