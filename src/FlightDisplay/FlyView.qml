@@ -57,6 +57,8 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
+    property bool   _informacao_central :  false
+
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
 
@@ -135,32 +137,8 @@ Item {
         visible:            false
     }
 
-    FlyViewMap {
-        id:                     mapControl
-        planMasterController:   _planController
-        rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        pipMode:                !_mainWindowIsMap
-        toolInsets:             customOverlay.totalToolInsets
-        mapName:                "FlightDisplayView"
-    }
 
-    FlyViewVideo {
-        id: videoControl
-    }
 
-    QGCPipOverlay { //Retangulo da camera
-        id:                     _pipOverlay
-       anchors.left:           parent.left
-       anchors.bottom:         parent.bottom
-       anchors.margins:        _toolsMargin
-        item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
-        fullZOrder:             _fullItemZorder
-        pipZOrder:              _pipItemZorder
-        show:                   !QGroundControl.videoManager.fullScreen &&
-                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
-    }
 
   /* Rectangle { //Circulo de exemplo pra evento de hover
          id: motores
@@ -187,20 +165,13 @@ Item {
         x: 500
         y: 400
         //text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue
-        text: _activeVehicle.escSatusFactGroup.currentFirst.rawValue
+        text: _activeVehicle.pitch.rawValue
         font.family: "Helvetica"
         font.pointSize: 24
         color: "red"
     }
 
-    Rectangle{ //area pras informações na parte de baixo da tela
-        id: area_info_bottom
-        x: 0
-        y: parent.height*5/6
-        width: parent.width
-        height: parent.height*1/6
-        color: "#0A283F"
-    }
+
 
     Rectangle{ //area pras informações na direita da tela
         id: area_info_right
@@ -355,7 +326,76 @@ Item {
             }
         }
 
+    Rectangle {
+        id: area_mapa_camera
+        x: 0
+        y: 0
+        width: parent.width*7/8
+        height: parent.height*5/6
+        color: "transparent"
+    }
 
+    MouseArea {
+       id: teste
+       anchors.fill: area_info_right
+       hoverEnabled: true
+       onClicked: _informacao_central = !_informacao_central
+    }
+
+    FlyViewMap {
+        id:                     mapControl
+        planMasterController:   _planController
+       // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
+        x: area_mapa_camera.x
+        y: area_mapa_camera.y
+        width: area_mapa_camera.width
+        height: area_mapa_camera.height
+        pipMode:                !_mainWindowIsMap
+        //toolInsets:             customOverlay.totalToolInsets
+        mapName:                "FlightDisplayView"
+        visible: _informacao_central
+    }
+
+    FlyViewVideo {
+        id: videoControl
+        x: area_mapa_camera.x
+        y: area_mapa_camera.y
+        width: area_mapa_camera.width
+        height: area_mapa_camera.height
+        visible: !_informacao_central
+
+    }
+
+    Text {
+        x: mapControl.x
+        y: mapControl.y
+        text: "MOUSE NA AREA"
+        font.family: "Helvetica"
+        font.pointSize: 24
+        color: "red"
+        visible: teste.containsMouse ? false : true
+    }
+
+    /*QGCPipOverlay { //Retangulo da camera ou mapa, depende quem está centralizado (descobrir onde mexe em quem esta centralizado)
+        id:                     _pipOverlay
+       anchors.left:           parent.left
+       anchors.bottom:         parent.bottom
+       anchors.margins:        _toolsMargin
+       item1IsFullSettingsKey: "MainFlyWindowIsMap"
+        item1:                  mapControl
+        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        fullZOrder:             _fullItemZorder
+        pipZOrder:              _pipItemZorder
+       }*/
+
+    Rectangle{ //area pras informações na parte de baixo da tela
+        id: area_info_bottom
+        x: 0
+        y: parent.height*5/6
+        width: parent.width
+        height: parent.height*1/6
+        color: "#0A283F"
+    }
 
 
 }
