@@ -88,7 +88,7 @@ Item {
         visible:                !QGroundControl.videoManager.fullScreen
     }
 
-    FlyViewCustomLayer {
+    FlyViewCustomLayer {    //
         id:                 customOverlay
         anchors.fill:       widgetLayer
         z:                  _fullItemZorder + 2
@@ -161,10 +161,18 @@ Item {
 
     }*/
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+
+             TUDO DAQUI PRA BAIXO É COISA MINHA, PRA CIMA NÃO TEVE MUITA ALTERAÇÃO QUE EU ME LEMBRE 22/03/222
+
+    */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     Text{
         x: 500
         y: 400
-        //text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue
+        //text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
         text: _activeVehicle.pitch.rawValue
         font.family: "Helvetica"
         font.pointSize: 24
@@ -243,22 +251,21 @@ Item {
 
 
 
-    QGCColoredImage {
+    QGCColoredImage { //imagem do drone com os rotores
             id: monitor_motores
-            //x: (parent.width * 4)/5
-            anchors.right : parent.right
-            y: 160
-            width: 983 * 0.15
-            height: 857 * 0.15
+            x: area_info_right.x
+            y: area_info_right.y
+            width: area_info_right.width
+            height: area_info_right.height*1/5
             color: white
             source: "/res/QGCLogoWhite"
 
             Rectangle {
                 id: motor1
-                x: monitor_motores.width * 0.8
+                x: monitor_motores.width * 0.73
                 y: monitor_motores.height * 0.44
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -267,10 +274,10 @@ Item {
 
             Rectangle {
                 id: motor2
-                x: monitor_motores.width * 0.1
+                x: monitor_motores.width * 0.2
                 y: monitor_motores.height * 0.44
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -279,10 +286,10 @@ Item {
 
             Rectangle {
                 id: motor3
-                x: monitor_motores.width * 0.28
+                x: monitor_motores.width * 0.33
                 y: monitor_motores.height * 0.1
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -291,10 +298,10 @@ Item {
 
             Rectangle {
                 id: motor4
-                x: monitor_motores.width * 0.63
+                x: monitor_motores.width * 0.6
                 y: monitor_motores.height * 0.8
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -303,10 +310,10 @@ Item {
 
             Rectangle {
                 id: motor5
-                x: monitor_motores.width * 0.63
+                x: monitor_motores.width * 0.6
                 y: monitor_motores.height * 0.1
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -315,10 +322,10 @@ Item {
 
             Rectangle {
                 id: motor6
-                x: monitor_motores.width * 0.28
+                x: monitor_motores.width * 0.33
                 y: monitor_motores.height * 0.8
-                width: monitor_motores.width/10
-                height: monitor_motores.width/10
+                width: monitor_motores.width/15
+                height: monitor_motores.width/15
                 radius: width* 0.5
                 border.color: monitor_motores.color
                 border.width: 1
@@ -326,7 +333,7 @@ Item {
             }
         }
 
-    Rectangle {
+    Rectangle { //AREA ONDE O MAPA OU O VIDEO APARECE
         id: area_mapa_camera
         x: 0
         y: 0
@@ -335,46 +342,48 @@ Item {
         color: "transparent"
     }
 
-    MouseArea {
-       id: teste
-       anchors.fill: area_info_right
-       hoverEnabled: true
-       onClicked: _informacao_central = !_informacao_central
-    }
+        MouseArea {
+           id: teste
+           anchors.fill: area_info_right
+           hoverEnabled: true
+           onClicked: _informacao_central = !_informacao_central
+        }
 
-    FlyViewMap {
-        id:                     mapControl
-        planMasterController:   _planController
-       // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        x: area_mapa_camera.x
-        y: area_mapa_camera.y
-        width: area_mapa_camera.width
-        height: area_mapa_camera.height
-        pipMode:                !_mainWindowIsMap
-        //toolInsets:             customOverlay.totalToolInsets
-        mapName:                "FlightDisplayView"
-        visible: _informacao_central
-    }
+        FlyViewMap { //mapa
+            id:                     mapControl
+            planMasterController:   _planController
+           // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
+            x: area_mapa_camera.x
+            y: area_mapa_camera.y
+            width: area_mapa_camera.width
+            height: area_mapa_camera.height
+            pipMode:                !_mainWindowIsMap
+            //toolInsets:             customOverlay.totalToolInsets
+            mapName:                "FlightDisplayView"
+            visible: _informacao_central
+        }
 
-    FlyViewVideo {
-        id: videoControl
-        x: area_mapa_camera.x
-        y: area_mapa_camera.y
-        width: area_mapa_camera.width
-        height: area_mapa_camera.height
-        visible: !_informacao_central
+        FlyViewVideo { //video
+            id: videoControl
+            x: area_mapa_camera.x
+            y: area_mapa_camera.y
+            width: area_mapa_camera.width
+            height: area_mapa_camera.height
+            visible: !_informacao_central
+        }
 
-    }
+        Text {
+            x: mapControl.x +300
+            y: mapControl.y
+            text: _activeVehicle.heading.rawValue //"MOUSE NA AREA" //(_activeVehicle.batteries.get(0).percentRemaining.valueString) assim que consigo acesso as baterias, .valueString pega FACT e transforma em string [ver FactControls]
+            font.family: "Helvetica"
+            font.pointSize: 24
+            color: "#80FF0000"
+            visible: true
 
-    Text {
-        x: mapControl.x
-        y: mapControl.y
-        text: "MOUSE NA AREA"
-        font.family: "Helvetica"
-        font.pointSize: 24
-        color: "red"
-        visible: teste.containsMouse ? false : true
-    }
+        }
+
+
 
     /*QGCPipOverlay { //Retangulo da camera ou mapa, depende quem está centralizado (descobrir onde mexe em quem esta centralizado)
         id:                     _pipOverlay
@@ -396,6 +405,19 @@ Item {
         height: parent.height*1/6
         color: "#0A283F"
     }
+
+    Rectangle{
+        id: area_direção
+        x: area_info_bottom.width/2 - area_info_bottom.width/5
+        y: area_info_bottom.y - 30
+        width: area_info_bottom.width*2/5
+        height: area_info_bottom.height + 30
+        color: "gray"
+        border.color: area_info_bottom.color
+        border.width: 5
+    }
+
+
 
 
 }
