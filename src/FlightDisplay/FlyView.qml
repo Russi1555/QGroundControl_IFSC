@@ -173,7 +173,7 @@ Item {
         x: 500
         y: 400
         //text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
-        text: _activeVehicle.pitch.rawValue
+       // text: _activeVehicle.pitch.rawValue
         font.family: "Helvetica"
         font.pointSize: 24
         color: "red"
@@ -237,7 +237,7 @@ Item {
                      color: "black"
 
                  }
-
+/*
        Text {
            anchors.horizontalCenter: slider_pitch.horizontalCenter
            y:slider_pitch.y + slider_pitch.height - 1
@@ -246,7 +246,7 @@ Item {
            font.pointSize: 11
            color: "white"
        }
-
+*/
 
 
 
@@ -346,7 +346,7 @@ Item {
            id: teste
            anchors.fill: area_info_right
            hoverEnabled: true
-           onClicked: _informacao_central = !_informacao_central
+           onClicked: _informacao_central = !_informacao_central // console.log(_activeVehicle.escStatus.rpmFirst.valueString)
         }
 
         FlyViewMap { //mapa
@@ -375,7 +375,7 @@ Item {
         Text {
             x: mapControl.x +300
             y: mapControl.y
-            text: _activeVehicle.heading.rawValue //"MOUSE NA AREA" //(_activeVehicle.batteries.get(0).percentRemaining.valueString) assim que consigo acesso as baterias, .valueString pega FACT e transforma em string [ver FactControls]
+           // text: _activeVehicle.heading.rawValue //"MOUSE NA AREA" //(_activeVehicle.batteries.get(0).percentRemaining.valueString) assim que consigo acesso as baterias, .valueString pega FACT e transforma em string [ver FactControls]
             font.family: "Helvetica"
             font.pointSize: 24
             color: "#80FF0000"
@@ -407,7 +407,7 @@ Item {
     }
 
     Rectangle{
-        id: area_direção
+        id: area_info_bottom_central
         x: area_info_bottom.width/2 - area_info_bottom.width/5
         y: area_info_bottom.y - 30
         width: area_info_bottom.width*2/5
@@ -415,6 +415,43 @@ Item {
         color: "gray"
         border.color: area_info_bottom.color
         border.width: 5
+    }
+    Item {
+        Rectangle {
+            id: circulo_1
+            width: area_info_bottom_central.height*5/6
+            height: area_info_bottom_central.height*5/6
+            x: area_info_bottom_central.x + area_info_bottom_central.width/2 - circulo_1.width/2
+            y: area_info_bottom_central.y + area_info_bottom_central.height/8
+            color: "black"
+            border.color: area_info_bottom_central.color
+            border.width: 1
+            radius: width*0.5
+        }
+
+        QGCColoredImage { //imagem do drone com os rotores
+                id: bussola_geral
+                x: area_info_bottom_central.x
+                y: area_info_bottom_central.y + area_info_bottom_central.height/8
+                width: area_info_bottom_central.width
+                height: area_info_bottom_central.height*5/6
+                rotation: _activeVehicle.heading.rawValue
+                color: "white"
+                source: "/res/Compass_360.svg"
+    }
+        QGCColoredImage {
+                id: ponteiro_bussola
+                /*anchors.horizontalCenter: bussola_geral.horizontalCenter
+                anchors.verticalCenter: bussola_geral.verticalCenter*/
+                width: bussola_geral.height/2
+                height: bussola_geral.height/2
+                x: bussola_geral.x + bussola_geral.width/2 - ponteiro_bussola.width/2
+                y: bussola_geral.y + bussola_geral.height/2 - ponteiro_bussola.width/2
+                color: "white"
+                source: "/res/airplane_compass.svg"
+                }
+
+
     }
 
 
