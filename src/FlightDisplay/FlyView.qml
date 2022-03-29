@@ -188,9 +188,9 @@ Item {
         width: parent.width*1/8
         height: parent.height*5/6
         color: "#0A283F"
-
-
     }
+
+
         Rectangle { //area para as informações em sliders
             id: area_info_sliders
             x: area_info_right.x
@@ -339,29 +339,21 @@ Item {
         y: 0
         width: parent.width*7/8
         height: parent.height*5/6
-        color: "transparent"
+        color: "transparent"        
     }
+
+
 
         MouseArea {
            id: teste
            anchors.fill: area_info_right
            hoverEnabled: true
-           onClicked: _informacao_central = !_informacao_central // console.log(_activeVehicle.escStatus.rpmFirst.valueString)
+           onClicked: _informacao_central = !_informacao_central // console.log(_activeVehicle.escStatus.currentFirst.valueString)
         }
 
-        FlyViewMap { //mapa
-            id:                     mapControl
-            planMasterController:   _planController
-           // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-            x: area_mapa_camera.x
-            y: area_mapa_camera.y
-            width: area_mapa_camera.width
-            height: area_mapa_camera.height
-            pipMode:                !_mainWindowIsMap
-            //toolInsets:             customOverlay.totalToolInsets
-            mapName:                "FlightDisplayView"
-            visible: _informacao_central
-        }
+
+Item{
+    visible: !_informacao_central
 
         FlyViewVideo { //video
             id: videoControl
@@ -371,6 +363,96 @@ Item {
             height: area_mapa_camera.height
             visible: !_informacao_central
         }
+
+        Item{
+            QGCColoredImage { //crosshair no centro da camera
+                    id: crosshair_central
+                    width: area_mapa_camera.width/10
+                    height: area_mapa_camera.width/10
+                    x: area_mapa_camera.width/2 - width/2
+                    y: area_mapa_camera.height/2 -height/2 + _activeVehicle.pitch.rawValue/2
+                    color: "#A0009900"
+                    source: "/res/crossHair_res.svg"
+                    rotation: _activeVehicle.roll.rawValue
+            }
+
+            Rectangle{//circulo ao redor do crosshair
+                id: borda_crosshair
+                width: area_mapa_camera.width/8
+                height: area_mapa_camera.width/8
+                x: area_mapa_camera.width/2 - width/2
+                y: area_mapa_camera.height/2 - height/2
+                color: "transparent"
+                border.color: "#A0007700"
+                border.width: 2
+                radius: width*0.5
+            }
+
+        }
+         Item {
+            Rectangle{
+                id: coluna_altitude_baro
+                y: borda_crosshair.y - borda_crosshair.height/2
+                x: borda_crosshair.x - borda_crosshair.width/4
+                width: 3
+                height: borda_crosshair.height*2
+                color: "#A0007700"
+            }
+            Text{ //valor máximo permitido para o voo
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "#A0007700"
+                text: "MAX_ALT"
+                x: coluna_altitude_baro.x - 70
+                y: coluna_altitude_baro.y - font.pointSize/2
+
+            }
+
+            Text{ //valor minimo permitido para o voo
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "#A0007700"
+                text: "MIN_ALT"
+                x: coluna_altitude_baro.x - 70
+                y: coluna_altitude_baro.y + coluna_altitude_baro.height - font.pointSize/2
+
+            }
+
+            Text{ //altitude barométrica
+                id: pointer_alt_baro
+                font.family: "Helvetica"
+                font.pointSize: 18
+                color: "#A0007700"
+                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.altitudeAMSL.rawValue/50) //assumindo MAX_ALT = 50
+                x: borda_crosshair.x - borda_crosshair.width*0.66
+                text: _activeVehicle.altitudeAMSL.valueString + "m"
+                visible: true
+            }
+
+            Rectangle{
+                width: 10
+                height: 5
+                x: coluna_altitude_baro.x - width
+                y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
+                color: pointer_alt_baro.color
+            }
+
+        }
+
+
+
+       /* Rectangle{
+            width:50
+            height:50
+            x: area_mapa_camera.width/2 -width/2
+            y: area_mapa_camera.height/2 -height/2
+            color: "#A0007700"
+            rotation: _activeVehicle.roll.rawValue
+        }*/
+
+
+ }
+
 
         Text {
             x: mapControl.x +300
@@ -429,29 +511,44 @@ Item {
             radius: width*0.5
         }
 
-        QGCColoredImage { //imagem do drone com os rotores
-                id: bussola_geral
-                x: area_info_bottom_central.x
-                y: area_info_bottom_central.y + area_info_bottom_central.height/8
-                width: area_info_bottom_central.width
-                height: area_info_bottom_central.height*5/6
-                rotation: _activeVehicle.heading.rawValue
-                color: "white"
-                source: "/res/Compass_360.svg"
+        Item{
+            QGCColoredImage { //imagem do drone com os rotores
+                    id: bussola_geral
+                    x: area_info_bottom_central.x
+                    y: area_info_bottom_central.y + area_info_bottom_central.height/8
+                    width: area_info_bottom_central.width
+                    height: area_info_bottom_central.height*5/6
+                    rotation: _activeVehicle.heading.rawValue
+                    color: "white"
+                    source: "/res/Compass_360.svg"
+                    }
+            QGCColoredImage {
+                    id: ponteiro_bussola
+                    /*anchors.horizontalCenter: bussola_geral.horizontalCenter
+                    anchors.verticalCenter: bussola_geral.verticalCenter*/
+                    width: bussola_geral.height/2
+                    height: bussola_geral.height/2
+                    x: bussola_geral.x + bussola_geral.width/2 - ponteiro_bussola.width/2
+                    y: bussola_geral.y + bussola_geral.height/2 - ponteiro_bussola.width/2
+                    color: "white"
+                    source: "/res/airplane_compass.svg"
+                    }
+        }
+
     }
-        QGCColoredImage {
-                id: ponteiro_bussola
-                /*anchors.horizontalCenter: bussola_geral.horizontalCenter
-                anchors.verticalCenter: bussola_geral.verticalCenter*/
-                width: bussola_geral.height/2
-                height: bussola_geral.height/2
-                x: bussola_geral.x + bussola_geral.width/2 - ponteiro_bussola.width/2
-                y: bussola_geral.y + bussola_geral.height/2 - ponteiro_bussola.width/2
-                color: "white"
-                source: "/res/airplane_compass.svg"
-                }
 
-
+    FlyViewMap { //mapa
+        id:                     mapControl
+        planMasterController:   _planController
+       // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        width: area_info_bottom.width*0.3
+        height: area_info_bottom.height*7/3
+        pipMode:                !_mainWindowIsMap
+        //toolInsets:             customOverlay.totalToolInsets
+        mapName:                "FlightDisplayView"
+        visible: true
     }
 
 
