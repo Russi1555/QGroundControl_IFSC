@@ -190,6 +190,17 @@ Item {
         color: "#0A283F"
     }
 
+    Text {
+        x: area_info_right.x + 30
+        y: area_info_right.y + 400
+        text: "AREA PARA MAIS INFO"
+        font.family: "Helvetica"
+        font.pointSize: 12
+        color: "white"
+    }
+
+    Item{
+
 
         Rectangle { //area para as informações em sliders
             id: area_info_sliders
@@ -201,18 +212,18 @@ Item {
         }
 
             Rectangle { // exemplo de slide, pitch não é um valor relevante para um slider mas é um fácil de se testar em laboratório
-                id: slider_pitch
-                x: area_info_sliders.x + area_info_sliders.width*1/11
+                id: slider_0
+                x: area_info_sliders.x + area_info_sliders.width*1/14
                 y: area_info_sliders.y + area_info_sliders.width*1/11
-                width: area_info_sliders.width/11 //estou usando isso como tamanho e espaçamento dos sliders
+                width: area_info_sliders.width/14 //estou usando isso como tamanho e espaçamento dos sliders
                 height: area_info_sliders.height - 20
                 color: _activeVehicle.pitch.rawValue < 45 ? "green" : "red"
 
             }
 
                Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
-                    x: slider_pitch.x
-                    y: slider_pitch.y
+                    x: slider_0.x
+                    y: slider_0.y
                     width: slider_pitch.width
                     height: 2*(_activeVehicle.pitch.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                     color: "black"
@@ -220,23 +231,110 @@ Item {
                 }
 
             Rectangle {
-                id: slider_roll
-                anchors.top: slider_pitch.top
-                anchors.left: slider_pitch.right
+                id: slider_1
+                anchors.top: slider_0.top
+                anchors.left: slider_0.right
                 anchors.leftMargin: area_info_sliders.width/11
-                width: slider_pitch.width
-                height: slider_pitch.height
-                color: "red"
+                width: slider_0.width
+                height: slider_0.height
+                color: "Green"
             }
 
                 Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
-                     x: slider_roll.x
-                     y: slider_roll.y
-                     width: slider_roll.width
+                     x: slider_1.x
+                     y: slider_1.y
+                     width: slider_1.width
                      height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                      color: "black"
 
                  }
+
+                Rectangle {
+                    id: slider_2
+                    anchors.top: slider_1.top
+                    anchors.left: slider_1.right
+                    anchors.leftMargin: area_info_sliders.width/11
+                    width: slider_1.width
+                    height: slider_1.height
+                    color: "Green"
+                }
+
+                    Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
+                         x: slider_2.x
+                         y: slider_2.y
+                         width: slider_2.width
+                         height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                         color: "black"
+
+                     }
+                    Rectangle {
+                        id: slider_3
+                        anchors.top: slider_2.top
+                        anchors.left: slider_2.right
+                        anchors.leftMargin: area_info_sliders.width/11
+                        width: slider_2.width
+                        height: slider_2.height
+                        color: "Green"
+                    }
+
+                        Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
+                             x: slider_3.x
+                             y: slider_3.y
+                             width: slider_3.width
+                             height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                             color: "black"
+
+                         }
+
+                        Rectangle {
+                            id: slider_4
+                            anchors.top: slider_3.top
+                            anchors.left: slider_3.right
+                            anchors.leftMargin: area_info_sliders.width/11
+                            width: slider_3.width
+                            height: slider_3.height
+                            color: "Green"
+                        }
+
+                            Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
+                                 x: slider_4.x
+                                 y: slider_4.y
+                                 width: slider_4.width
+                                 height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                 color: "black"
+
+                             }
+                            Rectangle {
+                                id: slider_5
+                                anchors.top: slider_4.top
+                                anchors.left: slider_4.right
+                                anchors.leftMargin: area_info_sliders.width/11
+                                width: slider_4.width
+                                height: slider_4.height
+                                color: "Green"
+                            }
+
+                                Rectangle { // cresce ou diminui conforme o valor do slider acima para fazer a barra diminuir ou aumentar
+                                     x: slider_5.x
+                                     y: slider_5.y
+                                     width: slider_5.width
+                                     height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                     color: "black"
+
+                                 }
+
+                                Text{
+                                    text: "CORRENTE EM CADA MOTOR"
+                                    font.family: "Helvetica"
+                                    font.pointSize: 12
+                                    color: "white"
+                                    x: slider_0.x
+                                    y: slider_0.y + slider_0.height/2 - font.pointSize
+                                   // text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
+                                   // text: _activeVehicle.pitch.rawValue
+
+                                }
+              }
 /*
        Text {
            anchors.horizontalCenter: slider_pitch.horizontalCenter
@@ -388,11 +486,21 @@ Item{
                 radius: width*0.5
             }
 
+            Text{ //valor máximo permitido para o voo
+                font.family: "Helvetica"
+                font.pointSize: 24
+                color: "#A0007700"
+                text: _activeVehicle.throttlePct.rawValue
+                x: borda_crosshair.x + 200
+                y: coluna_altitude_baro.y - font.pointSize/2
+
+            }
+
         }
-         Item {
+         Item { //COLUNA DIREITA DO HUD
             Rectangle{
                 id: coluna_altitude_baro
-                y: borda_crosshair.y - borda_crosshair.height/2
+                y:  borda_crosshair.y - borda_crosshair.height/2
                 x: borda_crosshair.x - borda_crosshair.width/4
                 width: 3
                 height: borda_crosshair.height*2
@@ -426,6 +534,56 @@ Item{
                 y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.altitudeAMSL.rawValue/50) //assumindo MAX_ALT = 50
                 x: borda_crosshair.x - borda_crosshair.width*0.66
                 text: _activeVehicle.altitudeAMSL.valueString + "m"
+                visible: true
+            }
+
+            Rectangle{
+                width: 10
+                height: 5
+                x: coluna_altitude_baro.x - width
+                y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
+                color: pointer_alt_baro.color
+            }
+
+        }
+
+         Item { //COLUNA ESQUERDA DO HUD
+            Rectangle{
+                id: coluna_velocidade_vertical
+                y:  borda_crosshair.y - borda_crosshair.height/2
+                x: borda_crosshair.x + borda_crosshair.width*1.25
+                width: 3
+                height: borda_crosshair.height*2
+                color: "#A0007700"
+            }
+            Text{ //valor máximo permitido para o voo
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "#A0007700"
+                text: "MAX_VEL"
+                x: coluna_velocidade_vertical.x + 10
+                y: coluna_velocidade_vertical.y - font.pointSize/2
+
+            }
+
+            Text{ //valor minimo permitido para o voo
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "#A0007700"
+                text: "MIN_VEL"
+                x: coluna_velocidade_vertical.x + 10
+                y: coluna_velocidade_vertical.y + coluna_velocidade_vertical.height - font.pointSize/2
+
+            }
+
+            Text{ //altitude barométrica
+                id: pointer_velocidade_vertical
+                font.family: "Helvetica"
+                font.pointSize: 18
+                color: "#A0007700"
+                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.climbRate.rawValue/50) //assumindo MAX_VEL = 10
+                x: borda_crosshair.x + borda_crosshair.width*1.33
+                text: _activeVehicle.climbRate.valueString + "m/s"
                 visible: true
             }
 
@@ -486,6 +644,15 @@ Item{
         width: parent.width
         height: parent.height*1/6
         color: "#0A283F"
+    }
+
+    Text {
+        x: area_info_bottom.width - 450
+        y: area_info_bottom.y + 50
+        text: "AREA PARA MAIS INFO"
+        font.family: "Helvetica"
+        font.pointSize: 24
+        color: "white"
     }
 
     Rectangle{
