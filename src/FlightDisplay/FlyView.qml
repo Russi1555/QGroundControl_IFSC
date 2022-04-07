@@ -199,7 +199,7 @@ Item {
         color: "white"
     }
 
-    Item{
+    Item{ //Sliders de corrente individual
 
 
         Rectangle { //area para as informações em sliders
@@ -225,7 +225,7 @@ Item {
                     x: slider_0.x
                     y: slider_0.y
                     width: slider_pitch.width
-                    height: 2*(_activeVehicle.pitch.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                    height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                     color: "black"
 
                 }
@@ -244,7 +244,7 @@ Item {
                      x: slider_1.x
                      y: slider_1.y
                      width: slider_1.width
-                     height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                     height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                      color: "black"
 
                  }
@@ -263,7 +263,7 @@ Item {
                          x: slider_2.x
                          y: slider_2.y
                          width: slider_2.width
-                         height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                         height: Math.abs(2*(_activeVehicle.roll.rawValue) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
                          color: "black"
 
                      }
@@ -281,7 +281,7 @@ Item {
                              x: slider_3.x
                              y: slider_3.y
                              width: slider_3.width
-                             height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                             height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                              color: "black"
 
                          }
@@ -300,7 +300,7 @@ Item {
                                  x: slider_4.x
                                  y: slider_4.y
                                  width: slider_4.width
-                                 height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                 height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                                  color: "black"
 
                              }
@@ -318,7 +318,7 @@ Item {
                                      x: slider_5.x
                                      y: slider_5.y
                                      width: slider_5.width
-                                     height: 2*(_activeVehicle.roll.rawValue) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                     height: Math.abs(2*(_activeVehicle.roll.rawValue) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
                                      color: "black"
 
                                  }
@@ -348,7 +348,7 @@ Item {
 
 
 
-
+ Item{ //area do desenho do drone
     QGCColoredImage { //imagem do drone com os rotores
             id: monitor_motores
             x: area_info_right.x
@@ -430,8 +430,9 @@ Item {
                 color: "green"
             }
         }
+   }
 
-    Rectangle { //AREA ONDE O MAPA OU O VIDEO APARECE
+    Rectangle { //AREA ONDE O VIDEO APARECE
         id: area_mapa_camera
         x: 0
         y: 0
@@ -446,7 +447,7 @@ Item {
            id: teste
            anchors.fill: area_info_right
            hoverEnabled: true
-           onClicked: _informacao_central = !_informacao_central // console.log(_activeVehicle.escStatus.currentFirst.valueString)
+           onClicked: console.log("Alt AMSL: "+_activeVehicle.altitudeRelative.rawValue + "|| Velocidade Vertical: " + _activeVehicle.climbRate.rawValue + "||" + _activeVehicle.motorCount) //  _informacao_central = !_informacao_central
         }
 
 
@@ -469,7 +470,7 @@ Item{
                     height: area_mapa_camera.width/10
                     x: area_mapa_camera.width/2 - width/2
                     y: area_mapa_camera.height/2 -height/2 + _activeVehicle.pitch.rawValue/2
-                    color: "#A0009900"
+                    color: "white"
                     source: "/res/crossHair_res.svg"
                     rotation: _activeVehicle.roll.rawValue
             }
@@ -481,20 +482,23 @@ Item{
                 x: area_mapa_camera.width/2 - width/2
                 y: area_mapa_camera.height/2 - height/2
                 color: "transparent"
-                border.color: "#A0007700"
+                border.color: crosshair_central.color
                 border.width: 2
                 radius: width*0.5
             }
 
-            Text{ //valor máximo permitido para o voo
+            Text{ //para teste de valores (se da 0 ou ta desligado ou provavelmente não temos como realizar essa medição ainda)
                 font.family: "Helvetica"
                 font.pointSize: 24
-                color: "#A0007700"
+                color: crosshair_central.color
                 text: _activeVehicle.throttlePct.rawValue
                 x: borda_crosshair.x + 200
                 y: coluna_altitude_baro.y - font.pointSize/2
+                visible: false
 
             }
+
+
 
         }
          Item { //COLUNA DIREITA DO HUD
@@ -504,12 +508,12 @@ Item{
                 x: borda_crosshair.x - borda_crosshair.width/4
                 width: 3
                 height: borda_crosshair.height*2
-                color: "#A0007700"
+                color: "white"
             }
             Text{ //valor máximo permitido para o voo
                 font.family: "Helvetica"
                 font.pointSize: 12
-                color: "#A0007700"
+                color: coluna_altitude_baro.color
                 text: "MAX_ALT"
                 x: coluna_altitude_baro.x - 70
                 y: coluna_altitude_baro.y - font.pointSize/2
@@ -519,7 +523,7 @@ Item{
             Text{ //valor minimo permitido para o voo
                 font.family: "Helvetica"
                 font.pointSize: 12
-                color: "#A0007700"
+                color: coluna_altitude_baro.color
                 text: "MIN_ALT"
                 x: coluna_altitude_baro.x - 70
                 y: coluna_altitude_baro.y + coluna_altitude_baro.height - font.pointSize/2
@@ -530,11 +534,11 @@ Item{
                 id: pointer_alt_baro
                 font.family: "Helvetica"
                 font.pointSize: 18
-                color: "#A0007700"
-                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.altitudeAMSL.rawValue/50) //assumindo MAX_ALT = 50
+                color: coluna_altitude_baro.color
+                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.altitudeRelative.rawValue/50) //assumindo MAX_ALT = 50
                 x: borda_crosshair.x - borda_crosshair.width*0.66
-                text: _activeVehicle.altitudeAMSL.valueString + "m"
-                visible: true
+                text: _activeVehicle.altitudeRelative.valueString + "m"
+                visible: _activeVehicle.altitudeRelative.rawValue === "NaN" ? false : true
             }
 
             Rectangle{
@@ -543,6 +547,7 @@ Item{
                 x: coluna_altitude_baro.x - width
                 y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
                 color: pointer_alt_baro.color
+                visible: pointer_alt_baro.visible
             }
 
         }
@@ -554,12 +559,12 @@ Item{
                 x: borda_crosshair.x + borda_crosshair.width*1.25
                 width: 3
                 height: borda_crosshair.height*2
-                color: "#A0007700"
+                color: "white"
             }
             Text{ //valor máximo permitido para o voo
                 font.family: "Helvetica"
                 font.pointSize: 12
-                color: "#A0007700"
+                color: coluna_velocidade_vertical.color
                 text: "MAX_VEL"
                 x: coluna_velocidade_vertical.x + 10
                 y: coluna_velocidade_vertical.y - font.pointSize/2
@@ -569,7 +574,7 @@ Item{
             Text{ //valor minimo permitido para o voo
                 font.family: "Helvetica"
                 font.pointSize: 12
-                color: "#A0007700"
+                color: coluna_velocidade_vertical.color
                 text: "MIN_VEL"
                 x: coluna_velocidade_vertical.x + 10
                 y: coluna_velocidade_vertical.y + coluna_velocidade_vertical.height - font.pointSize/2
@@ -580,19 +585,20 @@ Item{
                 id: pointer_velocidade_vertical
                 font.family: "Helvetica"
                 font.pointSize: 18
-                color: "#A0007700"
+                color: coluna_velocidade_vertical.color
                 y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.climbRate.rawValue/50) //assumindo MAX_VEL = 10
                 x: borda_crosshair.x + borda_crosshair.width*1.33
                 text: _activeVehicle.climbRate.valueString + "m/s"
-                visible: true
+                visible: _activeVehicle.climbRate === 0 ?   false:true
             }
 
             Rectangle{
                 width: 10
                 height: 5
-                x: coluna_altitude_baro.x - width
-                y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
+                x: coluna_velocidade_vertical.x
+                y: pointer_velocidade_vertical.y +pointer_velocidade_vertical.font.pointSize
                 color: pointer_alt_baro.color
+                visible: pointer_velocidade_vertical.visible
             }
 
         }
@@ -687,6 +693,7 @@ Item{
                     height: area_info_bottom_central.height*5/6
                     rotation: _activeVehicle.heading.rawValue
                     color: "white"
+                    mirror: true
                     source: "/res/Compass_360.svg"
                     }
             QGCColoredImage {
@@ -716,6 +723,19 @@ Item{
         //toolInsets:             customOverlay.totalToolInsets
         mapName:                "FlightDisplayView"
         visible: true
+    }
+
+
+    Text {
+
+        text: _activeVehicle.motorCount
+        font.family: "Helvetica"
+        font.pointSize: 24
+        x: monitor_motores.x + monitor_motores.width/2 - font.pointSize/2
+        y: monitor_motores.y + monitor_motores.height/2 - font.pointSize
+        color: "#00FF00"
+        visible: true
+
     }
 
 
