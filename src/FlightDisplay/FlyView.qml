@@ -206,6 +206,7 @@ Item {
             id: area_info_sliders
             x: area_info_right.x
             y: area_info_right.height*3/4
+            z:1
             color: "transparent"
             width: area_info_right.width
             height: area_info_right.height/4
@@ -443,184 +444,6 @@ Item {
 
 
 
-        MouseArea {
-           id: teste
-           anchors.fill: area_info_right
-           hoverEnabled: true
-           onClicked : {
-               console.log("Alt AMSL: "+_activeVehicle.altitudeRelative.rawValue + "|| Velocidade Vertical: " + _activeVehicle.climbRate.rawValue + "||" + _activeVehicle.motorCount)
-               _informacao_central = !_informacao_central
-           }
-        }
-
-
-Item{
-    //visible: !_informacao_central
-
-        FlyViewVideo { //video da camera
-            id: videoControl
-            x: area_mapa_camera.x
-            y: area_mapa_camera.y
-            width: !_informacao_central ? area_mapa_camera.width : area_info_bottom.width*0.3
-            height:!_informacao_central ?area_mapa_camera.height : area_info_bottom.height
-            //visible: !_informacao_central
-        }
-
-        Item{
-            QGCColoredImage { //crosshair no centro da camera
-                    id: crosshair_central
-                    width: videoControl.width/10
-                    height: videoControl.width/10
-                    x: videoControl.width/2 - width/2
-                    y: videoControl.height/2 -height/2 + _activeVehicle.pitch.rawValue/2
-                    color: "#00FF00"
-                    source: "/res/crossHair_res.svg"
-                    rotation: _activeVehicle.roll.rawValue
-            }
-
-            Rectangle{//circulo ao redor do crosshair
-                id: borda_crosshair
-                width: videoControl.width/8
-                height: videoControl.width/8
-                x: videoControl.width/2 - width/2
-                y: videoControl.height/2 - height/2
-                color: "transparent"
-                border.color: crosshair_central.color
-                border.width: 2
-                radius: width*0.5
-            }
-
-            Text{ //para teste de valores (se da 0 ou ta desligado ou provavelmente não temos como realizar essa medição ainda)
-                font.family: "Helvetica"
-                font.pointSize: 24
-                color: crosshair_central.color
-                text: _activeVehicle.throttlePct.rawValue
-                x: borda_crosshair.x + 200
-                y: coluna_vel_vert.y - font.pointSize/2
-                visible: false
-
-            }
-
-
-
-        }
-         Item { //COLUNA DIREITA DO HUD
-            Rectangle{
-                id: coluna_vel_vert
-                y:  borda_crosshair.y - borda_crosshair.height/2
-                x: borda_crosshair.x - borda_crosshair.width/4
-                width: 3
-                height: borda_crosshair.height*2
-                color: crosshair_central.color
-            }
-            Text{ //valor máximo permitido para o voo
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: coluna_vel_vert.color
-                text: "MAX_VEL"
-                x: coluna_vel_vert.x - 70
-                y: coluna_vel_vert.y - font.pointSize/2
-
-            }
-
-            Text{ //valor minimo permitido para o voo
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: coluna_vel_vert.color
-                text: "MIN_VEL"
-                x: coluna_vel_vert.x - 70
-                y: coluna_vel_vert.y + coluna_vel_vert.height - font.pointSize/2
-
-            }
-
-            Text{ //altitude barométrica
-                id: pointer_alt_baro
-                font.family: "Helvetica"
-                font.pointSize: 18
-                color: coluna_vel_vert.color
-                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.climbRate.rawValue/50) //assumindo MAX_ALT = 50
-                x: borda_crosshair.x - borda_crosshair.width*0.66
-                text: _activeVehicle.climbRate.valueString + "m/s"
-                visible: _activeVehicle.climbRate.rawValue === "NaN" ? false : true
-            }
-
-            Rectangle{
-                width: 10
-                height: 5
-                x: coluna_vel_vert.x - width
-                y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
-                color: pointer_alt_baro.color
-                visible: pointer_alt_baro.visible
-            }
-
-        }
-
-         Item { //COLUNA ESQUERDA DO HUD
-            Rectangle{
-                id: coluna_altitude_rel
-                y:  borda_crosshair.y - borda_crosshair.height/2
-                x: borda_crosshair.x + borda_crosshair.width*1.25
-                width: 3
-                height: borda_crosshair.height*2
-                color: coluna_vel_vert.color
-            }
-            Text{ //valor máximo permitido para o voo
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: coluna_altitude_rel.color
-                text: "MAX_ALT"
-                x: coluna_altitude_rel.x + 10
-                y: coluna_altitude_rel.y - font.pointSize/2
-
-            }
-
-            Text{ //valor minimo permitido para o voo
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: coluna_altitude_rel.color
-                text: "MIN_ALT"
-                x: coluna_altitude_rel.x + 10
-                y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize/2
-
-            }
-
-            Text{ //altitude Relativa
-                id: pointer_velocidade_vertical
-                font.family: "Helvetica"
-                font.pointSize: 18
-                color: coluna_altitude_rel.color
-                y: borda_crosshair.y + borda_crosshair.height - (borda_crosshair.height * _activeVehicle.altitudeRelative.rawValue/50) //assumindo MAX_VEL = 10
-                x: borda_crosshair.x + borda_crosshair.width*1.33
-                text: _activeVehicle.altitudeRelative.valueString + "m"
-                visible: _activeVehicle.altitudeRelative === 0 ?   false:true
-            }
-
-            Rectangle{
-                width: 10
-                height: 5
-                x: coluna_altitude_rel.x
-                y: pointer_velocidade_vertical.y +pointer_velocidade_vertical.font.pointSize
-                color: pointer_alt_baro.color
-                visible: pointer_velocidade_vertical.visible
-            }
-
-        }
-
-
-
-       /* Rectangle{
-            width:50
-            height:50
-            x: area_mapa_camera.width/2 -width/2
-            y: area_mapa_camera.height/2 -height/2
-            color: "#A0007700"
-            rotation: _activeVehicle.roll.rawValue
-        }*/
-
-
- }
-
-
         Text {
             x: mapControl.x +300
             y: mapControl.y
@@ -650,6 +473,7 @@ Item{
         id: area_info_bottom
         x: 0
         y: parent.height*4/5
+        z:1
         width: parent.width
         height: parent.height*1/5
         color: "#0A283F"
@@ -668,6 +492,7 @@ Item{
         id: area_info_bottom_central
         x: area_info_bottom.width/2 - area_info_bottom.width/5
         y: area_info_bottom.y
+        z: 1
         width: area_info_bottom.width*2/5
         height: area_info_bottom.height + 30
         color: "gray"
@@ -713,18 +538,221 @@ Item{
 
     }
 
+
+            FlyViewVideo { //video da camera
+                id: videoControl
+                x: 0
+                y: !_informacao_central ? 0 : parent.height*4/5
+                width: !_informacao_central ? area_mapa_camera.width : area_info_bottom.width*0.3
+                height:!_informacao_central ? area_mapa_camera.height : area_info_bottom.height
+                z: !_informacao_central ? 0 : 1
+
+
+
+                //visible: !_informacao_central
+            }
+Item {
+    z: videoControl.z
+            Item{
+                QGCColoredImage { //crosshair no centro da camera
+                        id: crosshair_central
+                        width: videoControl.width/10
+                        height: videoControl.width/10
+                        x: videoControl.width/2 - width/2
+                        y: videoControl.y + videoControl.height/2 -height/2 + _activeVehicle.pitch.rawValue/2
+                        color: "#00FF00"
+                        source: "/res/crossHair_res.svg"
+                        rotation: _activeVehicle.roll.rawValue
+                }
+
+                Rectangle{//circulo ao redor do crosshair
+                    id: borda_crosshair
+                    width: videoControl.width/8
+                    height: videoControl.width/8
+                    x: videoControl.width/2 - width/2
+                    y: videoControl.y + videoControl.height/2 - height/2
+                    color: "transparent"
+                    border.color: crosshair_central.color
+                    border.width: 2
+                    radius: width*0.5
+                }
+
+                Text{ //para teste de valores (se da 0 ou ta desligado ou provavelmente não temos como realizar essa medição ainda)
+                    font.family: "Helvetica"
+                    font.pointSize: 24
+                    color: crosshair_central.color
+                    text: _activeVehicle.throttlePct.rawValue
+                    x: borda_crosshair.x + 200
+                    y: coluna_vel_vert.y - font.pointSize/2
+                    visible: false
+
+                }
+
+
+
+            }
+             Item { //COLUNA ESQUERDA DO HUD
+                Rectangle{
+                    id: coluna_vel_vert
+                    y:  borda_crosshair.y - borda_crosshair.height/2
+                    x: borda_crosshair.x - borda_crosshair.width
+                    width: 3
+                    height: borda_crosshair.height*2
+                    color: crosshair_central.color
+                }
+                Text{ //valor máximo permitido para o voo
+                    font.family: "Helvetica"
+                    font.pointSize: 12
+                    color: coluna_vel_vert.color
+                    text: "MAX_VEL"
+                    x: coluna_vel_vert.x - 70
+                    y: coluna_vel_vert.y - font.pointSize/2
+
+                }
+
+                Text{ //valor minimo permitido para o voo
+                    font.family: "Helvetica"
+                    font.pointSize: 12
+                    color: coluna_vel_vert.color
+                    text: "MIN_VEL"
+                    x: coluna_vel_vert.x - 70
+                    y: coluna_vel_vert.y + coluna_vel_vert.height - font.pointSize/2
+
+                }
+
+                Text{ //altitude barométrica
+                    id:  pointer_velocidade_vertical
+                    font.family: "Helvetica"
+                    font.pointSize: 18
+                    color: coluna_vel_vert.color
+                    y: coluna_vel_vert.y + coluna_vel_vert.height/2 - (coluna_vel_vert.height * _activeVehicle.climbRate.rawValue/10) //assumindo MAX_VEL = 10
+                    x: coluna_vel_vert.x - coluna_vel_vert.width - font.pointSize*6
+                    text: _activeVehicle.climbRate.valueString + "m/s"
+                    visible: _activeVehicle.climbRate.rawValue === "NaN" ? false : true
+                }
+
+                Rectangle{
+                    width: 10
+                    height: 5
+                    x: coluna_vel_vert.x - width
+                    y: pointer_velocidade_vertical.y +pointer_velocidade_vertical.font.pointSize
+                    color: pointer_velocidade_vertical.color
+                    visible: pointer_velocidade_vertical.visible
+                }
+
+                Rectangle{
+                    width: pointer_velocidade_vertical.font.pointSize*6
+                    height: pointer_velocidade_vertical.font.pointSize*2
+                    x: pointer_velocidade_vertical.x -5
+                    y: pointer_velocidade_vertical.y
+                    color: "transparent"
+                    border.color: crosshair_central.color
+                    border.width: 2
+                }
+
+            }
+
+             Item { //COLUNA DIRETA DO HUD
+                Rectangle{
+                    id: coluna_altitude_rel
+                    y:  borda_crosshair.y - borda_crosshair.height/2
+                    x: borda_crosshair.x + borda_crosshair.width*2
+                    width: 3
+                    height: borda_crosshair.height*2
+                    color: coluna_vel_vert.color
+                }
+                Text{ //valor máximo permitido para o voo
+                    font.family: "Helvetica"
+                    font.pointSize: 12
+                    color: coluna_altitude_rel.color
+                    text: "MAX_ALT"
+                    x: coluna_altitude_rel.x + 10
+                    y: coluna_altitude_rel.y - font.pointSize/2
+
+                }
+
+                Text{ //valor minimo permitido para o voo
+                    font.family: "Helvetica"
+                    font.pointSize: 12
+                    color: coluna_altitude_rel.color
+                    text: "MIN_ALT"
+                    x: coluna_altitude_rel.x + 10
+                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize/2
+
+                }
+
+                Text{ //altitude Relativa
+                    id: pointer_alt_baro
+                    font.family: "Helvetica"
+                    font.pointSize: 18
+                    color: coluna_altitude_rel.color
+                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/50) //assumindo MAX_ALT = 50
+                    x: coluna_altitude_rel.x + font.pointSize
+                    text: _activeVehicle.altitudeRelative.valueString + "m"
+                    visible: _activeVehicle.altitudeRelative === 0 ?   false:true
+                }
+
+                Rectangle{
+                    width: 10
+                    height: 5
+                    x: coluna_altitude_rel.x
+                    y: pointer_alt_baro.y +pointer_alt_baro.font.pointSize
+                    color: pointer_alt_baro.color
+                    visible: pointer_alt_baro.visible
+                }
+
+                Rectangle{
+                    width: pointer_alt_baro.font.pointSize*6
+                    height: pointer_alt_baro.font.pointSize*2
+                    x: pointer_alt_baro.x -5
+                    y: pointer_alt_baro.y
+                    color: "transparent"
+                    border.color: crosshair_central.color
+                    border.width: 2
+                }
+
+            }
+
+
+
+           /* Rectangle{
+                width:50
+                height:50
+                x: area_mapa_camera.width/2 -width/2
+                y: area_mapa_camera.height/2 -height/2
+                color: "#A0007700"
+                rotation: _activeVehicle.roll.rawValue
+            }*/
+
+}
+
     FlyViewMap { //mapa
         id:                     mapControl
         planMasterController:   _planController
        // rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
+        x:0
+        y: _informacao_central ? 0 : parent.height*4/5
+        z: _informacao_central ? 0 : 1
         width: _informacao_central ? area_mapa_camera.width : area_info_bottom.width*0.3
         height: _informacao_central ? area_mapa_camera.height : area_info_bottom.height
         pipMode:                !_mainWindowIsMap
         //toolInsets:             customOverlay.totalToolInsets
         mapName:                "FlightDisplayView"
         visible: true
+    }
+
+    MouseArea {
+       id: teste
+       anchors.fill: area_info_right
+       hoverEnabled: true
+
+
+       onClicked : {
+           console.log("posicao x,y do mapa: " + mapControl.x + ", " + mapControl.y)
+           console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
+           _informacao_central = !_informacao_central
+           console.log(videoControl.y)
+       }
     }
 
 
