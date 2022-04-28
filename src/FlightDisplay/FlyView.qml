@@ -140,7 +140,7 @@ Item {
 
 
 
-  /* Rectangle { //Circulo de exemplo pra evento de hover
+  /* Rectangle {
          id: motores
          width: parent.width/10
          height: parent.width/10
@@ -433,6 +433,52 @@ Item {
         }
    }
 
+ Item{
+     Text {
+         x: area_info_right.x + 5
+         y: monitor_motores.height + monitor_motores.height*0.25
+         text: "OFF"
+         font.family: "Helvetica"
+         font.pointSize: 24
+         color: "#AA0000"
+         visible: true
+     }
+
+     Text {
+         x: area_info_right.x  + area_info_right.width/3
+         y: monitor_motores.height + monitor_motores.height*0.15
+         text: "IDLE"
+         font.family: "Helvetica"
+         font.pointSize: 24
+         color: "#FFFF00"
+         visible: true
+     }
+
+     Text {
+         x: area_info_right.x  + area_info_right.width*2/3 + 5
+         y: monitor_motores.height + monitor_motores.height*0.25
+         text: "ON"
+         font.family: "Helvetica"
+         font.pointSize: 24
+         color: "#00FF00"
+         visible: true
+     }
+
+    QGCColoredImage{
+        id: knob_armed
+        width: area_info_right.width/2
+        height: area_info_right.height*1/5
+        x: area_info_right.x + width/2
+        y: area_info_right.y + monitor_motores.height*1.25
+        color: "#FFFF00"
+        rotation: 43
+        source: "/res/knob_armed.png"
+
+    }
+
+
+ }
+
     Rectangle { //AREA ONDE O VIDEO APARECE
         id: area_mapa_camera
         x: 0
@@ -559,7 +605,7 @@ Item {
                         width: videoControl.width/10
                         height: videoControl.width/10
                         x: videoControl.width/2 - width/2
-                        y: videoControl.y + videoControl.height/2 -height/2 + _activeVehicle.pitch.rawValue/2
+                        y: videoControl.y + videoControl.height/2 - height/2 - _activeVehicle.pitch.rawValue
                         color: "#00FF00"
                         source: "/res/crossHair_res.svg"
                         rotation: _activeVehicle.roll.rawValue
@@ -575,17 +621,6 @@ Item {
                     border.color: crosshair_central.color
                     border.width: 2
                     radius: width*0.5
-                }
-
-                Text{ //para teste de valores (se da 0 ou ta desligado ou provavelmente não temos como realizar essa medição ainda)
-                    font.family: "Helvetica"
-                    font.pointSize: 24
-                    color: crosshair_central.color
-                    text: _activeVehicle.throttlePct.rawValue
-                    x: borda_crosshair.x + 200
-                    y: coluna_vel_vert.y - font.pointSize/2
-                    visible: false
-
                 }
 
 
@@ -686,7 +721,7 @@ Item {
                     font.family: "Helvetica"
                     font.pointSize: 18
                     color: coluna_altitude_rel.color
-                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/50) //assumindo MAX_ALT = 50
+                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/20) //assumindo MAX_ALT = 50
                     x: coluna_altitude_rel.x + font.pointSize
                     text: _activeVehicle.altitudeRelative.valueString + "m"
                     visible: _activeVehicle.altitudeRelative === 0 ?   false:true
@@ -712,6 +747,34 @@ Item {
                 }
 
             }
+
+             QGCColoredImage { //bussola FPV
+                     id: bussola_fpv
+                     width: videoControl.width/5
+                     height: videoControl.width/5
+                     x: videoControl.width/2 - width/2
+                     y: videoControl.y + videoControl.height - height/2
+
+
+                     color: "#00FF00"
+                     source: "/res/bussola_fpv.png"
+                     rotation: _activeVehicle.heading.rawValue
+
+
+             }
+
+             Text {
+
+                 text: _activeVehicle.heading.rawValue
+                 font.family: "Helvetica"
+                 font.pointSize: 24
+                 x: bussola_fpv.x + bussola_fpv.width/2 - font.pointSize
+                 y: bussola_fpv.y + bussola_fpv.height/4
+                 color: "#00FF00"
+                 visible: true
+
+             }
+
 
 
 
@@ -741,19 +804,74 @@ Item {
         visible: true
     }
 
-    MouseArea {
-       id: teste
-       anchors.fill: area_info_right
+
+        Rectangle {
+                id: botao_troca_centro
+                height: area_info_bottom.height/3
+                width: height
+                x: 0
+                y: parent.height - height
+                z: 2
+                color: "#AA000000"
+        }
+
+
+        QGCColoredImage { //botão para trocar
+                height: botao_troca_centro.width
+                width: height
+                x: botao_troca_centro.x
+                y: botao_troca_centro.y
+                z: botao_troca_centro.z
+                color: "#AA00FF00"
+                source: "/res/spin_icon.png" //"/res/crossHair_res.svg"
+        }
+
+    MouseArea { //botão_troca_centro
+       id: click_trocar_centro
+       z: botao_troca_centro.z
+       anchors.fill: botao_troca_centro
        hoverEnabled: true
 
 
        onClicked : {
            console.log("posicao x,y do mapa: " + mapControl.x + ", " + mapControl.y)
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
+           console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
            _informacao_central = !_informacao_central
-           console.log(videoControl.y)
        }
     }
+
+    Rectangle {
+            id: botao_troca_camera
+            height: area_info_bottom.height/3
+            width: height
+            x: area_info_bottom.width*0.3 - width
+            y: parent.height - height
+            z:2
+            color:"#AA000000"
+    }
+
+    QGCColoredImage { //botão para trocar
+            height: botao_troca_camera.width
+            width: height
+            x: botao_troca_camera.x
+            y: botao_troca_camera.y
+            z: botao_troca_camera.z
+            color: "#AA00FF00"
+            source: "/res/camera.svg"
+    }
+        MouseArea { //botão_troca_centro
+           id: click_trocar_camera
+           z: botao_troca_camera.z
+           anchors.fill: botao_troca_camera
+           hoverEnabled: true
+
+
+           onClicked : {
+               console.log("TROCA CAMERA")
+           }
+        }
+
 
 
     Text {
