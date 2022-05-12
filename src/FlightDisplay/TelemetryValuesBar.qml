@@ -22,7 +22,7 @@ Rectangle { //retangulo principal da barra de telemetria
     width:              telemetryLayout.width + (_toolsMargin * 4) //valor padrão: 2
     color:              qgcPal.window
     radius:             ScreenTools.defaultFontPixelWidth /2 // valor padrão /2
-
+    visible: false
     property bool       bottomMode: false //agora que bottomMode = false, o default é a barra de telemetria na esquerda da tela
 
     DeadMouseArea { anchors.fill: parent }

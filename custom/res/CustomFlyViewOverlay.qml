@@ -208,12 +208,13 @@ Item {
     }
 
     Rectangle {
+
         id:                     attitudeIndicator //indicador de angulo
         anchors.topMargin:   _toolsMargin
         anchors.rightMargin:    _toolsMargin
         anchors.top:         parent.top
         anchors.right:          parent.right
-        height:                 ScreenTools.defaultFontPixelHeight * 6 //valor padrão: 6
+        height:                 ScreenTools.defaultFontPixelHeight * 8 //valor padrão: 6
         width:                  height
         radius:                 height * 0.5
         color:                  qgcPal.windowShade
