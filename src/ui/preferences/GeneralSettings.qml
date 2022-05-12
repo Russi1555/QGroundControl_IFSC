@@ -70,6 +70,7 @@ Rectangle {
             contentHeight:      outerItem.height
             contentWidth:       outerItem.width
 
+
             Item {
                 id:     outerItem
                 width:  Math.max(_root.width, settingsColumn.width)

@@ -884,7 +884,24 @@ Item {
                console.log("****************")
            }
         }
+    /*Item {
+        x:0
+        y:0
 
+        GridLayout {
+            id:         videoGrid
+            columns:    1
+
+            QGCComboBox{
+                id:                     videoSource
+                Layout.preferredWidth:  _comboFieldWidth
+                indexModel:             false
+                Fact:                   QGroundControl.settingsManager.videoSettings.videoSource
+            }
+        }
+    }
+        Isso não funciona, "Invalid attached object assignment" no Fact. Nao tenho certeza do
+*/
 
     Text {
 
