@@ -61,7 +61,6 @@
         <file>resources/icons/Global_drones.svg</file>
         <file>resources/QGCLogoWhite2.svg</file>
         <file>resources/drone_motor_scheme.png</file>
-        <file>resources/Compass_360_(en).svg</file>
     </qresource>
     <qresource prefix="/res/firmware">
         <file alias="3drradio.png">resources/firmware/3drradio.png</file>

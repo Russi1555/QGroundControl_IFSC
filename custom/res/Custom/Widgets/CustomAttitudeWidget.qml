@@ -100,7 +100,7 @@ Item {
         }
     }
 
-    Rectangle {
+    Rectangle { //aqui da pra mexer no formato do attitudewidget. Não existe pronto na internet mas podemos fazer parecido com algum
         id:             mask
         anchors.fill:   instrument
         radius:         width / 2
