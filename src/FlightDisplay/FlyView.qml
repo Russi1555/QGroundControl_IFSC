@@ -12,6 +12,12 @@ import QtQuick.Controls         2.4
 import QtQuick.Dialogs          1.3
 import QtQuick.Layouts          1.12
 
+import QtQuick                  2.3
+import QtQuick.Controls         1.2
+import QtQuick.Controls.Styles  1.4
+import QtQuick.Dialogs          1.2
+import QtQuick.Layouts          1.2
+
 import QtLocation               5.3
 import QtPositioning            5.3
 import QtQuick.Window           2.2
@@ -28,6 +34,7 @@ import QGroundControl.FlightMap     1.0
 import QGroundControl.Palette       1.0
 import QGroundControl.ScreenTools   1.0
 import QGroundControl.Vehicle       1.0
+
 
 Item {
     id: _root
@@ -485,7 +492,7 @@ Item {
         y: 0
         width: parent.width*7/8
         height: parent.height*5/6
-        color: "transparent"        
+        color: "transparent"
     }
 
 
@@ -851,7 +858,7 @@ Item {
             color:"#AA000000"
     }
 
-    QGCColoredImage { //botão para trocar
+    QGCColoredImage { //botão para trocar camera
             height: botao_troca_camera.width
             width: height
             x: botao_troca_camera.x
@@ -868,10 +875,15 @@ Item {
 
 
            onClicked : {
-               console.log("TROCA CAMERA")
+
+               console.log(_activeVehicle.cameraManager.currentCamera)
+               console.log(_activeVehicle.cameraManager.cameras.count)
+               console.log(QGroundControl.settingsManager.videoSettings.videoSource.rawValue)
+               console.log(QGroundControl.settingsManager.videoSettings.videoSource.enumString)
+
+               console.log("****************")
            }
         }
-
 
 
     Text {
