@@ -36,6 +36,11 @@ import QGroundControl.ScreenTools   1.0
 import QGroundControl.Vehicle       1.0
 
 
+import QGroundControl.FactControls          1.0
+import QGroundControl.MultiVehicleManager   1.0
+import QGroundControl.SettingsManager       1.0
+
+
 Item {
     id: _root
 
@@ -65,6 +70,7 @@ Item {
     property var    _mapControl:            mapControl
 
     property bool   _informacao_central :  false
+    property bool   _selecao_camera: false
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -880,28 +886,31 @@ Item {
                console.log(_activeVehicle.cameraManager.cameras.count)
                console.log(QGroundControl.settingsManager.videoSettings.videoSource.rawValue)
                console.log(QGroundControl.settingsManager.videoSettings.videoSource.enumString)
+               _selecao_camera = !_selecao_camera
 
                console.log("****************")
            }
         }
-    /*Item {
-        x:0
-        y:0
+    Item {
+        x:botao_troca_camera.x
+        y:botao_troca_camera.y
+        z:botao_troca_camera.z+1
+        visible: _selecao_camera
 
         GridLayout {
             id:         videoGrid
             columns:    1
 
-            QGCComboBox{
+            FactComboBox{
                 id:                     videoSource
                 Layout.preferredWidth:  _comboFieldWidth
                 indexModel:             false
-                Fact:                   QGroundControl.settingsManager.videoSettings.videoSource
+                fact:                   QGroundControl.settingsManager.videoSettings.videoSource
             }
         }
     }
-        Isso não funciona, "Invalid attached object assignment" no Fact. Nao tenho certeza do
-*/
+       // Isso não funciona, "Invalid attached object assignment" no Fact. Nao tenho certeza do por que
+
 
     Text {
 
@@ -914,7 +923,6 @@ Item {
         visible: true
 
     }
-
 
 
 
