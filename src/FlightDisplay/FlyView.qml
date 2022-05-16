@@ -873,7 +873,7 @@ Item {
             color: "#AA00FF00"
             source: "/res/camera.svg"
     }
-        MouseArea { //botão_troca_centro
+        MouseArea {
            id: click_trocar_camera
            z: botao_troca_camera.z
            anchors.fill: botao_troca_camera
@@ -892,8 +892,8 @@ Item {
            }
         }
     Item {
-        x:botao_troca_camera.x
-        y:botao_troca_camera.y
+        x:botao_troca_camera.x - videoSource.width + botao_troca_camera.width
+        y:botao_troca_camera.y - videoSource.height
         z:botao_troca_camera.z+1
         visible: _selecao_camera
 
@@ -909,8 +909,6 @@ Item {
             }
         }
     }
-       // Isso não funciona, "Invalid attached object assignment" no Fact. Nao tenho certeza do por que
-
 
     Text {
 
