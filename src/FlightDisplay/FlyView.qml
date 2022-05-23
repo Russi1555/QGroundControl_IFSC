@@ -39,7 +39,7 @@ import QGroundControl.Vehicle       1.0
 import QGroundControl.FactControls          1.0
 import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.SettingsManager       1.0
-
+import QtGraphicalEffects 1.12
 
 Item {
     id: _root
@@ -174,13 +174,24 @@ Item {
 
     }*/
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*
 
              TUDO DAQUI PRA BAIXO É COISA MINHA, PRA CIMA NÃO TEVE MUITA ALTERAÇÃO QUE EU ME LEMBRE 22/03/222
+             UNICA ALTERAÇÃO DESDE 22/03 NA PARTE DE CIMA FORAM OS TRÊS ULTIMOS IMPORTS PARA REALIZAR A TROCA DE CAMERA 23/05/2022
 
     */
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function manter_na_barra(id_seta, id_barra){
+        fim_da_barra = id_barra.y + id_barra.height
+        if (id_seta.y > fim_da_barra){
+            id_seta.y = fim_da_barra
+        }
+    }
+
+
+
+
 
     Text{
         x: 500
@@ -446,11 +457,11 @@ Item {
         }
    }
 
- Item{
+ Item{ //este item inteiro precisa ser discutido com mais detalhes com o professor.
      Text {
          x: area_info_right.x + 5
          y: monitor_motores.height + monitor_motores.height*0.25
-         text: "OFF"
+         text: _activeVehicle.initialConnectComplete//"OFF"
          font.family: "Helvetica"
          font.pointSize: 24
          color: "#AA0000"
@@ -460,7 +471,7 @@ Item {
      Text {
          x: area_info_right.x  + area_info_right.width/3
          y: monitor_motores.height + monitor_motores.height*0.15
-         text: "IDLE"
+         text: _activeVehicle.readyToFly//"IDLE"
          font.family: "Helvetica"
          font.pointSize: 24
          color: "#FFFF00"
@@ -470,7 +481,7 @@ Item {
      Text {
          x: area_info_right.x  + area_info_right.width*2/3 + 5
          y: monitor_motores.height + monitor_motores.height*0.25
-         text: "ON"
+         text: _activeVehicle.armed//"ON"
          font.family: "Helvetica"
          font.pointSize: 24
          color: "#00FF00"
@@ -483,9 +494,11 @@ Item {
         height: area_info_right.height*1/5
         x: area_info_right.x + width/2
         y: area_info_right.y + monitor_motores.height*1.25
-        color: "#FFFF00"
-        rotation: 43
+        color: _activeVehicle.initialConnectComplete ? (_activeVehicle.readyToFly ? "#00FF00":"#FFFF00") : "#AA0000"
+        rotation: knob_armed.color === "#AA0000" ? 10 : (knob_armed.color === "#FFFF00" ? 45: 60) //é preciso fazer testes com o drone armado.
         source: "/res/knob_armed.png"
+
+
 
     }
 
@@ -636,6 +649,57 @@ Item {
                     radius: width*0.5
                 }
 
+                OpacityMask {
+                        anchors.fill: borda_crosshair
+                        source: crosshair_central
+                        maskSource: borda_crosshair
+                    }
+
+                Item{ //angulos de inclinação
+
+                    Rectangle{
+                    width: borda_crosshair.width/2
+                    height: borda_crosshair.border.width
+                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
+                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*4/45 - borda_crosshair.border.width // +20°
+                    color: "red"
+                    }
+
+                    Rectangle{
+                    width: borda_crosshair.width/3
+                    height: borda_crosshair.border.width
+                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
+                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*2/45 - borda_crosshair.border.width // +10°
+                    color: "red"
+                    }
+
+                    Rectangle{
+                    width: borda_crosshair.width/3
+                    height: borda_crosshair.border.width
+                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
+                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*2/45 // -10°
+                    color: "red"
+                    }
+
+                    Rectangle{
+                    width: borda_crosshair.width/2
+                    height: borda_crosshair.border.width
+                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
+                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*4/45 // -20°
+                    color: "red"
+                    }
+
+                    Text{ //valor máximo permitido para o voo
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: "red"
+                        text: _activeVehicle.pitch.rawValue
+                        x: 100
+                        y: 100
+
+                    }
+                }
+
 
 
             }
@@ -644,7 +708,7 @@ Item {
                     id: coluna_vel_vert
                     y:  borda_crosshair.y - borda_crosshair.height/2
                     x: borda_crosshair.x - borda_crosshair.width
-                    width: 3
+                    width: 5
                     height: borda_crosshair.height*2
                     color: crosshair_central.color
                 }
@@ -705,7 +769,7 @@ Item {
                     id: coluna_altitude_rel
                     y:  borda_crosshair.y - borda_crosshair.height/2
                     x: borda_crosshair.x + borda_crosshair.width*2
-                    width: 3
+                    width: 5
                     height: borda_crosshair.height*2
                     color: coluna_vel_vert.color
                 }
