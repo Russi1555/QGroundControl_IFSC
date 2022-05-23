@@ -661,7 +661,7 @@ Item {
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*4/45 - borda_crosshair.border.width // +20°
+                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*80/693 // +20°
                     color: "red"
                     }
 
@@ -669,7 +669,7 @@ Item {
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*2/45 - borda_crosshair.border.width // +10°
+                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*40/693 // +10°
                     color: "red"
                     }
 
