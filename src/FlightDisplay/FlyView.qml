@@ -631,7 +631,7 @@ Item {
                         width: videoControl.width/10
                         height: videoControl.width/10
                         x: videoControl.width/2 - width/2
-                        y: videoControl.y + videoControl.height/2 - height/2 - _activeVehicle.pitch.rawValue
+                        y: videoControl.y + videoControl.height/2 - height/2
                         color: "#00FF00"
                         source: "/res/crossHair_res.svg"
                         rotation: _activeVehicle.roll.rawValue
@@ -649,35 +649,29 @@ Item {
                     radius: width*0.5
                 }
 
-                OpacityMask {
-                        anchors.fill: borda_crosshair
-                        source: crosshair_central
-                        maskSource: borda_crosshair
-                    }
-
-                Item{ //angulos de inclinação
+                Item{ //angulos de inclinação. Tudo aqui ta um INFERNO, acho uma boa refazer a lógica de Crosshair pra deixar estático. 
 
                     Rectangle{
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*80/693 // +20°
-                    color: "red"
+                    y:  crosshair_central.y - _activeVehicle.pitch.rawValue -20 // +20°
+                    color: "blue"
                     }
 
                     Rectangle{
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*40/693 // +10°
-                    color: "red"
+                    y: crosshair_central.y - _activeVehicle.pitch.rawValue -10// +10°
+                    color: "white"
                     }
 
                     Rectangle{
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*2/45 // -10°
+                    y: crosshair_central.y + crosshair_central.height/2 - _activeVehicle.pitch.rawValue +10 // -10°
                     color: "red"
                     }
 
@@ -685,8 +679,8 @@ Item {
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
                     x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*4/45 // -20°
-                    color: "red"
+                    y:  crosshair_central.y - _activeVehicle.pitch.rawValue + 20 // -20°
+                    color: "yellow"
                     }
 
                     Text{ //valor máximo permitido para o voo
