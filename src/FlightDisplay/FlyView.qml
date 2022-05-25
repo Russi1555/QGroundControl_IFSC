@@ -628,7 +628,7 @@ Item {
             Item{
                 QGCColoredImage { //crosshair no centro da camera
                         id: crosshair_central
-                        width: videoControl.width/10
+                        width: videoControl.width/12
                         height: videoControl.width/10
                         x: videoControl.width/2 - width/2
                         y: videoControl.y + videoControl.height/2 - height/2
@@ -650,49 +650,103 @@ Item {
                 }
 
                 Item{ //angulos de inclinação. Tudo aqui ta um INFERNO, acho uma boa refazer a lógica de Crosshair pra deixar estático. 
+                    id: angulos_inclinacao
+                    x: borda_crosshair.x + borda_crosshair.width/2
+                    y: crosshair_central.y + crosshair_central.height/2
 
                     Rectangle{
+                    id: angulos_inclinacao_20p
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y:  crosshair_central.y - _activeVehicle.pitch.rawValue -20 // +20°
-                    color: "blue"
+                    x: - width/2
+                    y:  - _activeVehicle.pitch.rawValue*2 -40 // +20°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue < 26 ? true : false
+
+                    }
+
+                    Text{ //valor 20°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_20p.color
+                        text: "20°"
+                        x:  angulos_inclinacao_20p.x + angulos_inclinacao_20p.width
+                        y:  angulos_inclinacao_20p.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue < 12 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_10p
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: crosshair_central.y - _activeVehicle.pitch.rawValue -10// +10°
-                    color: "white"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 -20// +10°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue < 39 ? true : false
+                    }
+
+                    Text{ //valor 10°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_10p.color
+                        text: "10°"
+                        x:  angulos_inclinacao_10p.x + angulos_inclinacao_10p.width
+                        y:  angulos_inclinacao_10p.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue < 30 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_10n
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: crosshair_central.y + crosshair_central.height/2 - _activeVehicle.pitch.rawValue +10 // -10°
-                    color: "red"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 +20 // -10°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue > -38 ? true : false
+                    }
+
+                    Text{ //valor -10°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_10n.color
+                        text: "10°"
+                        x:  angulos_inclinacao_10n.x + angulos_inclinacao_10n.width
+                        y:  angulos_inclinacao_10n.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue > -35 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_20n
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y:  crosshair_central.y - _activeVehicle.pitch.rawValue + 20 // -20°
-                    color: "yellow"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 + 40 // -20°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue > -25 ? true : false
                     }
+
+                    Text{ //valor -20°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_20n.color
+                        text: "20°"
+                        x:  angulos_inclinacao_20n.x + angulos_inclinacao_20n.width
+                        y:  angulos_inclinacao_20n.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue > -19 ? true : false
+                    }
+
+                }
 
                     Text{ //valor máximo permitido para o voo
                         font.family: "Helvetica"
                         font.pointSize: 12
                         color: "red"
-                        text: _activeVehicle.pitch.rawValue
-                        x: 100
-                        y: 100
+                        text: _activeVehicle.pitch.valueString
+                        x: angulos_inclinacao.x - width/2
+                        y: borda_crosshair.y + borda_crosshair.height - font.pointSize*2
 
                     }
-                }
+
 
 
 
