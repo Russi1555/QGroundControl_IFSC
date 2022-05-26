@@ -54,6 +54,14 @@ Item {
         Component.onCompleted:  start()
     }
 
+    MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
+       anchors.fill: _root
+       hoverEnabled: true
+
+       onClicked: _selecao_camera = false
+
+    }
+
     property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
@@ -69,8 +77,8 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
-    property bool   _informacao_central :  false
-    property bool   _selecao_camera: false
+    property bool   _informacao_central :  false //booleano que define se a camera ou o mapa fica no foco central
+    property bool   _selecao_camera: false //booleano que decide se a tabela de cameras esta visivel ou não.
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
