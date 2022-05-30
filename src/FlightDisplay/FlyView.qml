@@ -69,8 +69,16 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
+<<<<<<< Updated upstream
     property bool   _informacao_central :  false
     property bool   _selecao_camera: false
+=======
+    property bool   _informacao_central :  false //booleano que define se a camera ou o mapa fica no foco central
+    property bool   _selecao_camera: false //booleano que decide se a tabela de cameras esta visivel ou não.
+    property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
+    property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
+    property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
+>>>>>>> Stashed changes
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -179,6 +187,7 @@ Item {
 
              TUDO DAQUI PRA BAIXO É COISA MINHA, PRA CIMA NÃO TEVE MUITA ALTERAÇÃO QUE EU ME LEMBRE 22/03/222
              UNICA ALTERAÇÃO DESDE 22/03 NA PARTE DE CIMA FORAM OS TRÊS ULTIMOS IMPORTS PARA REALIZAR A TROCA DE CAMERA 23/05/2022
+             MAIS ALTERAÇÕES: MOUSEAREA NA LINHA 57 26/05/2022
 
     */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,11 +463,39 @@ Item {
                 border.width: 1
                 color: "green"
             }
+
+            Text{
+
+               text: _conexaoinicial ? (_idle ? (_armed ? "ARMED": "READY TO FLY"): "PRE-FLIGHT CHECK") : "DISCONNECTED"
+               font.family: "Helvetica"
+               font.pointSize: 18
+               color: "#FFFFFF"
+               anchors.horizontalCenter: parent.horizontalCenter
+               anchors.top: parent.bottom
+               verticalAlignment: Text.AlignVCenter
+            }
+
+            Rectangle{
+               id: vehicle_status_bar
+               width: parent.width/10
+               height: parent.width/10
+               //x: parent.width/2 - width/2
+               anchors.horizontalCenter: parent.horizontalCenter
+               y: parent.height/2 - height/2
+               z: parent.z +1
+               radius: width* 0.5
+               border.color: parent.color
+               border.width: 1
+               color: "blue"
+            }
         }
    }
 
  Item{ //este item inteiro precisa ser discutido com mais detalhes com o professor.
-     Text {
+
+
+
+    /* Text {
          x: area_info_right.x + 5
          y: monitor_motores.height + monitor_motores.height*0.25
          text: _activeVehicle.initialConnectComplete//"OFF"
@@ -500,7 +537,7 @@ Item {
 
 
 
-    }
+    }*/
 
 
  }
@@ -972,18 +1009,6 @@ Item {
                 fact:                   QGroundControl.settingsManager.videoSettings.videoSource
             }
         }
-    }
-
-    Text {
-
-        text: _activeVehicle.motorCount
-        font.family: "Helvetica"
-        font.pointSize: 24
-        x: monitor_motores.x + monitor_motores.width/2 - font.pointSize/2
-        y: monitor_motores.y + monitor_motores.height/2 - font.pointSize
-        color: "green"
-        visible: true
-
     }
 
 
