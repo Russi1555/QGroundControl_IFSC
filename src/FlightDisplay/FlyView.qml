@@ -600,55 +600,6 @@ Item {
         color: "white"
     }
 
-    Rectangle{
-        id: area_info_bottom_central
-        x: area_info_bottom.width/2 - area_info_bottom.width/5
-        y: area_info_bottom.y
-        z: 1
-        width: area_info_bottom.width*2/5
-        height: area_info_bottom.height + 30
-        color: "gray"
-
-    }
-    Item {
-        Rectangle {
-            id: circulo_1
-            width: area_info_bottom_central.height*5/6
-            height: area_info_bottom_central.height*5/6
-            x: area_info_bottom_central.x + area_info_bottom_central.width/2 - circulo_1.width/2
-            y: area_info_bottom_central.y + area_info_bottom_central.height/8
-            color: "black"
-            border.color: area_info_bottom_central.color
-            border.width: 1
-            radius: width*0.5
-        }
-
-        Item{
-            QGCColoredImage { //imagem do drone com os rotores
-                    id: bussola_geral
-                    x: area_info_bottom_central.x
-                    y: area_info_bottom_central.y + area_info_bottom_central.height/8
-                    width: area_info_bottom_central.width
-                    height: area_info_bottom_central.height*5/6
-                    rotation: _activeVehicle.heading.rawValue
-                    color: "white"
-                    mirror: true
-                    source: "/res/Compass_360.svg"
-                    }
-            QGCColoredImage {
-                    id: ponteiro_bussola
-                    /*anchors.horizontalCenter: bussola_geral.horizontalCenter
-                    anchors.verticalCenter: bussola_geral.verticalCenter*/
-                    width: bussola_geral.height/2
-                    height: bussola_geral.height/2
-                    x: bussola_geral.x + bussola_geral.width/2 - ponteiro_bussola.width/2
-                    y: bussola_geral.y + bussola_geral.height/2 - ponteiro_bussola.width/2
-                    color: "white"
-                    source: "/res/airplane_compass.svg"
-                    }
-        }
-
-    }
 
 
             FlyViewVideo { //video da camera
