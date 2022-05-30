@@ -54,6 +54,14 @@ Item {
         Component.onCompleted:  start()
     }
 
+    MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
+       anchors.fill: _root
+       hoverEnabled: true
+
+       onClicked: _selecao_camera = false
+
+    }
+
     property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
@@ -69,16 +77,11 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
-<<<<<<< Updated upstream
-    property bool   _informacao_central :  false
-    property bool   _selecao_camera: false
-=======
     property bool   _informacao_central :  false //booleano que define se a camera ou o mapa fica no foco central
     property bool   _selecao_camera: false //booleano que decide se a tabela de cameras esta visivel ou não.
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
->>>>>>> Stashed changes
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -665,10 +668,10 @@ Item {
             Item{
                 QGCColoredImage { //crosshair no centro da camera
                         id: crosshair_central
-                        width: videoControl.width/10
+                        width: videoControl.width/12
                         height: videoControl.width/10
                         x: videoControl.width/2 - width/2
-                        y: videoControl.y + videoControl.height/2 - height/2 - _activeVehicle.pitch.rawValue
+                        y: videoControl.y + videoControl.height/2 - height/2
                         color: "#00FF00"
                         source: "/res/crossHair_res.svg"
                         rotation: _activeVehicle.roll.rawValue
@@ -686,56 +689,104 @@ Item {
                     radius: width*0.5
                 }
 
-                OpacityMask {
-                        anchors.fill: borda_crosshair
-                        source: crosshair_central
-                        maskSource: borda_crosshair
-                    }
-
-                Item{ //angulos de inclinação
+                Item{ //angulos de inclinação. Tudo aqui ta um INFERNO, acho uma boa refazer a lógica de Crosshair pra deixar estático.
+                    id: angulos_inclinacao
+                    x: borda_crosshair.x + borda_crosshair.width/2
+                    y: crosshair_central.y + crosshair_central.height/2
 
                     Rectangle{
+                    id: angulos_inclinacao_20p
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*80/693 // +20°
-                    color: "red"
+                    x: - width/2
+                    y:  - _activeVehicle.pitch.rawValue*2 -40 // +20°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue < 26 ? true : false
+
+                    }
+
+                    Text{ //valor 20°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_20p.color
+                        text: "20°"
+                        x:  angulos_inclinacao_20p.x + angulos_inclinacao_20p.width
+                        y:  angulos_inclinacao_20p.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue < 12 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_10p
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 - borda_crosshair.height*40/693 // +10°
-                    color: "red"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 -20// +10°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue < 39 ? true : false
+                    }
+
+                    Text{ //valor 10°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_10p.color
+                        text: "10°"
+                        x:  angulos_inclinacao_10p.x + angulos_inclinacao_10p.width
+                        y:  angulos_inclinacao_10p.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue < 30 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_10n
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*2/45 // -10°
-                    color: "red"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 +20 // -10°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue > -38 ? true : false
+                    }
+
+                    Text{ //valor -10°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_10n.color
+                        text: "10°"
+                        x:  angulos_inclinacao_10n.x + angulos_inclinacao_10n.width
+                        y:  angulos_inclinacao_10n.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue > -35 ? true : false
                     }
 
                     Rectangle{
+                    id: angulos_inclinacao_20n
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
-                    x: borda_crosshair.x + borda_crosshair.width/2 - width/2
-                    y: borda_crosshair.y + borda_crosshair.height/2 + borda_crosshair.height*4/45 // -20°
-                    color: "red"
+                    x: - width/2
+                    y: - _activeVehicle.pitch.rawValue*2 + 40 // -20°
+                    color: "#00FF00"
+                    visible: _activeVehicle.pitch.rawValue > -25 ? true : false
                     }
+
+                    Text{ //valor -20°
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        color: angulos_inclinacao_20n.color
+                        text: "20°"
+                        x:  angulos_inclinacao_20n.x + angulos_inclinacao_20n.width
+                        y:  angulos_inclinacao_20n.y - font.pointSize
+                        visible: _activeVehicle.pitch.rawValue > -19 ? true : false
+                    }
+
+                }
 
                     Text{ //valor máximo permitido para o voo
                         font.family: "Helvetica"
                         font.pointSize: 12
                         color: "red"
-                        text: _activeVehicle.pitch.rawValue
-                        x: 100
-                        y: 100
+                        text: _activeVehicle.pitch.valueString
+                        x: angulos_inclinacao.x - width/2
+                        y: borda_crosshair.y + borda_crosshair.height - font.pointSize*2
 
                     }
-                }
+
 
 
 
