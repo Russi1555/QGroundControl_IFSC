@@ -82,6 +82,7 @@ Item {
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
+    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -471,7 +472,7 @@ Item {
 
                text: _conexaoinicial ? (_idle ? (_armed ? "ARMED": "READY TO FLY"): "PRE-FLIGHT CHECK") : "DISCONNECTED"
                font.family: "Helvetica"
-               font.pointSize: 18
+               font.pointSize: ScreenTools.defaultFontPixelWidth*2
                color: "#FFFFFF"
                anchors.horizontalCenter: parent.horizontalCenter
                anchors.top: parent.bottom
@@ -489,61 +490,11 @@ Item {
                radius: width* 0.5
                border.color: parent.color
                border.width: 1
-               color: "blue"
+               color: _conexaoinicial ? (_idle ? (_armed ? "green": "yellow"): "red") : "black"
             }
         }
    }
 
- Item{ //este item inteiro precisa ser discutido com mais detalhes com o professor.
-
-
-
-    /* Text {
-         x: area_info_right.x + 5
-         y: monitor_motores.height + monitor_motores.height*0.25
-         text: _activeVehicle.initialConnectComplete//"OFF"
-         font.family: "Helvetica"
-         font.pointSize: 24
-         color: "#AA0000"
-         visible: true
-     }
-
-     Text {
-         x: area_info_right.x  + area_info_right.width/3
-         y: monitor_motores.height + monitor_motores.height*0.15
-         text: _activeVehicle.readyToFly//"IDLE"
-         font.family: "Helvetica"
-         font.pointSize: 24
-         color: "#FFFF00"
-         visible: true
-     }
-
-     Text {
-         x: area_info_right.x  + area_info_right.width*2/3 + 5
-         y: monitor_motores.height + monitor_motores.height*0.25
-         text: _activeVehicle.armed//"ON"
-         font.family: "Helvetica"
-         font.pointSize: 24
-         color: "#00FF00"
-         visible: true
-     }
-
-    QGCColoredImage{
-        id: knob_armed
-        width: area_info_right.width/2
-        height: area_info_right.height*1/5
-        x: area_info_right.x + width/2
-        y: area_info_right.y + monitor_motores.height*1.25
-        color: _activeVehicle.initialConnectComplete ? (_activeVehicle.readyToFly ? "#00FF00":"#FFFF00") : "#AA0000"
-        rotation: knob_armed.color === "#AA0000" ? 10 : (knob_armed.color === "#FFFF00" ? 45: 60) //é preciso fazer testes com o drone armado.
-        source: "/res/knob_armed.png"
-
-
-
-    }*/
-
-
- }
 
     Rectangle { //AREA ONDE O VIDEO APARECE
         id: area_mapa_camera
@@ -590,15 +541,56 @@ Item {
         height: parent.height*1/5
         color: "#0A283F"
     }
+    Rectangle{ //area para alertas e informações. Estilo painel de carro
+            id: area_alertas
+            x: parent.width*0.3
+            y: parent.height*4/5
+            width: parent.width
+            height: parent.height*1/5
+            color: "#0A283F"
+            z: area_info_bottom.z +2
+        }
+    QGCColoredImage{
+           id: alerta_bateria
+           x: area_alertas.x - width*0.3
+           y: area_alertas.y+ height*0.1
+           z: area_alertas.z+1
+           width: area_alertas.width/10
+           height: area_alertas.height/3
+           color: "#FFFFFF"
+           source: "/qmlimages/Battery.svg"
 
-    Text {
-        x: area_info_bottom.width - 450
-        y: area_info_bottom.y + 50
-        text: "AREA PARA MAIS INFO"
-        font.family: "Helvetica"
-        font.pointSize: 24
-        color: "white"
-    }
+           Text{
+              text: "TESTE"//_pct_bateria
+              font.family: "Helvetica"
+              font.pointSize: ScreenTools.defaultFontPixelWidth
+              color: "#FFFFFF"
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.top: parent.bottom
+              verticalAlignment: Text.AlignVCenter
+           }
+       }
+    QGCColoredImage{
+           id: alerta_gps
+           x: alerta_bateria.x + width*0.4
+           y: area_alertas.y+ height*0.1
+           z: area_alertas.z+1
+           width: area_alertas.width/10
+           height: area_alertas.height/3
+           color: "#FFFFFF"
+           source: "/qmlimages/Gps.svg"
+
+           Text{
+              text: "ZAP"//_pct_bateria
+              font.family: "Helvetica"
+              font.pointSize: ScreenTools.defaultFontPixelWidth
+              color: "#FFFFFF"
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.top: parent.bottom
+              verticalAlignment: Text.AlignVCenter
+           }
+       }
+
 
 
 
@@ -658,7 +650,7 @@ Item {
 
                     Text{ //valor 20°
                         font.family: "Helvetica"
-                        font.pointSize: 12
+                        font.pointSize: ScreenTools.defaultFontPixelWidth
                         color: angulos_inclinacao_20p.color
                         text: "20°"
                         x:  angulos_inclinacao_20p.x + angulos_inclinacao_20p.width
@@ -678,7 +670,7 @@ Item {
 
                     Text{ //valor 10°
                         font.family: "Helvetica"
-                        font.pointSize: 12
+                        font.pointSize: ScreenTools.defaultFontPixelWidth
                         color: angulos_inclinacao_10p.color
                         text: "10°"
                         x:  angulos_inclinacao_10p.x + angulos_inclinacao_10p.width
@@ -698,7 +690,7 @@ Item {
 
                     Text{ //valor -10°
                         font.family: "Helvetica"
-                        font.pointSize: 12
+                        font.pointSize: ScreenTools.defaultFontPixelWidth
                         color: angulos_inclinacao_10n.color
                         text: "10°"
                         x:  angulos_inclinacao_10n.x + angulos_inclinacao_10n.width
@@ -718,7 +710,7 @@ Item {
 
                     Text{ //valor -20°
                         font.family: "Helvetica"
-                        font.pointSize: 12
+                        font.pointSize: ScreenTools.defaultFontPixelWidth
                         color: angulos_inclinacao_20n.color
                         text: "20°"
                         x:  angulos_inclinacao_20n.x + angulos_inclinacao_20n.width
@@ -730,7 +722,7 @@ Item {
 
                     Text{ //valor máximo permitido para o voo
                         font.family: "Helvetica"
-                        font.pointSize: 12
+                        font.pointSize: ScreenTools.defaultFontPixelWidth
                         color: "red"
                         text: _activeVehicle.pitch.valueString
                         x: angulos_inclinacao.x - width/2
@@ -753,7 +745,7 @@ Item {
                 }
                 Text{ //valor máximo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: 12
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_vel_vert.color
                     text: "MAX_VEL"
                     x: coluna_vel_vert.x - 70
@@ -763,7 +755,7 @@ Item {
 
                 Text{ //valor minimo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: 12
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_vel_vert.color
                     text: "MIN_VEL"
                     x: coluna_vel_vert.x - 70
@@ -774,7 +766,7 @@ Item {
                 Text{ //altitude barométrica
                     id:  pointer_velocidade_vertical
                     font.family: "Helvetica"
-                    font.pointSize: 18
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_vel_vert.color
                     y: coluna_vel_vert.y + coluna_vel_vert.height/2 - (coluna_vel_vert.height * _activeVehicle.climbRate.rawValue/10) //assumindo MAX_VEL = 10
                     x: coluna_vel_vert.x - coluna_vel_vert.width - font.pointSize*6
@@ -814,7 +806,7 @@ Item {
                 }
                 Text{ //valor máximo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: 12
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_altitude_rel.color
                     text: "MAX_ALT"
                     x: coluna_altitude_rel.x + 10
@@ -824,7 +816,7 @@ Item {
 
                 Text{ //valor minimo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: 12
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_altitude_rel.color
                     text: "MIN_ALT"
                     x: coluna_altitude_rel.x + 10
@@ -835,7 +827,7 @@ Item {
                 Text{ //altitude Relativa
                     id: pointer_alt_baro
                     font.family: "Helvetica"
-                    font.pointSize: 18
+                    font.pointSize: ScreenTools.defaultFontPixelWidth
                     color: coluna_altitude_rel.color
                     y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/20) //assumindo MAX_ALT = 50
                     x: coluna_altitude_rel.x + font.pointSize
@@ -883,7 +875,7 @@ Item {
 
                  text: _activeVehicle.heading.rawValue
                  font.family: "Helvetica"
-                 font.pointSize: 24
+                 font.pointSize: ScreenTools.defaultFontPixelWidth
                  x: bussola_fpv.x + bussola_fpv.width/2 - font.pointSize
                  y: bussola_fpv.y + bussola_fpv.height/4
                  color: "#00FF00"

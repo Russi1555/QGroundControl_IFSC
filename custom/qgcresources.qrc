@@ -62,6 +62,7 @@
         <file>bussola_fpv.png</file>
         <file>knob_armed.png</file>
         <file>camera.svg</file>
+        <file>bateria_painel.png</file>
     </qresource>
     <qresource prefix="/res/firmware">
         <file alias="3drradio.png">../resources/firmware/3drradio.png</file>
