@@ -556,7 +556,7 @@ Item {
            y: area_alertas.y+ height*0.1
            z: area_alertas.z+1
            width: area_alertas.width/10
-           height: area_alertas.height/3
+           height: area_alertas.height/2
            color: "#FFFFFF"
            source: "/qmlimages/Battery.svg"
 
@@ -572,16 +572,58 @@ Item {
        }
     QGCColoredImage{
            id: alerta_gps
-           x: alerta_bateria.x + width*0.4
+           x: alerta_bateria.x + width*0.5
            y: area_alertas.y+ height*0.1
            z: area_alertas.z+1
            width: area_alertas.width/10
-           height: area_alertas.height/3
+           height: area_alertas.height/2
            color: "#FFFFFF"
            source: "/qmlimages/Gps.svg"
 
            Text{
-              text: "ZAP"//_pct_bateria
+              text: "ZAP"//_HDOP
+              font.family: "Helvetica"
+              font.pointSize: ScreenTools.defaultFontPixelWidth
+              color: "#FFFFFF"
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.top: parent.bottom
+              verticalAlignment: Text.AlignVCenter
+           }
+       }
+
+    QGCColoredImage{
+           id: alerta_RC
+           x: alerta_gps.x + width*0.5
+           y: area_alertas.y+ height*0.1
+           z: area_alertas.z+1
+           width: area_alertas.width/10
+           height: area_alertas.height/2
+           color: "#FFFFFF"
+           source: "/qmlimages/RC.svg"
+
+           Text{
+              text: "RC"//descobrir qual parametro de vehicle recebe conexão RC
+              font.family: "Helvetica"
+              font.pointSize: ScreenTools.defaultFontPixelWidth
+              color: "#FFFFFF"
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.top: parent.bottom
+              verticalAlignment: Text.AlignVCenter
+           }
+       }
+
+    QGCColoredImage{
+           id: alerta_combustivel
+           x: alerta_RC.x + width*0.5
+           y: area_alertas.y+ height*0.1
+           z: area_alertas.z+1
+           width: area_alertas.width/10
+           height: area_alertas.height/2
+           color: "#FFFFFF"
+           source: "/res/Fuel.png"
+
+           Text{
+              text: "LITROS"//descobrir qual parametro de vehicle recebe conexão RC
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
