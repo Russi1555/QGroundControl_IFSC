@@ -82,7 +82,7 @@ Item {
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
-    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
+    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.valueString
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -507,16 +507,17 @@ Item {
 
 
 
-        Text {
-            x: mapControl.x +300
-            y: mapControl.y
-           // text: _activeVehicle.heading.rawValue //"MOUSE NA AREA" //(_activeVehicle.batteries.get(0).percentRemaining.valueString) assim que consigo acesso as baterias, .valueString pega FACT e transforma em string [ver FactControls]
+       /* Text {
+            x: 600
+            y:600
+            z:1000
+            text: (_activeVehicle.batteries.get(0).percentRemaining.valueString)
             font.family: "Helvetica"
-            font.pointSize: 24
+            font.pointSize: 80
             color: "#80FF0000"
             visible: true
 
-        }
+        }*/
 
 
 
@@ -561,15 +562,18 @@ Item {
            source: "/qmlimages/Battery.svg"
 
            Text{
-              text: "TESTE"//_pct_bateria
+              text: _activeVehicle.batteries.get(0).percentRemaining.valueString//_pct_bateria
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
+              z: parent.z+1
               anchors.horizontalCenter: parent.horizontalCenter
               anchors.top: parent.bottom
               verticalAlignment: Text.AlignVCenter
            }
+
        }
+
     QGCColoredImage{
            id: alerta_gps
            x: alerta_bateria.x + width*0.5
@@ -581,7 +585,7 @@ Item {
            source: "/qmlimages/Gps.svg"
 
            Text{
-              text: "ZAP"//_HDOP
+              text: _activeVehicle.gps.hdop.rawValue//_HDOP
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
@@ -602,7 +606,7 @@ Item {
            source: "/qmlimages/RC.svg"
 
            Text{
-              text: "RC"//descobrir qual parametro de vehicle recebe conexão RC
+              text: _activeVehicle.rcRSSI //descobrir qual parametro de vehicle recebe conexão RC
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
@@ -623,7 +627,7 @@ Item {
            source: "/res/Fuel.png"
 
            Text{
-              text: "LITROS"//descobrir qual parametro de vehicle recebe conexão RC
+              text: "LITROS"//Depende de quando e como recebermos a informação da gasolina restante.
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
