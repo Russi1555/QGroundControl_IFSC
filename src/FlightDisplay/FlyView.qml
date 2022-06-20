@@ -242,7 +242,7 @@ Item {
         Rectangle { //area para as informações em sliders
             id: area_info_sliders
             x: area_info_right.x
-            y: area_info_right.height*3/4
+            y: area_info_right.height*0.7
             z:1
             color: "transparent"
             width: area_info_right.width
@@ -551,13 +551,35 @@ Item {
             color: "#0A283F"
             z: area_info_bottom.z +2
         }
+
+    Rectangle{
+        id: terminal_alertas
+        x: parent.width*0.7
+        y: parent.height*4/5
+        width: parent.width*0.3
+        height: parent.height*1/5
+        color: "black"//"#0A283F"
+        z: area_info_bottom.z +2
+
+        Text{
+            id: alerta_textual
+            text: _activeVehicle.gps.hdop.rawValue > 1.12 ? "SINAL DE GPS FRACO" : ""//_pct_bateria
+            font.family: "Helvetica"
+            font.pointSize: ScreenTools.defaultFontPixelWidth*2
+            color: "#FFFFFF"
+            z: parent.z+1
+            anchors.top: parent.top
+            anchors.left: parent.left
+
+        }
+    }
     QGCColoredImage{
            id: alerta_bateria
-           x: area_alertas.x - width*0.3
-           y: area_alertas.y+ height*0.1
+           x: area_alertas.x - width*0.35
+           y: area_alertas.y+ height*0.4
            z: area_alertas.z+1
-           width: area_alertas.width/10
-           height: area_alertas.height/2
+           width: area_alertas.width/5
+           height: area_alertas.height/2.5
            color: "#FFFFFF"
            source: "/qmlimages/Battery.svg"
 
@@ -576,19 +598,19 @@ Item {
 
     QGCColoredImage{
            id: alerta_gps
-           x: alerta_bateria.x + width*0.5
-           y: area_alertas.y+ height*0.1
+           x: alerta_bateria.x + width*0.22
+           y: alerta_bateria.y
            z: area_alertas.z+1
-           width: area_alertas.width/10
-           height: area_alertas.height/2
-           color: "#FFFFFF"
+           width: alerta_bateria.width
+           height: alerta_bateria.height
+           color: _activeVehicle.gps.hdop.rawValue >= 1 ? (_activeVehicle.gps.hdop.rawValue >= 1.12 ? "red" : "yellow"): "#FFFFFF"
            source: "/qmlimages/Gps.svg"
 
            Text{
               text: _activeVehicle.gps.hdop.rawValue//_HDOP
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
-              color: "#FFFFFF"
+              color:  "#FFFFFF"
               anchors.horizontalCenter: parent.horizontalCenter
               anchors.top: parent.bottom
               verticalAlignment: Text.AlignVCenter
@@ -597,11 +619,11 @@ Item {
 
     QGCColoredImage{
            id: alerta_RC
-           x: alerta_gps.x + width*0.5
-           y: area_alertas.y+ height*0.1
+           x: alerta_gps.x + width*0.22
+           y: alerta_bateria.y
            z: area_alertas.z+1
-           width: area_alertas.width/10
-           height: area_alertas.height/2
+           width: alerta_bateria.width
+           height: alerta_bateria.height
            color: "#FFFFFF"
            source: "/qmlimages/RC.svg"
 
@@ -618,11 +640,11 @@ Item {
 
     QGCColoredImage{
            id: alerta_combustivel
-           x: alerta_RC.x + width*0.5
-           y: area_alertas.y+ height*0.1
+           x: alerta_RC.x + width*0.22
+           y: alerta_bateria.y
            z: area_alertas.z+1
-           width: area_alertas.width/10
-           height: area_alertas.height/2
+           width: alerta_bateria.width
+           height: alerta_bateria.height
            color: "#FFFFFF"
            source: "/res/Fuel.png"
 
@@ -636,6 +658,30 @@ Item {
               verticalAlignment: Text.AlignVCenter
            }
        }
+
+    Text{
+        id: indicador_pitch
+        x: area_alertas.x + area_alertas.width*0.2
+        y: alerta_combustivel.y
+        z: alerta_combustivel.z+1
+        text: qsTr("PITCH: ") + _activeVehicle.pitch.valueString
+        font.family: "Helvetica"
+        font.pointSize: ScreenTools.defaultFontPixelWidth*2
+        color: "#FFFFFF"
+
+    }
+
+    Text{
+        id: indicador_roll
+        x: indicador_pitch.x
+        y: indicador_pitch.y + indicador_pitch.font.pointSize*1.1
+        z: alerta_combustivel.z+1
+        text: qsTr("ROLL: ") + _activeVehicle.roll.valueString
+        font.family: "Helvetica"
+        font.pointSize: ScreenTools.defaultFontPixelWidth*2
+        color: "#FFFFFF"
+
+    }
 
 
 
