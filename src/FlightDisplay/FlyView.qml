@@ -82,7 +82,7 @@ Item {
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
-    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.valueString
+    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -93,6 +93,22 @@ Item {
         if (QGroundControl.corePlugin.options.instrumentWidget) {
             flightDisplayViewWidgets.adjustToolInset(newToolInset)
         }
+    }
+
+    function _terminal_de_alertas(){
+        var retorno = "";
+        if(_activeVehicle.gps.hdop.rawValue >= 1){
+            retorno = retorno + "- ATENÇÃO: GPS COM BAIXA PRECISÃO\n";
+        }
+        if(_activeVehicle.rcRSSI > 115){
+            retorno = retorno + "- ATENÇÃO: SINAL FRACO DE RADIOCONTROLE\n";
+        }
+        if(_pct_bateria < 15){
+            retorno = retorno + "- ATENÇÃO: BATERIA BAIXA\n";
+        }
+        //espaço para alertas futuros. se necessário, fazer função para reajustar tamanho da fonte de acordo com o numero de alertas simultâneos.
+
+        return  retorno;
     }
 
     QGCToolInsets {
@@ -192,6 +208,7 @@ Item {
              TUDO DAQUI PRA BAIXO É COISA MINHA, PRA CIMA NÃO TEVE MUITA ALTERAÇÃO QUE EU ME LEMBRE 22/03/222
              UNICA ALTERAÇÃO DESDE 22/03 NA PARTE DE CIMA FORAM OS TRÊS ULTIMOS IMPORTS PARA REALIZAR A TROCA DE CAMERA 23/05/2022
              MAIS ALTERAÇÕES: MOUSEAREA NA LINHA 57 26/05/2022
+             FUNÇÃO "_terminal_de_alertas" 23/06/2022
 
     */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -563,8 +580,8 @@ Item {
 
         Text{
             id: alerta_textual
-            text: _activeVehicle.gps.hdop.rawValue > 1.12 ? "SINAL DE GPS FRACO" : ""//_pct_bateria
-            font.family: "Helvetica"
+            text: _terminal_de_alertas()//chama função que retorna todos os alertas em forma textual.
+            font.family: "Georgia"
             font.pointSize: ScreenTools.defaultFontPixelWidth*2
             color: "#FFFFFF"
             z: parent.z+1
@@ -584,7 +601,7 @@ Item {
            source: "/qmlimages/Battery.svg"
 
            Text{
-              text: _activeVehicle.batteries.get(0).percentRemaining.valueString//_pct_bateria
+              text: _activeVehicle.batteries.get(0).percentRemaining.rawValue//_pct_bateria. por que essa bosta não funciona?
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
               color: "#FFFFFF"
@@ -603,7 +620,7 @@ Item {
            z: area_alertas.z+1
            width: alerta_bateria.width
            height: alerta_bateria.height
-           color: _activeVehicle.gps.hdop.rawValue >= 1 ? (_activeVehicle.gps.hdop.rawValue >= 1.12 ? "red" : "yellow"): "#FFFFFF"
+           color: _activeVehicle.gps.hdop.rawValue >= 1 ? (_activeVehicle.gps.hdop.rawValue >= 1.5 ? "red" : "yellow"): "#FFFFFF"
            source: "/qmlimages/Gps.svg"
 
            Text{
