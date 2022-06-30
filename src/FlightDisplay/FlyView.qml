@@ -97,6 +97,7 @@ Item {
 
     function _terminal_de_alertas(){
         var retorno = "";
+        //talvez fazer um contador pra cada alerta e se tiver mais de x alertas, retorno = "POUSE IMEDIATAMENTE. CONDIÇÕES PERIGOSAS PARA VOO"
         if(_activeVehicle.gps.hdop.rawValue >= 1){
             retorno = retorno + "- ATENÇÃO: GPS COM BAIXA PRECISÃO\n";
         }
@@ -563,10 +564,10 @@ Item {
             id: area_alertas
             x: parent.width*0.3
             y: parent.height*4/5
-            width: parent.width
+            width: parent.width*0.3
             height: parent.height*1/5
             color: "#0A283F"
-            z: area_info_bottom.z +2
+            z: area_info_bottom.z +3
         }
 
     Rectangle{
@@ -590,6 +591,203 @@ Item {
 
         }
     }
+
+    Rectangle{
+        id: alerta_bateria
+        x: area_alertas.x
+        y: area_alertas.y
+        z: area_alertas.z+1
+        width: area_alertas.width/4
+        height: area_alertas.height
+        color: "transparent"
+        border.width: 1
+        border.color: "black"
+
+
+
+        Text{
+
+           text: "BATTERY"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.verticalCenter: parent.verticalCenter
+           verticalAlignment: Text.AlignVCenter
+        }
+
+        Text{
+
+           text: "_pct_bateria"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.bottom: parent.bottom
+           verticalAlignment: Text.AlignVCenter
+        }
+
+    }
+
+    Rectangle{
+        id: alerta_gps
+        x: area_alertas.x + area_alertas.width/4
+        y: area_alertas.y
+        z: area_alertas.z+1
+        width: area_alertas.width/4
+        height: area_alertas.height
+        color: "transparent"
+        border.width: 1
+        border.color: "black"
+
+        Text{
+
+           text: "GPS"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.verticalCenter: parent.verticalCenter
+           verticalAlignment: Text.AlignVCenter
+        }
+
+        Text{
+
+           text: "num_satelites"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.bottom: parent.bottom
+           verticalAlignment: Text.AlignVCenter
+        }
+
+    }
+
+    Rectangle{
+        id: alerta_RC
+        x: area_alertas.x + area_alertas.width*2/4
+        y: area_alertas.y
+        z: area_alertas.z+1
+        width: area_alertas.width/4
+        height: area_alertas.height
+        color: "transparent"
+        border.width: 1
+        border.color: "black"
+
+        Text{
+
+           text: "RC"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.verticalCenter: parent.verticalCenter
+           verticalAlignment: Text.AlignVCenter
+        }
+
+        Text{
+
+           text: "quality_sinal"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.bottom: parent.bottom
+           verticalAlignment: Text.AlignVCenter
+        }
+    }
+
+    Rectangle{
+        id: alerta_gasolina
+        x: area_alertas.x + area_alertas.width*3/4
+        y: area_alertas.y
+        z: area_alertas.z+1
+        width: area_alertas.width/4
+        height: area_alertas.height
+        color: "transparent"
+        border.width: 1
+        border.color: "black"
+
+        Text{
+
+           text: "COMBUSTIVEL"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.verticalCenter: parent.verticalCenter
+           verticalAlignment: Text.AlignVCenter
+        }
+
+        Text{
+
+           text: "litros restantes"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.bottom: parent.bottom
+           verticalAlignment: Text.AlignVCenter
+        }
+    }
+
+    Rectangle{
+        id: alerta_texto
+        x: area_alertas.x + area_alertas.width
+        y: area_alertas.y
+        z: area_alertas.z+1
+        color: "transparent"
+        width: area_alertas.width/3
+        height: area_alertas.height
+        border.width: 1
+        border.color: "black"
+
+        Text{
+           id: txt_pitch
+           text: "PITCH"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.margins: 2
+           anchors.left: parent.left
+           anchors.top: parent.top
+        }
+
+        Text{
+           id: txt_roll
+           text: "ROLL"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.left: txt_pitch.left
+           anchors.top: txt_pitch.bottom
+        }
+
+        Text{
+           id: txt_vel
+           text: "VELOCIDADE"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.left: txt_pitch.left
+           anchors.top: txt_roll.bottom
+        }
+
+        Text{
+
+           text: "ALTITUDE"
+           font.family: "Helvetica"
+           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           color: "#FFFFFF"
+           anchors.left: txt_pitch.left
+           anchors.top: txt_vel.bottom
+        }
+
+    }
+
+
+    /* VERSÃO ANTIGA DOS ALERTAS. USAR COMO REFERÊNCIA E DEPOIS DELETAR.
     QGCColoredImage{
            id: alerta_bateria
            x: area_alertas.x - width*0.35
@@ -641,14 +839,14 @@ Item {
            z: area_alertas.z+1
            width: alerta_bateria.width
            height: alerta_bateria.height
-           color: "#FFFFFF"
+           color: _activeVehicle.rcRSSI >= 115 ? (_activeVehicle.rcRSSI  >= 175 ? "red" : "yellow"): "#FFFFFF"
            source: "/qmlimages/RC.svg"
 
            Text{
               text: _activeVehicle.rcRSSI //descobrir qual parametro de vehicle recebe conexão RC
               font.family: "Helvetica"
               font.pointSize: ScreenTools.defaultFontPixelWidth
-              color: "#FFFFFF"
+              color:"#FFFFFF"
               anchors.horizontalCenter: parent.horizontalCenter
               anchors.top: parent.bottom
               verticalAlignment: Text.AlignVCenter
@@ -699,6 +897,7 @@ Item {
         color: "#FFFFFF"
 
     }
+    */
 
 
 
