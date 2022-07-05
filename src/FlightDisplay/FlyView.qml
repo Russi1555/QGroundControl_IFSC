@@ -44,6 +44,7 @@ import QtGraphicalEffects 1.12
 Item {
     id: _root
 
+
     // These should only be used by MainRootWindow
     property var planController:    _planController
     property var guidedController:  _guidedController
@@ -54,13 +55,7 @@ Item {
         Component.onCompleted:  start()
     }
 
-    MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
-       anchors.fill: _root
-       hoverEnabled: true
 
-       onClicked: _selecao_camera = false
-
-    }
 
     property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
@@ -83,9 +78,11 @@ Item {
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
     property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
+    property var _tamanho_fonte_FPV: 12 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
+
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
@@ -93,6 +90,12 @@ Item {
         if (QGroundControl.corePlugin.options.instrumentWidget) {
             flightDisplayViewWidgets.adjustToolInset(newToolInset)
         }
+    }
+
+    function _resize_fonts(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
+        console.log("x da tela: " + mainWindow.width);
+        console.log("y da tela: " + mainWindow.height);
+        return 12 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
     }
 
     function _terminal_de_alertas(){
@@ -111,6 +114,16 @@ Item {
 
         return  retorno;
     }
+    MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
+       anchors.fill: _root
+       hoverEnabled: true
+
+       onClicked: {
+           _selecao_camera = false;
+           _tamanho_fonte_FPV = _resize_fonts()}
+
+    }
+
 
     QGCToolInsets {
         id:                     _toolInsets
@@ -245,16 +258,9 @@ Item {
         color: "#0A283F"
     }
 
-    Text {
-        x: area_info_right.x + 30
-        y: area_info_right.y + 400
-        text: "AREA PARA MAIS INFO"
-        font.family: "Helvetica"
-        font.pointSize: 12
-        color: "white"
-    }
 
-    Item{ //Sliders de corrente individual
+
+    Item{ //Sliders de corrente individual e tensão de barramento
 
 
         Rectangle { //area para as informações em sliders
@@ -263,8 +269,10 @@ Item {
             y: area_info_right.height*0.7
             z:1
             color: "transparent"
+            border.color: "black"
+            border.width: 2
             width: area_info_right.width
-            height: area_info_right.height/4
+            height: area_info_right.height/3
         }
 
             Rectangle { // exemplo de slide, pitch não é um valor relevante para um slider mas é um fácil de se testar em laboratório
@@ -272,7 +280,7 @@ Item {
                 x: area_info_sliders.x + area_info_sliders.width*1/14
                 y: area_info_sliders.y + area_info_sliders.width*1/11
                 width: area_info_sliders.width/14 //estou usando isso como tamanho e espaçamento dos sliders
-                height: area_info_sliders.height - 20
+                height: area_info_sliders.height * 0.65
                 color: _activeVehicle.pitch.rawValue < 45 ? "green" : "red"
 
             }
@@ -390,7 +398,43 @@ Item {
                                    // text: _activeVehicle.pitch.rawValue
 
                                 }
+
+
+
+
               }
+Item{
+    Rectangle { //area para as informações em sliders
+        x: area_info_sliders.x
+        y: area_info_sliders.y - height
+        z:11
+        color: "transparent"
+        border.color: "black"
+        border.width: 2
+        width: area_info_right.width
+        height: area_info_right.height/8
+
+        Rectangle{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width*0.9
+            height: parent.height/5
+            color: "green"
+        }
+
+    }
+    Text {
+        x: area_info_sliders.x + 30
+        y: area_info_sliders.y - 40
+        text: "TENSÃO DE BARRAMENTO"
+        font.family: "Clearview"
+        font.pointSize: 12
+        color: "white"
+    }
+
+}
+
+
 /*
        Text {
            anchors.horizontalCenter: slider_pitch.horizontalCenter
@@ -608,7 +652,7 @@ Item {
         Text{
 
            text: "BATTERY"
-           font.family: "Helvetica"
+           font.family: "Clearview"
            font.pointSize: ScreenTools.defaultFontPixelWidth*2
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
@@ -958,7 +1002,7 @@ Item {
 
                     Text{ //valor 20°
                         font.family: "Helvetica"
-                        font.pointSize: ScreenTools.defaultFontPixelWidth
+                        font.pointSize: _tamanho_fonte_FPV
                         color: angulos_inclinacao_20p.color
                         text: "20°"
                         x:  angulos_inclinacao_20p.x + angulos_inclinacao_20p.width
@@ -978,7 +1022,7 @@ Item {
 
                     Text{ //valor 10°
                         font.family: "Helvetica"
-                        font.pointSize: ScreenTools.defaultFontPixelWidth
+                        font.pointSize: _tamanho_fonte_FPV
                         color: angulos_inclinacao_10p.color
                         text: "10°"
                         x:  angulos_inclinacao_10p.x + angulos_inclinacao_10p.width
@@ -998,7 +1042,7 @@ Item {
 
                     Text{ //valor -10°
                         font.family: "Helvetica"
-                        font.pointSize: ScreenTools.defaultFontPixelWidth
+                        font.pointSize: _tamanho_fonte_FPV
                         color: angulos_inclinacao_10n.color
                         text: "10°"
                         x:  angulos_inclinacao_10n.x + angulos_inclinacao_10n.width
@@ -1018,7 +1062,7 @@ Item {
 
                     Text{ //valor -20°
                         font.family: "Helvetica"
-                        font.pointSize: ScreenTools.defaultFontPixelWidth
+                        font.pointSize: _tamanho_fonte_FPV
                         color: angulos_inclinacao_20n.color
                         text: "20°"
                         x:  angulos_inclinacao_20n.x + angulos_inclinacao_20n.width
@@ -1030,7 +1074,7 @@ Item {
 
                     Text{ //valor máximo permitido para o voo
                         font.family: "Helvetica"
-                        font.pointSize: ScreenTools.defaultFontPixelWidth
+                        font.pointSize: _tamanho_fonte_FPV
                         color: "red"
                         text: _activeVehicle.pitch.valueString
                         x: angulos_inclinacao.x - width/2
@@ -1053,7 +1097,7 @@ Item {
                 }
                 Text{ //valor máximo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_vel_vert.color
                     text: "MAX_VEL"
                     x: coluna_vel_vert.x - 70
@@ -1063,7 +1107,7 @@ Item {
 
                 Text{ //valor minimo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_vel_vert.color
                     text: "MIN_VEL"
                     x: coluna_vel_vert.x - 70
@@ -1074,7 +1118,7 @@ Item {
                 Text{ //altitude barométrica
                     id:  pointer_velocidade_vertical
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_vel_vert.color
                     y: coluna_vel_vert.y + coluna_vel_vert.height/2 - (coluna_vel_vert.height * _activeVehicle.climbRate.rawValue/10) //assumindo MAX_VEL = 10
                     x: coluna_vel_vert.x - coluna_vel_vert.width - font.pointSize*6
@@ -1114,7 +1158,7 @@ Item {
                 }
                 Text{ //valor máximo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_altitude_rel.color
                     text: "MAX_ALT"
                     x: coluna_altitude_rel.x + 10
@@ -1124,7 +1168,7 @@ Item {
 
                 Text{ //valor minimo permitido para o voo
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_altitude_rel.color
                     text: "MIN_ALT"
                     x: coluna_altitude_rel.x + 10
@@ -1135,7 +1179,7 @@ Item {
                 Text{ //altitude Relativa
                     id: pointer_alt_baro
                     font.family: "Helvetica"
-                    font.pointSize: ScreenTools.defaultFontPixelWidth
+                    font.pointSize: _tamanho_fonte_FPV
                     color: coluna_altitude_rel.color
                     y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/20) //assumindo MAX_ALT = 50
                     x: coluna_altitude_rel.x + font.pointSize
@@ -1183,7 +1227,7 @@ Item {
 
                  text: _activeVehicle.heading.rawValue
                  font.family: "Helvetica"
-                 font.pointSize: ScreenTools.defaultFontPixelWidth
+                 font.pointSize: _tamanho_fonte_FPV*2
                  x: bussola_fpv.x + bussola_fpv.width/2 - font.pointSize
                  y: bussola_fpv.y + bussola_fpv.height/4
                  color: "#00FF00"
@@ -1250,7 +1294,7 @@ Item {
 
 
        onClicked : {
-           console.log("posicao x,y do mapa: " + mapControl.x + ", " + mapControl.y)
+           console.log(_activeVehicle.parameterManager.getParameter())
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
            console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
            _informacao_central = !_informacao_central

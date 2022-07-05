@@ -20,6 +20,9 @@ import QGroundControl.ScreenTools   1.0
 import QGroundControl.FlightDisplay 1.0
 import QGroundControl.FlightMap     1.0
 
+
+
+
 /// @brief Native QML top level window
 /// All properties defined here are visible to all QML pages.
 ApplicationWindow {
@@ -27,6 +30,12 @@ ApplicationWindow {
     minimumWidth:   ScreenTools.isMobile ? Screen.width  : Math.min(ScreenTools.defaultFontPixelWidth * 100, Screen.width)
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
+
+    function _resize_fonts(font_fpv){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
+        font_fpv = 1 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
+        console.log("x da tela: " + mainWindow.width);
+        console.log("y da tela: " + mainWindow.height);
+    }
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -40,6 +49,8 @@ ApplicationWindow {
         // Start the sequence of first run prompt(s)
         firstRunPromptManager.nextPrompt()
     }
+
+
 
     QtObject {
         id: firstRunPromptManager
@@ -667,6 +678,8 @@ ApplicationWindow {
         indicatorPopup.currentIndicator = null
     }
 
+
+
     Popup {
         id:             indicatorPopup
         padding:        ScreenTools.defaultFontPixelWidth * 0.75
@@ -697,5 +710,14 @@ ApplicationWindow {
             loader.sourceComponent = null
             indicatorPopup.currentIndicator = null
         }
+    }
+    onWidthChanged:
+    {
+
+    _resize_fonts("qgroundcontrol\src\FlightDisplay\FlyView.qml\_tamanho_fonte_FPV");
+    }
+    onHeightChanged:
+    {
+    _resize_fonts("qgroundcontrol\src\FlightDisplay\FlyView.qml\_tamanho_fonte_FPV");
     }
 }
