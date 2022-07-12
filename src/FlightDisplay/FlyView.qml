@@ -78,11 +78,13 @@ Item {
     property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
     property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
-    property var _tamanho_fonte_FPV: 12 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
+    property int _tamanho_fonte_FPV: 12* (Screen.width/Screen.height)/1.88 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
+    property int _tamanho_fonte_dados_legenda: 14* (Screen.width/Screen.height)/1.88
+    property int _tamanho_fonte_dados_numero: 20* (Screen.width/Screen.height)/1.88
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
-
+   // property real    min_tamanho_tela: Screen.devicePixelRatio
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
@@ -114,7 +116,7 @@ Item {
 
         return  retorno;
     }
-    MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
+   /* MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
        anchors.fill: _root
        hoverEnabled: true
 
@@ -122,7 +124,7 @@ Item {
            _selecao_camera = false;
            _tamanho_fonte_FPV = _resize_fonts()}
 
-    }
+    }*/
 
 
     QGCToolInsets {
@@ -192,9 +194,6 @@ Item {
         visible:            false
     }
 
-
-
-
   /* Rectangle {
          id: motores
          width: parent.width/10
@@ -232,9 +231,6 @@ Item {
             id_seta.y = fim_da_barra
         }
     }
-
-
-
 
 
     Text{
@@ -390,7 +386,7 @@ Item {
                                 Text{
                                     text: "CORRENTE EM CADA MOTOR"
                                     font.family: "Helvetica"
-                                    font.pointSize: 12
+                                    font.pointSize: _tamanho_fonte_dados_legenda * 0.8
                                     color: "white"
                                     x: slider_0.x
                                     y: slider_0.y + slider_0.height/2 - font.pointSize
@@ -403,8 +399,10 @@ Item {
 
 
               }
+
 Item{
     Rectangle { //area para as informações em sliders
+        id: area_slider_tensão
         x: area_info_sliders.x
         y: area_info_sliders.y - height
         z:11
@@ -428,10 +426,34 @@ Item{
         y: area_info_sliders.y - 40
         text: "TENSÃO DE BARRAMENTO"
         font.family: "Clearview"
-        font.pointSize: 12
+        font.pointSize: _tamanho_fonte_dados_legenda * 0.8
         color: "white"
     }
 
+}
+
+Item{
+    Rectangle{
+        x:area_info_right.x
+        y:area_slider_tensão.y - height
+        z:area_slider_tensão.z+1
+        color: "transparent"
+        border.color: "black"
+        border.width: 2
+        width: area_info_right.width
+        height: area_info_right.height/3
+
+        Text{
+
+           text: "ESTIMATIVA DE VOO"
+           font.family: "Clearview"
+           font.pointSize: _tamanho_fonte_dados_legenda
+           color: "#FFFFFF"
+           anchors.horizontalCenter: parent.horizontalCenter
+           anchors.verticalCenter: parent.verticalCenter
+           verticalAlignment: Text.AlignVCenter
+        }
+    }
 }
 
 
@@ -534,7 +556,7 @@ Item{
 
                text: _conexaoinicial ? (_idle ? (_armed ? "ARMED": "READY TO FLY"): "PRE-FLIGHT CHECK") : "DISCONNECTED"
                font.family: "Helvetica"
-               font.pointSize: ScreenTools.defaultFontPixelWidth*2
+               font.pointSize: _tamanho_fonte_dados_legenda
                color: "#FFFFFF"
                anchors.horizontalCenter: parent.horizontalCenter
                anchors.top: parent.bottom
@@ -653,7 +675,7 @@ Item{
 
            text: "BATTERY"
            font.family: "Clearview"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
@@ -662,9 +684,9 @@ Item{
 
         Text{
 
-           text: "_pct_bateria"
+           text: _pct_bateria
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.bottom: parent.bottom
@@ -687,9 +709,9 @@ Item{
         Text{
 
            text: "GPS"
-           font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
-           color: "#FFFFFF"
+           font.family: "Clearview"
+           font.pointSize: _tamanho_fonte_dados_legenda
+           color: _activeVehicle.gps.count.rawValue <=15 ? (_activeVehicle.gps.count.rawValue <10 ? "red" : "yellow"): "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
            verticalAlignment: Text.AlignVCenter
@@ -697,9 +719,9 @@ Item{
 
         Text{
 
-           text: "num_satelites"
-           font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           text: _activeVehicle.gps.count.rawValue //"num_satelites"
+           font.family: "Clearview"
+           font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.bottom: parent.bottom
@@ -721,10 +743,10 @@ Item{
 
         Text{
 
-           text: "RC"
-           font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
-           color: "#FFFFFF"
+           text: "RADIO"
+           font.family: "Bold"
+           font.pointSize: _tamanho_fonte_dados_legenda
+           color: _activeVehicle.rcRSSI >= 115 ? (_activeVehicle.rcRSSI  >= 175 ? "red" : "yellow"): "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
            verticalAlignment: Text.AlignVCenter
@@ -732,9 +754,9 @@ Item{
 
         Text{
 
-           text: "quality_sinal"
+           text: _activeVehicle.rcRSSI //"quality_sinal"
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.bottom: parent.bottom
@@ -755,9 +777,9 @@ Item{
 
         Text{
 
-           text: "COMBUSTIVEL"
+           text: "GAS"
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
@@ -766,9 +788,9 @@ Item{
 
         Text{
 
-           text: "litros restantes"
+           text: "litros"
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.bottom: parent.bottom
@@ -988,6 +1010,7 @@ Item {
                     id: angulos_inclinacao
                     x: borda_crosshair.x + borda_crosshair.width/2
                     y: crosshair_central.y + crosshair_central.height/2
+                    visible: !_informacao_central
 
                     Rectangle{
                     id: angulos_inclinacao_20p
@@ -1294,10 +1317,11 @@ Item {
 
 
        onClicked : {
-           console.log(_activeVehicle.parameterManager.getParameter())
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
            console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
+           console.log("teste 2: " + _tamanho_fonte_FPV)
            _informacao_central = !_informacao_central
+
        }
     }
 

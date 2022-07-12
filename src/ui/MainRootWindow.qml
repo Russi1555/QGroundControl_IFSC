@@ -31,10 +31,11 @@ ApplicationWindow {
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
 
-    function _resize_fonts(font_fpv){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
-        font_fpv = 1 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
-        console.log("x da tela: " + mainWindow.width);
-        console.log("y da tela: " + mainWindow.height);
+    function _resize_fonts_FPV(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
+
+        flightView._tamanho_fonte_FPV = 12 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
+        flightView._tamanho_fonte_dados_legenda = 14 * (mainWindow.width/mainWindow.height)/1.88
+        flightView._tamanho_fonte_dados_numero = 20 * (mainWindow.width/mainWindow.height)/1.88
     }
 
     Component.onCompleted: {
@@ -714,10 +715,10 @@ ApplicationWindow {
     onWidthChanged:
     {
 
-    _resize_fonts("qgroundcontrol\src\FlightDisplay\FlyView.qml\_tamanho_fonte_FPV");
+    _resize_fonts_FPV();
     }
     onHeightChanged:
     {
-    _resize_fonts("qgroundcontrol\src\FlightDisplay\FlyView.qml\_tamanho_fonte_FPV");
+    _resize_fonts_FPV();
     }
 }
