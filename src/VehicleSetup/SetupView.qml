@@ -210,13 +210,13 @@ Rectangle {
 
             Repeater {
                 model:                  _corePlugin ? _corePlugin.settingsPages : []
-                visible:                _corePlugin && _corePlugin.options.combineSettingsAndSetup
+                visible:               true// _corePlugin && _corePlugin.options.combineSettingsAndSetup
                 SubMenuButton {
                     imageResource:      modelData.icon
                     setupIndicator:     false
                     exclusiveGroup:     setupButtonGroup
                     text:               modelData.title
-                    visible:            _corePlugin && _corePlugin.options.combineSettingsAndSetup
+                    visible:            true//_corePlugin && _corePlugin.options.combineSettingsAndSetup
                     onClicked:          showPanel(this, modelData.url)
                     Layout.fillWidth:   true
                 }
@@ -239,7 +239,7 @@ Rectangle {
                 imageResource:      "/qmlimages/FirmwareUpgradeIcon.png"
                 setupIndicator:     false
                 exclusiveGroup:     setupButtonGroup
-                visible:            !ScreenTools.isMobile && _corePlugin.options.showFirmwareUpgrade
+                visible:            true//!ScreenTools.isMobile && _corePlugin.options.showFirmwareUpgrade
                 text:               qsTr("Firmware")
                 Layout.fillWidth:   true
 
@@ -287,9 +287,9 @@ Rectangle {
             SubMenuButton {
                 setupIndicator:     false
                 exclusiveGroup:     setupButtonGroup
-                visible:            QGroundControl.multiVehicleManager.parameterReadyVehicleAvailable &&
+                visible:           true/* QGroundControl.multiVehicleManager.parameterReadyVehicleAvailable &&
                                     !QGroundControl.multiVehicleManager.activeVehicle.usingHighLatencyLink &&
-                                    _corePlugin.showAdvancedUI
+                                    _corePlugin.showAdvancedUI*/ //Se não estiver só como "True" ele não aparece por alguma motivo >:(
                 text:               qsTr("Parameters")
                 Layout.fillWidth:   true
                 onClicked:          showPanel(this, "SetupParameterEditor.qml")

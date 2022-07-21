@@ -81,6 +81,7 @@ Item {
     property int _tamanho_fonte_FPV: 12* (Screen.width/Screen.height)/1.88 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
     property int _tamanho_fonte_dados_legenda: 14* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_dados_numero: 20* (Screen.width/Screen.height)/1.88
+    property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -649,7 +650,7 @@ Item{
             id: alerta_textual
             text: _terminal_de_alertas()//chama função que retorna todos os alertas em forma textual.
             font.family: "Georgia"
-            font.pointSize: ScreenTools.defaultFontPixelWidth*2
+            font.pointSize: _tamanho_fonte_terminal_alertas
             color: "#FFFFFF"
             z: parent.z+1
             anchors.top: parent.top
@@ -811,9 +812,9 @@ Item{
 
         Text{
            id: txt_pitch
-           text: "PITCH"
+           text: "PITCH: " + _activeVehicle.pitch.valueString
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.margins: 2
            anchors.left: parent.left
@@ -822,9 +823,9 @@ Item{
 
         Text{
            id: txt_roll
-           text: "ROLL"
+           text: "ROLL: " + _activeVehicle.roll.valueString
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.left: txt_pitch.left
            anchors.top: txt_pitch.bottom
@@ -832,9 +833,9 @@ Item{
 
         Text{
            id: txt_vel
-           text: "VELOCIDADE"
+           text: "VELOCIDADE: " + _activeVehicle.airSpeed.valueString
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.left: txt_pitch.left
            anchors.top: txt_roll.bottom
@@ -842,9 +843,9 @@ Item{
 
         Text{
 
-           text: "ALTITUDE"
+           text: "ALTITUDE: " + _activeVehicle.altitudeAMSL.valueString
            font.family: "Helvetica"
-           font.pointSize: ScreenTools.defaultFontPixelWidth*2
+           font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
            anchors.left: txt_pitch.left
            anchors.top: txt_vel.bottom
@@ -1319,7 +1320,7 @@ Item {
        onClicked : {
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
            console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
-           console.log("teste 2: " + _tamanho_fonte_FPV)
+           console.log("teste 2: " + ParameterManager.parametersReady)
            _informacao_central = !_informacao_central
 
        }

@@ -36,6 +36,7 @@ ApplicationWindow {
         flightView._tamanho_fonte_FPV = 12 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
         flightView._tamanho_fonte_dados_legenda = 14 * (mainWindow.width/mainWindow.height)/1.88
         flightView._tamanho_fonte_dados_numero = 20 * (mainWindow.width/mainWindow.height)/1.88
+        flightView._tamanho_fonte_terminal_alertas = 14 * (mainWindow.width/mainWindow.height)/1.88
     }
 
     Component.onCompleted: {
