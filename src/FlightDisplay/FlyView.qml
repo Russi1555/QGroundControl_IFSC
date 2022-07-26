@@ -586,7 +586,7 @@ Item{
         x: 0
         y: 0
         width: parent.width*7/8
-        height: parent.height*5/6
+        height: parent.height - area_info_bottom.height
         color: "transparent"
     }
 
@@ -843,7 +843,7 @@ Item{
 
         Text{
 
-           text: "ALTITUDE: " + _activeVehicle.altitudeAMSL.valueString
+           text: "ALTITUDE: " + _activeVehicle.altitudeRelative.valueString
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
@@ -980,6 +980,15 @@ Item{
 
 
                 //visible: !_informacao_central
+            }
+
+            Rectangle{
+                id: borda_video
+                anchors.fill: videoControl
+                color: "transparent"
+                border.width: _informacao_central ? 1 : 5
+                border.color: black
+                z: videoControl.z
             }
 Item {
     z: videoControl.z
@@ -1251,7 +1260,8 @@ Item {
 
                  text: _activeVehicle.heading.rawValue
                  font.family: "Helvetica"
-                 font.pointSize: _tamanho_fonte_FPV*2
+                 font.pointSize: _informacao_central ? _tamanho_fonte_FPV : _tamanho_fonte_FPV*2
+                 verticalAlignment: Text.AlignVCenter
                  x: bussola_fpv.x + bussola_fpv.width/2 - font.pointSize
                  y: bussola_fpv.y + bussola_fpv.height/4
                  color: "#00FF00"
@@ -1287,6 +1297,14 @@ Item {
         mapName:                "FlightDisplayView"
         visible: true
     }
+    Rectangle{
+        id: borda_mapa
+        anchors.fill: mapControl
+        color: "transparent"
+        border.width: _informacao_central ? 5 : 1
+        border.color: black
+        z:mapControl.z
+    }
 
 
         Rectangle {
@@ -1320,7 +1338,7 @@ Item {
        onClicked : {
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
            console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
-           console.log("teste 2: " + ParameterManager.parametersReady)
+          // console.log("teste 2: " + Parame)
            _informacao_central = !_informacao_central
 
        }
