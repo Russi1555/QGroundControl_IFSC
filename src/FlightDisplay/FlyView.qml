@@ -83,6 +83,8 @@ Item {
     property int _tamanho_fonte_dados_numero: 20* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
 
+    property int valor_teste: 0
+
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
    // property real    min_tamanho_tela: Screen.devicePixelRatio
@@ -258,6 +260,7 @@ Item {
 
 
     Item{ //Sliders de corrente individual e tensão de barramento
+        visible: false
 
 
         Rectangle { //area para as informações em sliders
@@ -649,7 +652,7 @@ Item{
         Text{
             id: alerta_textual
             text: _terminal_de_alertas()//chama função que retorna todos os alertas em forma textual.
-            font.family: "Georgia"
+            font.family: "Clearview"
             font.pointSize: _tamanho_fonte_terminal_alertas
             color: "#FFFFFF"
             z: parent.z+1
@@ -988,7 +991,7 @@ Item{
                 color: "transparent"
                 border.width: _informacao_central ? 1 : 5
                 border.color: black
-                z: videoControl.z
+                z: videoControl.z+5
             }
 Item {
     z: videoControl.z
@@ -1338,6 +1341,7 @@ Item {
        onClicked : {
            console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
            console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
+           //console.log("teste 2" + RadioComponentController.controller)
           // console.log("teste 2: " + Parame)
            _informacao_central = !_informacao_central
 
@@ -1353,6 +1357,18 @@ Item {
             z:2
             color:"#AA000000"
     }
+
+
+            RadioComponentController {
+                id:             controller
+                statusText:     statusText
+                cancelButton:   cancelButton
+                nextButton:     nextButton
+                skipButton:     skipButton
+                onChannelCountChanged:              updateChannelCount()
+            }
+
+
 
     QGCColoredImage { //botão para trocar camera
             height: botao_troca_camera.width
@@ -1374,8 +1390,9 @@ Item {
 
                console.log(_activeVehicle.cameraManager.currentCamera)
                console.log(_activeVehicle.cameraManager.cameras.count)
-               console.log(QGroundControl.settingsManager.videoSettings.videoSource.rawValue)
-               console.log(QGroundControl.settingsManager.videoSettings.videoSource.enumString)
+               //console.log(QGroundControl.settingsManager.videoSettings.videoSource.rawValue)
+               //console.log(QGroundControl.settingsManager.videoSettings.videoSource.enumString)
+               console.log(controller.channelCount.rawValue)
                _selecao_camera = !_selecao_camera
 
                console.log("****************")
