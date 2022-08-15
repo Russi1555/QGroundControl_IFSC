@@ -84,6 +84,12 @@ Item {
     property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
 
     property int valor_teste: 0
+    property real _pitch: Math.round(_activeVehicle.pitch.value * 10) / 10 //operação matemática para arredondar o número para 1 casa decimal...
+    property real _roll:  Math.round(_activeVehicle.roll.rawValue * 10) / 10 //... provavelmente melhora desempenho poupando a CPU de calcular posição de itens na tela com 10 casas decimais de subpixel
+    property real _heading: Math.round(_activeVehicle.heading.value)
+    property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
+    property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
+
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -239,8 +245,8 @@ Item {
     Text{
         x: 500
         y: 400
-        //text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
-       // text: _activeVehicle.pitch.rawValue
+        //text: _pitch //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
+       // text: _pitch
         font.family: "Helvetica"
         font.pointSize: 24
         color: "red"
@@ -281,7 +287,7 @@ Item {
                 y: area_info_sliders.y + area_info_sliders.width*1/11
                 width: area_info_sliders.width/14 //estou usando isso como tamanho e espaçamento dos sliders
                 height: area_info_sliders.height * 0.65
-                color: _activeVehicle.pitch.rawValue < 45 ? "green" : "red"
+                color: _pitch < 45 ? "green" : "red"
 
             }
 
@@ -289,7 +295,7 @@ Item {
                     x: slider_0.x
                     y: slider_0.y
                     width: slider_pitch.width
-                    height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                    height: Math.abs(2*(_roll) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                     color: "black"
 
                 }
@@ -308,7 +314,7 @@ Item {
                      x: slider_1.x
                      y: slider_1.y
                      width: slider_1.width
-                     height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                     height: Math.abs(2*(_roll) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                      color: "black"
 
                  }
@@ -327,7 +333,7 @@ Item {
                          x: slider_2.x
                          y: slider_2.y
                          width: slider_2.width
-                         height: Math.abs(2*(_activeVehicle.roll.rawValue) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
+                         height: Math.abs(2*(_roll) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
                          color: "black"
 
                      }
@@ -345,7 +351,7 @@ Item {
                              x: slider_3.x
                              y: slider_3.y
                              width: slider_3.width
-                             height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                             height: Math.abs(2*(_roll) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                              color: "black"
 
                          }
@@ -364,7 +370,7 @@ Item {
                                  x: slider_4.x
                                  y: slider_4.y
                                  width: slider_4.width
-                                 height: Math.abs(2*(_activeVehicle.roll.rawValue) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                 height: Math.abs(2*(_roll) ) //os atributos que podem ser acessados estão em headers/src/vehicles.h
                                  color: "black"
 
                              }
@@ -382,7 +388,7 @@ Item {
                                      x: slider_5.x
                                      y: slider_5.y
                                      width: slider_5.width
-                                     height: Math.abs(2*(_activeVehicle.roll.rawValue) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
+                                     height: Math.abs(2*(_roll) )//os atributos que podem ser acessados estão em headers/src/vehicles.h
                                      color: "black"
 
                                  }
@@ -394,8 +400,8 @@ Item {
                                     color: "white"
                                     x: slider_0.x
                                     y: slider_0.y + slider_0.height/2 - font.pointSize
-                                   // text: _activeVehicle.pitch.rawValue //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
-                                   // text: _activeVehicle.pitch.rawValue
+                                   // text: _pitch //isso funciona. pra acessar deve ser então _activeVehicle.(atributo).rawValue (nem sempre rawValue, olhar no header)
+                                   // text: _pitch
 
                                 }
 
@@ -815,7 +821,7 @@ Item{
 
         Text{
            id: txt_pitch
-           text: "PITCH: " + _activeVehicle.pitch.valueString
+           text: "PITCH: " + _pitch
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
@@ -826,7 +832,7 @@ Item{
 
         Text{
            id: txt_roll
-           text: "ROLL: " + _activeVehicle.roll.valueString
+           text: "ROLL: " + _roll
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
@@ -836,7 +842,7 @@ Item{
 
         Text{
            id: txt_vel
-           text: "VELOCIDADE: " + _activeVehicle.airSpeed.valueString
+           text: "VELOCIDADE: " + Math.round(_activeVehicle.airSpeed.value * 100) / 100
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
@@ -846,7 +852,7 @@ Item{
 
         Text{
 
-           text: "ALTITUDE: " + _activeVehicle.altitudeRelative.valueString
+           text: "ALTITUDE: " + _altitude_relative
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_legenda
            color: "#FFFFFF"
@@ -1004,7 +1010,7 @@ Item {
                         y: videoControl.y + videoControl.height/2 - height/2
                         color: "#00FF00"
                         source: "/res/crossHair_res.svg"
-                        rotation: _activeVehicle.roll.rawValue
+                        rotation: _roll
                 }
 
                 Rectangle{//circulo ao redor do crosshair
@@ -1030,9 +1036,9 @@ Item {
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
                     x: - width/2
-                    y:  - _activeVehicle.pitch.rawValue*2 -40 // +20°
+                    y:  - _pitch*2 -40 // +20°
                     color: "#00FF00"
-                    visible: _activeVehicle.pitch.rawValue < 26 ? true : false
+                    visible: _pitch < 26 ? true : false
 
                     }
 
@@ -1043,7 +1049,7 @@ Item {
                         text: "20°"
                         x:  angulos_inclinacao_20p.x + angulos_inclinacao_20p.width
                         y:  angulos_inclinacao_20p.y - font.pointSize
-                        visible: _activeVehicle.pitch.rawValue < 12 ? true : false
+                        visible: _pitch < 12 ? true : false
                     }
 
                     Rectangle{
@@ -1051,9 +1057,9 @@ Item {
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
                     x: - width/2
-                    y: - _activeVehicle.pitch.rawValue*2 -20// +10°
+                    y: - _pitch*2 -20// +10°
                     color: "#00FF00"
-                    visible: _activeVehicle.pitch.rawValue < 39 ? true : false
+                    visible: _pitch < 39 ? true : false
                     }
 
                     Text{ //valor 10°
@@ -1063,7 +1069,7 @@ Item {
                         text: "10°"
                         x:  angulos_inclinacao_10p.x + angulos_inclinacao_10p.width
                         y:  angulos_inclinacao_10p.y - font.pointSize
-                        visible: _activeVehicle.pitch.rawValue < 30 ? true : false
+                        visible: _pitch < 30 ? true : false
                     }
 
                     Rectangle{
@@ -1071,9 +1077,9 @@ Item {
                     width: borda_crosshair.width/3
                     height: borda_crosshair.border.width
                     x: - width/2
-                    y: - _activeVehicle.pitch.rawValue*2 +20 // -10°
+                    y: - _pitch*2 +20 // -10°
                     color: "#00FF00"
-                    visible: _activeVehicle.pitch.rawValue > -38 ? true : false
+                    visible: _pitch > -38 ? true : false
                     }
 
                     Text{ //valor -10°
@@ -1083,7 +1089,7 @@ Item {
                         text: "10°"
                         x:  angulos_inclinacao_10n.x + angulos_inclinacao_10n.width
                         y:  angulos_inclinacao_10n.y - font.pointSize
-                        visible: _activeVehicle.pitch.rawValue > -35 ? true : false
+                        visible: _pitch > -35 ? true : false
                     }
 
                     Rectangle{
@@ -1091,9 +1097,9 @@ Item {
                     width: borda_crosshair.width/2
                     height: borda_crosshair.border.width
                     x: - width/2
-                    y: - _activeVehicle.pitch.rawValue*2 + 40 // -20°
+                    y: - _pitch*2 + 40 // -20°
                     color: "#00FF00"
-                    visible: _activeVehicle.pitch.rawValue > -25 ? true : false
+                    visible: _pitch > -25 ? true : false
                     }
 
                     Text{ //valor -20°
@@ -1103,7 +1109,7 @@ Item {
                         text: "20°"
                         x:  angulos_inclinacao_20n.x + angulos_inclinacao_20n.width
                         y:  angulos_inclinacao_20n.y - font.pointSize
-                        visible: _activeVehicle.pitch.rawValue > -19 ? true : false
+                        visible: _pitch > -19 ? true : false
                     }
 
                 }
@@ -1112,7 +1118,7 @@ Item {
                         font.family: "Helvetica"
                         font.pointSize: _tamanho_fonte_FPV
                         color: "red"
-                        text: _activeVehicle.pitch.valueString
+                        text: _pitch
                         x: angulos_inclinacao.x - width/2
                         y: borda_crosshair.y + borda_crosshair.height - font.pointSize*2
 
@@ -1156,10 +1162,10 @@ Item {
                     font.family: "Helvetica"
                     font.pointSize: _tamanho_fonte_FPV
                     color: coluna_vel_vert.color
-                    y: coluna_vel_vert.y + coluna_vel_vert.height/2 - (coluna_vel_vert.height * _activeVehicle.climbRate.rawValue/10) //assumindo MAX_VEL = 10
+                    y: coluna_vel_vert.y + coluna_vel_vert.height/2 - (coluna_vel_vert.height * _climb_rate /10) //assumindo MAX_VEL = 10
                     x: coluna_vel_vert.x - coluna_vel_vert.width - font.pointSize*6
-                    text: _activeVehicle.climbRate.valueString + "m/s"
-                    visible: _activeVehicle.climbRate.rawValue === "NaN" ? false : true
+                    text: _climb_rate  + "m/s"
+                    visible: _climb_rate  === "NaN" ? false : true
                 }
 
                 Rectangle{
@@ -1217,7 +1223,7 @@ Item {
                     font.family: "Helvetica"
                     font.pointSize: _tamanho_fonte_FPV
                     color: coluna_altitude_rel.color
-                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _activeVehicle.altitudeRelative.rawValue/20) //assumindo MAX_ALT = 50
+                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _altitude_relative/20) //assumindo MAX_ALT = 50
                     x: coluna_altitude_rel.x + font.pointSize
                     text: _activeVehicle.altitudeRelative.valueString + "m"
                     visible: _activeVehicle.altitudeRelative === 0 ?   false:true
@@ -1251,17 +1257,16 @@ Item {
                      x: videoControl.width/2 - width/2
                      y: videoControl.y + videoControl.height - height/2
 
-
                      color: "#00FF00"
                      source: "/res/bussola_fpv.png"
-                     rotation: _activeVehicle.heading.rawValue
+                     rotation: _heading
 
 
              }
 
              Text {
 
-                 text: _activeVehicle.heading.rawValue
+                 text: _heading
                  font.family: "Helvetica"
                  font.pointSize: _informacao_central ? _tamanho_fonte_FPV : _tamanho_fonte_FPV*2
                  verticalAlignment: Text.AlignVCenter
@@ -1281,7 +1286,7 @@ Item {
                 x: area_mapa_camera.width/2 -width/2
                 y: area_mapa_camera.height/2 -height/2
                 color: "#A0007700"
-                rotation: _activeVehicle.roll.rawValue
+                rotation: _roll
             }*/
 
 }
@@ -1330,6 +1335,7 @@ Item {
                 color: "#AA00FF00"
                 source: "/res/spin_icon.png" //"/res/crossHair_res.svg"
         }
+        FactPanelController { id: controller2; }
 
     MouseArea { //botão_troca_centro
        id: click_trocar_centro
@@ -1339,10 +1345,9 @@ Item {
 
 
        onClicked : {
-           console.log("posicao x,y do video: " + videoControl.x + ", " + videoControl.y)
-           console.log("teste: " + globals.activeVehicle.cameraManager.currentCamera)
+           //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
-          // console.log("teste 2: " + Parame)
+           console.log("teste 2: " + controller2.getParameterFact(1, "CAL_MAG0_ID").value)
            _informacao_central = !_informacao_central
 
        }
