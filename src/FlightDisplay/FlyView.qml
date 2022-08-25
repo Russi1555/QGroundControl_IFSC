@@ -89,7 +89,7 @@ Item {
     property real _heading: Math.round(_activeVehicle.heading.value)
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
-
+    property bool _redraw_ocupado: false
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -266,7 +266,6 @@ Item {
 
 
     Item{ //Sliders de corrente individual e tensão de barramento
-        visible: false
 
 
         Rectangle { //area para as informações em sliders
@@ -694,6 +693,7 @@ Item{
 
         Text{
 
+           property real valor_antigo : _pct_bateria
            text: _pct_bateria
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_numero
@@ -1347,7 +1347,7 @@ Item {
        onClicked : {
            //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
-           console.log("teste 2: " + controller2.getParameterFact(1, "CAL_MAG0_ID").value)
+           console.log("teste 2: " + controller2.getParameterFact(1, "COMPASS_CAL_FIT").rawValue) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp. Coisa linda
            _informacao_central = !_informacao_central
 
        }
