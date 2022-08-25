@@ -89,7 +89,7 @@ Item {
     property real _heading: Math.round(_activeVehicle.heading.value)
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
-    property bool _redraw_ocupado: false
+    property real _parametro_custom_1: 0
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -1335,7 +1335,11 @@ Item {
                 color: "#AA00FF00"
                 source: "/res/spin_icon.png" //"/res/crossHair_res.svg"
         }
-        FactPanelController { id: controller2; }
+
+        ParameterEditorController {
+            id: controller2
+        }
+
 
     MouseArea { //botão_troca_centro
        id: click_trocar_centro
@@ -1343,11 +1347,20 @@ Item {
        anchors.fill: botao_troca_centro
        hoverEnabled: true
 
+       //Acredito que o caminho seja por aqui. O Controller2 parece promissor mas é bom olhar no PARAMETEREDITOR.QML depois pra pegar outras possibilidades
+       property Fact fact1: controller2.getParameterFact(-1,"IMU_ACCEL_CUTOFF").valueString
+       property Fact fact2: controller2.getParameterFact(-1,"BAT1_V_CHARGED").valueString
+       property Fact fact3: controller2.getParameterFact(-1,"LNDMC_ALT_GND").valueString
+       property Fact fact4: controller2.parameterExists(-1, "IMU_ACCEL_CUTOFF")
+
 
        onClicked : {
            //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
-           console.log("teste 2: " + controller2.getParameterFact(1, "COMPASS_CAL_FIT").rawValue) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp. Coisa linda
+           console.log("teste 2: " + fact4) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
+           console.log("teste 3: " + fact2)
+           console.log("teste 4: " + fact3)
+           console.log("teste 5: " + _activeVehicle.factGroupNames)
            _informacao_central = !_informacao_central
 
        }

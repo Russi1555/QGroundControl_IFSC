@@ -252,6 +252,11 @@ Item {
                             return factRow.modelFact.selectedBitmaskStrings.join(',')
                         }
 
+                        /*if (factRow.modelFact.name == "SENS_BARO_RATE"){
+                            flightView._parametro_custom_1 = factRow.modelFact.enumStringValue
+                            console.log(factRow.modelFact.enumStringValue)
+                        }*/ //Vamos ver se isso me deixa dar um sorriso. Acho dificil...
+
                         return factRow.modelFact.enumStringValue
                     }
                     clip:   true
