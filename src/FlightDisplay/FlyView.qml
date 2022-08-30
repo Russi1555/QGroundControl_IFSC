@@ -1336,13 +1336,14 @@ Item {
                 source: "/res/spin_icon.png" //"/res/crossHair_res.svg"
         }
 
-        ParameterEditorController {
+        ParameterEditorController { //talvez não precise mais disso
             id: controller2
+
         }
 
         ParameterEditor {
             id: parameters_vehicle
-           // visible: false
+            visible: false
         }
 
     MouseArea { //botão_troca_centro
@@ -1451,7 +1452,7 @@ Item {
     }
 
 
-
+/*
     Item { // ta uma bosta isso aqui. Não funciona controller2 é meme. Ele ta lendo outra merda só deus sabe o que
         x:500
         y:200
@@ -1465,11 +1466,11 @@ Item {
                 id:                     videoSource2
                 Layout.preferredWidth:  _comboFieldWidth
                 indexModel:             false
-                fact:                   parameters_vehicle._controller.categories.name
+                fact:                   parameters_vehicle._controller.parameters
             }
         }
     }
-
+*/
 
 
 }
