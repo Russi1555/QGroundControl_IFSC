@@ -1340,6 +1340,10 @@ Item {
             id: controller2
         }
 
+        ParameterEditor {
+            id: parameters_vehicle
+           // visible: false
+        }
 
     MouseArea { //botão_troca_centro
        id: click_trocar_centro
@@ -1348,19 +1352,30 @@ Item {
        hoverEnabled: true
 
        //Acredito que o caminho seja por aqui. O Controller2 parece promissor mas é bom olhar no PARAMETEREDITOR.QML depois pra pegar outras possibilidades
-       property Fact fact1: controller2.getParameterFact(-1,"IMU_ACCEL_CUTOFF").valueString
-       property Fact fact2: controller2.getParameterFact(-1,"BAT1_V_CHARGED").valueString
-       property Fact fact3: controller2.getParameterFact(-1,"LNDMC_ALT_GND").valueString
-       property Fact fact4: controller2.parameterExists(-1, "IMU_ACCEL_CUTOFF")
+      /* property Fact fact1: parameters_vehicle._controller.getParameterFact(-1,"IMU_ACCEL_CUTOFF").value
+       property Fact fact2: parameters_vehicle._controller.getParameterFact(-1,"BAT1_V_CHARGED")
+       property Fact fact3: parameters_vehicle._controller.getParameterFact(-1,"LNDMC_ALT_GND")
+       property Fact fact4: parameters_vehicle._controller.getParameterFact(-1, "IMU_ACCEL_CUTOFF")*/
 
 
        onClicked : {
            //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
-           console.log("teste 2: " + fact4) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
-           console.log("teste 3: " + fact2)
-           console.log("teste 4: " + fact3)
-           console.log("teste 5: " + _activeVehicle.factGroupNames)
+           parameters_vehicle._controller.currentCategory = parameters_vehicle._controller.categories.get(0) //seta a categoria dos parametros como STANDARD
+           console.log("teste 2: " + parameters_vehicle._controller.parameters) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
+           console.log(parameters_vehicle._controller.parameters.count)
+           console.log(parameters_vehicle._controller.parameters.get(0).name)
+           console.log(parameters_vehicle._controller.parameters.get(0).rawValue)
+           console.log(parameters_vehicle._controller.parameters.get(0).defaultValue)
+           console.log(parameters_vehicle._controller.parameters.get(1).name)
+           console.log(parameters_vehicle._controller.parameters.get(1).rawValue)
+           console.log(parameters_vehicle._controller.parameters.get(1).defaultValue)
+           console.log(parameters_vehicle._controller.parameters.get(2).name)
+           console.log(parameters_vehicle._controller.parameters.get(2).rawValue)
+           console.log(parameters_vehicle._controller.parameters.get(2).defaultValue)
+
+           console.log(parameters_vehicle._controller.currentCategory.name)
+//
            _informacao_central = !_informacao_central
 
        }
@@ -1431,6 +1446,26 @@ Item {
                 Layout.preferredWidth:  _comboFieldWidth
                 indexModel:             false
                 fact:                   QGroundControl.settingsManager.videoSettings.videoSource
+            }
+        }
+    }
+
+
+
+    Item { // ta uma bosta isso aqui. Não funciona controller2 é meme. Ele ta lendo outra merda só deus sabe o que
+        x:500
+        y:200
+        z:2000
+
+        GridLayout {
+            id:         videoGrid2
+            columns:    1
+
+            FactComboBox{
+                id:                     videoSource2
+                Layout.preferredWidth:  _comboFieldWidth
+                indexModel:             false
+                fact:                   parameters_vehicle._controller.categories.name
             }
         }
     }
