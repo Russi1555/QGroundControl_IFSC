@@ -30,6 +30,7 @@ ApplicationWindow {
     minimumWidth:   ScreenTools.isMobile ? Screen.width  : Math.min(ScreenTools.defaultFontPixelWidth * 100, Screen.width)
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
+    property var _variavel_intermediaria
 
     function _resize_fonts_FPV(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
 
@@ -37,7 +38,17 @@ ApplicationWindow {
         flightView._tamanho_fonte_dados_legenda = 14 * (mainWindow.width/mainWindow.height)/1.88
         flightView._tamanho_fonte_dados_numero = 20 * (mainWindow.width/mainWindow.height)/1.88
         flightView._tamanho_fonte_terminal_alertas = 14 * (mainWindow.width/mainWindow.height)/1.88
+
     }
+
+    Timer {
+        interval: 1000; running: true; repeat: true
+        onTriggered: {
+            console.log("Atualizando valor customizado...")
+            flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
+        }
+    }
+
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -447,6 +458,22 @@ ApplicationWindow {
         id:             flightView
         anchors.fill:   parent
     }
+/*
+    ParameterEditor {
+        id: tela_parametros
+        visible: false
+    }
+
+    Item { //deleter depois
+        Timer {
+            interval: 1000; running: true; repeat: true
+            onTriggered: {
+                console.log(tela_parametros._ponte_root_window)
+                flightView._parametro_custom_1 = tela_parametros._ponte_root_window}
+        }
+
+        Text { id: time }
+    }*/
 
     PlanView {
         id:             planView

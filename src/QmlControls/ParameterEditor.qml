@@ -20,6 +20,9 @@ import QGroundControl.Controllers   1.0
 import QGroundControl.FactSystem    1.0
 import QGroundControl.FactControls  1.0
 
+import QGroundControl.FlightDisplay 1.0
+//import QGroundControl.FlightMap     1.0
+
 Item {
     id:         _root
     property Fact   _editorDialogFact: Fact { }
@@ -31,10 +34,14 @@ Item {
     property bool   _showRCToParam:     _activeVehicle.px4Firmware
     property var    _appSettings:       QGroundControl.settingsManager.appSettings
     property var    _controller:        controller
+    property real _ponte_root_window: 0
+
+
 
     ParameterEditorController {
         id: controller
     }
+
 
     ExclusiveGroup { id: sectionGroup }
 
@@ -75,6 +82,7 @@ Item {
                 if(ScreenTools.isMobile) {
                     Qt.inputMethod.hide();
                 }
+                flightView._parametro_custom_1 = 5//factRow.modelFact.name
                 clearTimer.start()
             }
             anchors.verticalCenter: parent.verticalCenter
@@ -218,6 +226,7 @@ Item {
         model:              controller.parameters
         cacheBuffer:        height > 0 ? height * 2 : 0
         clip:               true
+        visible: true
 
         delegate: Rectangle {
             height: _rowHeight
@@ -231,11 +240,13 @@ Item {
 
                 property Fact modelFact: object
 
+
                 QGCLabel {
                     id:     nameLabel
                     width:  ScreenTools.defaultFontPixelWidth  * 20
                     text:   factRow.modelFact.name
                     clip:   true
+
                 }
 
                 QGCLabel {
@@ -249,6 +260,26 @@ Item {
 
                         if(factRow.modelFact.bitmaskStrings.length != 0) {
                             return factRow.modelFact.selectedBitmaskStrings.join(',')
+                        }
+
+                        if (factRow.modelFact.name != false){
+                            console.log(factRow.modelFact.name + " : " + factRow.modelFact.value)
+
+                            if (factRow.modelFact.name == "NAV_RCL_ACT"){
+                                mainWindow._variavel_intermidiaria = factRow.modelFact.value
+                                //console.log(_ponte_root_window)
+                                console.log(mainWindow._variavel_intermidiaria)
+                                // console.log(factRow.modelFact.category)
+                                // console.log(factRow.modelFact.defaultValueString)
+                                // console.log(factRow.modelFact.group)
+                            }
+
+                           // console.log(factRow.modelFact.category)
+                           // console.log(factRow.modelFact.defaultValueString)
+                           // console.log(factRow.modelFact.group)
+
+
+
                         }
 
                         /*if (factRow.modelFact.name == "SENS_BARO_RATE"){
@@ -269,6 +300,7 @@ Item {
                     if(_rowWidth < factRow.width + ScreenTools.defaultFontPixelWidth) {
                         _rowWidth = factRow.width + ScreenTools.defaultFontPixelWidth
                     }
+
                 }
             }
 
@@ -375,4 +407,12 @@ Item {
             destroyOnClose:     true
         }
     }
+
+    FlyView {
+        id: flightView
+        visible: false
+    }
+
 }
+
+

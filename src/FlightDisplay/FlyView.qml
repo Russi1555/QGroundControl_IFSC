@@ -1336,7 +1336,7 @@ Item {
                 source: "/res/spin_icon.png" //"/res/crossHair_res.svg"
         }
 
-        ParameterEditorController { //talvez não precise mais disso
+       /* ParameterEditorController { //talvez não precise mais disso
             id: controller2
 
         }
@@ -1344,7 +1344,7 @@ Item {
         ParameterEditor {
             id: parameters_vehicle
             visible: false
-        }
+        }*/
 
     MouseArea { //botão_troca_centro
        id: click_trocar_centro
@@ -1362,9 +1362,9 @@ Item {
        onClicked : {
            //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
-           parameters_vehicle._controller.currentCategory = parameters_vehicle._controller.categories.get(0) //seta a categoria dos parametros como STANDARD
-           console.log("teste 2: " + parameters_vehicle._controller.parameters) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
-           console.log(parameters_vehicle._controller.parameters.count)
+          // parameters_vehicle._controller.currentCategory = parameters_vehicle._controller.categories.get(0) //seta a categoria dos parametros como STANDARD
+          // console.log("teste 2: " + parameters_vehicle._controller.parameters) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
+          /* console.log(parameters_vehicle._controller.parameters.count)
            console.log(parameters_vehicle._controller.parameters.get(0).name)
            console.log(parameters_vehicle._controller.parameters.get(0).rawValue)
            console.log(parameters_vehicle._controller.parameters.get(0).defaultValue)
@@ -1375,7 +1375,8 @@ Item {
            console.log(parameters_vehicle._controller.parameters.get(2).rawValue)
            console.log(parameters_vehicle._controller.parameters.get(2).defaultValue)
 
-           console.log(parameters_vehicle._controller.currentCategory.name)
+           console.log(parameters_vehicle._controller.currentCategory.name)*/
+           console.log(_parametro_custom_1)
 //
            _informacao_central = !_informacao_central
 
@@ -1471,6 +1472,7 @@ Item {
         }
     }
 */
+
 
 
 }
