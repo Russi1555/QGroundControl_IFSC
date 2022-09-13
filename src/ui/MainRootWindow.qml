@@ -337,9 +337,9 @@ ApplicationWindow {
     }
 
     function showToolSelectDialog() {
-        //if (!mainWindow.preventViewSwitch()) {
+        if (!mainWindow.preventViewSwitch()) {
             toolSelectDialog.open()
-        //}
+        }
     }
 
     QGCPopupDialog {
