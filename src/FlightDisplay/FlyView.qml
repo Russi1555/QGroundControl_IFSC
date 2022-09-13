@@ -1357,7 +1357,9 @@ Item {
            console.log(parameters_vehicle._controller.parameters.get(2).defaultValue)
            console.log(parameters_vehicle._controller.currentCategory.name)*/
            console.log(_parametro_custom_1)
-           console.log(controller3.systems.count)
+           console.log(controller3.activeSystem.messages.get(0).name)
+           console.log(controller3.activeSystem.messages.get(0).id)
+           console.log(controller3.activeSystem.messages.get(0).fields)
            //controller3.systems.get(0).name
 
 
