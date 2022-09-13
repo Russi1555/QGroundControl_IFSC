@@ -128,11 +128,9 @@ Item {
    /* MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
        anchors.fill: _root
        hoverEnabled: true
-
        onClicked: {
            _selecao_camera = false;
            _tamanho_fonte_FPV = _resize_fonts()}
-
     }*/
 
 
@@ -213,25 +211,19 @@ Item {
          border.color: "black"
          border.width: 1
          radius: width*0.5
-
-
-
          MouseArea {
             id: teste
             anchors.fill: motores
             hoverEnabled: true
          }
-
     }*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*
-
              TUDO DAQUI PRA BAIXO É COISA MINHA, PRA CIMA NÃO TEVE MUITA ALTERAÇÃO QUE EU ME LEMBRE 22/03/222
              UNICA ALTERAÇÃO DESDE 22/03 NA PARTE DE CIMA FORAM OS TRÊS ULTIMOS IMPORTS PARA REALIZAR A TROCA DE CAMERA 23/05/2022
              MAIS ALTERAÇÕES: MOUSEAREA NA LINHA 57 26/05/2022
              FUNÇÃO "_terminal_de_alertas" 23/06/2022
-
     */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function manter_na_barra(id_seta, id_barra){
@@ -609,7 +601,6 @@ Item{
             font.pointSize: 80
             color: "#80FF0000"
             visible: true
-
         }*/
 
 
@@ -873,7 +864,6 @@ Item{
            height: area_alertas.height/2.5
            color: "#FFFFFF"
            source: "/qmlimages/Battery.svg"
-
            Text{
               text: _activeVehicle.batteries.get(0).percentRemaining.rawValue//_pct_bateria. por que essa bosta não funciona?
               font.family: "Helvetica"
@@ -884,9 +874,7 @@ Item{
               anchors.top: parent.bottom
               verticalAlignment: Text.AlignVCenter
            }
-
        }
-
     QGCColoredImage{
            id: alerta_gps
            x: alerta_bateria.x + width*0.22
@@ -896,7 +884,6 @@ Item{
            height: alerta_bateria.height
            color: _activeVehicle.gps.hdop.rawValue >= 1 ? (_activeVehicle.gps.hdop.rawValue >= 1.5 ? "red" : "yellow"): "#FFFFFF"
            source: "/qmlimages/Gps.svg"
-
            Text{
               text: _activeVehicle.gps.hdop.rawValue//_HDOP
               font.family: "Helvetica"
@@ -907,7 +894,6 @@ Item{
               verticalAlignment: Text.AlignVCenter
            }
        }
-
     QGCColoredImage{
            id: alerta_RC
            x: alerta_gps.x + width*0.22
@@ -917,7 +903,6 @@ Item{
            height: alerta_bateria.height
            color: _activeVehicle.rcRSSI >= 115 ? (_activeVehicle.rcRSSI  >= 175 ? "red" : "yellow"): "#FFFFFF"
            source: "/qmlimages/RC.svg"
-
            Text{
               text: _activeVehicle.rcRSSI //descobrir qual parametro de vehicle recebe conexão RC
               font.family: "Helvetica"
@@ -928,7 +913,6 @@ Item{
               verticalAlignment: Text.AlignVCenter
            }
        }
-
     QGCColoredImage{
            id: alerta_combustivel
            x: alerta_RC.x + width*0.22
@@ -938,7 +922,6 @@ Item{
            height: alerta_bateria.height
            color: "#FFFFFF"
            source: "/res/Fuel.png"
-
            Text{
               text: "LITROS"//Depende de quando e como recebermos a informação da gasolina restante.
               font.family: "Helvetica"
@@ -949,7 +932,6 @@ Item{
               verticalAlignment: Text.AlignVCenter
            }
        }
-
     Text{
         id: indicador_pitch
         x: area_alertas.x + area_alertas.width*0.2
@@ -959,9 +941,7 @@ Item{
         font.family: "Helvetica"
         font.pointSize: ScreenTools.defaultFontPixelWidth*2
         color: "#FFFFFF"
-
     }
-
     Text{
         id: indicador_roll
         x: indicador_pitch.x
@@ -971,7 +951,6 @@ Item{
         font.family: "Helvetica"
         font.pointSize: ScreenTools.defaultFontPixelWidth*2
         color: "#FFFFFF"
-
     }
     */
 
@@ -1338,19 +1317,21 @@ Item {
 
        /* ParameterEditorController { //talvez não precise mais disso
             id: controller2
-
         }
-
         ParameterEditor {
             id: parameters_vehicle
             visible: false
         }*/
+        MAVLinkInspectorController {
+            id: controller3
+        }
 
     MouseArea { //botão_troca_centro
        id: click_trocar_centro
        z: botao_troca_centro.z
        anchors.fill: botao_troca_centro
        hoverEnabled: true
+
 
        //Acredito que o caminho seja por aqui. O Controller2 parece promissor mas é bom olhar no PARAMETEREDITOR.QML depois pra pegar outras possibilidades
       /* property Fact fact1: parameters_vehicle._controller.getParameterFact(-1,"IMU_ACCEL_CUTOFF").value
@@ -1364,7 +1345,7 @@ Item {
            //console.log("teste 2" + RadioComponentController.controller)
           // parameters_vehicle._controller.currentCategory = parameters_vehicle._controller.categories.get(0) //seta a categoria dos parametros como STANDARD
           // console.log("teste 2: " + parameters_vehicle._controller.parameters) //talvez isso aqui seja a resposta pro nosso problema de comunicação com a rasp.
-          /* console.log(parameters_vehicle._controller.parameters.count)
+          /*
            console.log(parameters_vehicle._controller.parameters.get(0).name)
            console.log(parameters_vehicle._controller.parameters.get(0).rawValue)
            console.log(parameters_vehicle._controller.parameters.get(0).defaultValue)
@@ -1374,9 +1355,12 @@ Item {
            console.log(parameters_vehicle._controller.parameters.get(2).name)
            console.log(parameters_vehicle._controller.parameters.get(2).rawValue)
            console.log(parameters_vehicle._controller.parameters.get(2).defaultValue)
-
            console.log(parameters_vehicle._controller.currentCategory.name)*/
            console.log(_parametro_custom_1)
+           console.log(controller3.systems.count)
+           //controller3.systems.get(0).name
+
+
 //
            _informacao_central = !_informacao_central
 
@@ -1458,11 +1442,9 @@ Item {
         x:500
         y:200
         z:2000
-
         GridLayout {
             id:         videoGrid2
             columns:    1
-
             FactComboBox{
                 id:                     videoSource2
                 Layout.preferredWidth:  _comboFieldWidth

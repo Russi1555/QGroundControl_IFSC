@@ -43,6 +43,8 @@ Item {
     }
 
 
+
+
     ExclusiveGroup { id: sectionGroup }
 
     //---------------------------------------------
@@ -264,14 +266,20 @@ Item {
 
                         if (factRow.modelFact.name != false){
                             console.log(factRow.modelFact.name + " : " + factRow.modelFact.value)
+                            console.log(factRow.modelFact.group + " : " + factRow.modelFact.category)
+                            mainWindow._variavel_intermediaria = factRow.modelFact.value
+                            mainWindow._teste_1 = _controller.currentGroup
+                            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + mainWindow._teste_1)
 
-                            if (factRow.modelFact.name == "NAV_RCL_ACT"){
-                                mainWindow._variavel_intermidiaria = factRow.modelFact.value
-                                //console.log(_ponte_root_window)
+                            if (factRow.modelFact.name == "COM_OBC_LOSS_T"){
+
+                               // mainWindow._teste_1 = c
                                 console.log(mainWindow._variavel_intermidiaria)
-                                // console.log(factRow.modelFact.category)
-                                // console.log(factRow.modelFact.defaultValueString)
-                                // console.log(factRow.modelFact.group)
+                                console.log(factRow.modelFact.category)
+                                console.log(factRow.modelFact.defaultValueString)
+                                console.log(factRow.modelFact.group)
+
+
                             }
 
                            // console.log(factRow.modelFact.category)
@@ -414,5 +422,3 @@ Item {
     }
 
 }
-
-

@@ -31,6 +31,7 @@ ApplicationWindow {
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
     property var _variavel_intermediaria
+    property var _teste_1
 
     function _resize_fonts_FPV(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
 
@@ -42,10 +43,15 @@ ApplicationWindow {
     }
 
     Timer {
-        interval: 1000; running: true; repeat: true
+        interval: 10000; running: true; repeat: true
         onTriggered: {
             console.log("Atualizando valor customizado...")
             flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
+            console.log(tela_parametros._controller.currentCategory.name)
+            console.log(tela_parametros._controller.currentGroup.name )
+            //_controller.currentGroupChanged()
+
+            //console.log(tela_parametros._controller.ParameterEditorGroup.groups)
         }
     }
 
@@ -375,7 +381,7 @@ ApplicationWindow {
                     text:               qsTr("Analyze Tools")
                     imageResource:      "/qmlimages/Analyze.svg"
                     imageColor:         qgcPal.text
-                    visible:            QGroundControl.corePlugin.showAdvancedUI
+                    visible:            true//QGroundControl.corePlugin.showAdvancedUI
                     onClicked: {
                         if (!mainWindow.preventViewSwitch()) {
                             toolSelectDialog.close()
@@ -458,22 +464,12 @@ ApplicationWindow {
         id:             flightView
         anchors.fill:   parent
     }
-/*
+
     ParameterEditor {
         id: tela_parametros
         visible: false
     }
 
-    Item { //deleter depois
-        Timer {
-            interval: 1000; running: true; repeat: true
-            onTriggered: {
-                console.log(tela_parametros._ponte_root_window)
-                flightView._parametro_custom_1 = tela_parametros._ponte_root_window}
-        }
-
-        Text { id: time }
-    }*/
 
     PlanView {
         id:             planView
