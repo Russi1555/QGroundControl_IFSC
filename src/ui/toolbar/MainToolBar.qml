@@ -67,7 +67,7 @@ Rectangle {
         QGCToolBarButton {
             id:                     currentButton
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "/res/QGCLogoFull" //QGCLogoBlack é o logo da Global Drones agora.
+            icon.source:            "/res/QGCLogoFull" //QGCLogoBlack é o logo da Global Drones agora. Que bosta tu fez. agora sei arrumar mas que função do caralho ein 13/09/2022
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
         }

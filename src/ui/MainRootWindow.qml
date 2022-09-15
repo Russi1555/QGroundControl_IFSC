@@ -42,18 +42,21 @@ ApplicationWindow {
 
     }
 
-    Timer {
+    /*Timer {
         interval: 10000; running: true; repeat: true
         onTriggered: {
             console.log("Atualizando valor customizado...")
-            flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
+            //flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
             console.log(tela_parametros._controller.currentCategory.name)
             console.log(tela_parametros._controller.currentGroup.name )
+            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).name)
+            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).value)
+            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).type)
             //_controller.currentGroupChanged()
 
             //console.log(tela_parametros._controller.ParameterEditorGroup.groups)
         }
-    }
+    }*/
 
 
     Component.onCompleted: {
@@ -467,6 +470,11 @@ ApplicationWindow {
 
     ParameterEditor {
         id: tela_parametros
+        visible: false
+    }
+
+    MAVLinkInspectorPage {
+        id: controller1
         visible: false
     }
 
