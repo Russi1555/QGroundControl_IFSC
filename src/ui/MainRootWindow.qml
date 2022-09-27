@@ -70,6 +70,7 @@ ApplicationWindow {
 
         // Start the sequence of first run prompt(s)
         firstRunPromptManager.nextPrompt()
+        QGroundControl.corePlugin.showAdvancedUI = true
     }
 
 
@@ -200,550 +201,465 @@ ApplicationWindow {
     //-------------------------------------------------------------------------
     //-- Global simple message dialog
 
-    function showMessageDialog(dialogTitle, dialogText) {
-        simpleMessageDialog.title = dialogTitle
-        simpleMessageDialog.text = dialogText
-        simpleMessageDialog.open()
-    }
-
-    QGCSimpleMessageDialog {
-        id:         simpleMessageDialog
-        buttons:    StandardButton.Ok
-    }
-
-    /// Saves main window position and size
-    MainWindowSavedState {
-        window: mainWindow
-    }
-
-    //-------------------------------------------------------------------------
-    //-- Global complex dialog
-
-    /// Shows a QGCViewDialogContainer based dialog
-    ///     @param component The dialog contents
-    ///     @param title Title for dialog
-    ///     @param charWidth Width of dialog in characters
-    ///     @param buttons Buttons to show in dialog using StandardButton enum
-
-    readonly property int showDialogFullWidth:      -1  ///< Use for full width dialog
-    readonly property int showDialogDefaultWidth:   40  ///< Use for default dialog width
-
-    function showComponentDialog(component, title, charWidth, buttons) {
-        var dialogWidth = charWidth === showDialogFullWidth ? mainWindow.width : ScreenTools.defaultFontPixelWidth * charWidth
-        var dialog = dialogDrawerComponent.createObject(mainWindow, { width: dialogWidth, dialogComponent: component, dialogTitle: title, dialogButtons: buttons })
-        mainWindow.pushPreventViewSwitch()
-        dialog.open()
-    }
-
-    Component {
-        id: dialogDrawerComponent
-        QGCViewDialogContainer {
-            y:          mainWindow.header.height
-            height:     mainWindow.height - mainWindow.header.height
-            onClosed:   mainWindow.popPreventViewSwitch()
+    function showMessageDialog(dialogTitle, dialogText, buttons = StandardButton.Ok, acceptFunction = null) {
+            simpleMessageDialogComponent.createObject(mainWindow, { title: dialogTitle, text: dialogText, buttons: buttons, acceptFunction: acceptFunction }).open()
         }
-    }
 
-    property bool _forceClose: false
-
-    function finishCloseProcess() {
-        _forceClose = true
-        // For some reason on the Qml side Qt doesn't automatically disconnect a signal when an object is destroyed.
-        // So we have to do it ourselves otherwise the signal flows through on app shutdown to an object which no longer exists.
-        firstRunPromptManager.clearNextPromptSignal()
-        QGroundControl.linkManager.shutdown()
-        QGroundControl.videoManager.stopVideo();
-        mainWindow.close()
-    }
-
-    // On attempting an application close we check for:
-    //  Unsaved missions - then
-    //  Pending parameter writes - then
-    //  Active connections
-
-    property string closeDialogTitle: qsTr("Close %1").arg(QGroundControl.appName)
-
-    function checkForUnsavedMission() {
-        if (globals.planMasterControllerPlanView && globals.planMasterControllerPlanView.dirty) {
-            unsavedMissionCloseDialog.open()
-        } else {
-            checkForPendingParameterWrites()
+        // This variant is only meant to be called by QGCApplication
+        function _showMessageDialog(dialogTitle, dialogText) {
+            showMessageDialog(dialogTitle, dialogText)
         }
-    }
 
-    function checkForPendingParameterWrites() {
-        for (var index=0; index<QGroundControl.multiVehicleManager.vehicles.count; index++) {
-            if (QGroundControl.multiVehicleManager.vehicles.get(index).parameterManager.pendingWrites) {
-                pendingParameterWritesCloseDialog.open()
-                return
+        Component {
+            id: simpleMessageDialogComponent
+
+            QGCSimpleMessageDialog {
             }
         }
-        checkForActiveConnections()
-    }
 
-    function checkForActiveConnections() {
-        if (QGroundControl.multiVehicleManager.activeVehicle) {
-            activeConnectionsCloseDialog.open()
-        } else {
-            finishCloseProcess()
+        /// Saves main window position and size
+        MainWindowSavedState {
+            window: mainWindow
         }
-    }
 
-    onClosing: {
-        if (!_forceClose) {
-            close.accepted = false
-            checkForUnsavedMission()
+        property bool _forceClose: false
+
+        function finishCloseProcess() {
+            _forceClose = true
+            // For some reason on the Qml side Qt doesn't automatically disconnect a signal when an object is destroyed.
+            // So we have to do it ourselves otherwise the signal flows through on app shutdown to an object which no longer exists.
+            firstRunPromptManager.clearNextPromptSignal()
+            QGroundControl.linkManager.shutdown()
+            QGroundControl.videoManager.stopVideo();
+            mainWindow.close()
         }
-    }
 
-    QGCSimpleMessageDialog {
-        id:         unsavedMissionCloseDialog
-        title:      closeDialogTitle
-        text:       qsTr("You have a mission edit in progress which has not been saved/sent. If you close you will lose changes. Are you sure you want to close?")
-        buttons:    StandardButton.Yes | StandardButton.No
-        onAccepted: checkForPendingParameterWrites()
-    }
+        // On attempting an application close we check for:
+        //  Unsaved missions - then
+        //  Pending parameter writes - then
+        //  Active connections
 
-    QGCSimpleMessageDialog {
-        id:         pendingParameterWritesCloseDialog
-        title:      closeDialogTitle
-        text:       qsTr("You have pending parameter updates to a vehicle. If you close you will lose changes. Are you sure you want to close?")
-        buttons:    StandardButton.Yes | StandardButton.No
-        onAccepted: checkForActiveConnections()
-    }
+        property string closeDialogTitle: qsTr("Close %1").arg(QGroundControl.appName)
 
-    QGCSimpleMessageDialog {
-        id:         activeConnectionsCloseDialog
-        title:      closeDialogTitle
-        text:       qsTr("There are still active connections to vehicles. Are you sure you want to exit?")
-        buttons:    StandardButton.Yes | StandardButton.No
-        onAccepted: finishCloseProcess()
-    }
 
-    //-------------------------------------------------------------------------
-    /// Main, full window background (Fly View)
-    background: Item {
-        id:             rootBackground
-        anchors.fill:   parent
-    }
 
-    //-------------------------------------------------------------------------
-    /// Toolbar
-    header: MainToolBar {
-        id:         toolbar
-        height:     ScreenTools.toolbarHeight
-        visible:    !QGroundControl.videoManager.fullScreen
-    }
-
-    footer: LogReplayStatusBar {
-        visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
-    }
-
-    function showToolSelectDialog() {
-        if (!mainWindow.preventViewSwitch()) {
-            toolSelectDialog.open()
+        //-------------------------------------------------------------------------
+        /// Main, full window background (Fly View)
+        background: Item {
+            id:             rootBackground
+            anchors.fill:   parent
         }
-    }
 
-    QGCPopupDialog {
-        id:         toolSelectDialog
-        title:      qsTr("Select Tool")
-        buttons:    StandardButton.Close
+        //-------------------------------------------------------------------------
+        /// Toolbar
+        header: MainToolBar {
+            id:         toolbar
+            height:     ScreenTools.toolbarHeight
+            visible:    !QGroundControl.videoManager.fullScreen
+        }
 
-        property real _toolButtonHeight:    ScreenTools.defaultFontPixelHeight * 3
-        property real _margins:             ScreenTools.defaultFontPixelWidth
+        footer: LogReplayStatusBar {
+            visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
+        }
 
-        ColumnLayout {
-            width:  innerLayout.width + (toolSelectDialog._margins * 2)
-            height: innerLayout.height + (toolSelectDialog._margins * 2)
+        function showToolSelectDialog() {
+            if (!mainWindow.preventViewSwitch()) {
+                toolSelectDialogComponent.createObject(mainWindow).open()
+            }
+        }
 
-            ColumnLayout {
-                id:             innerLayout
-                Layout.margins: toolSelectDialog._margins
-                spacing:        ScreenTools.defaultFontPixelWidth
+        Component {
+            id: toolSelectDialogComponent
 
-                SubMenuButton {
-                    id:                 setupButton
-                    height:             toolSelectDialog._toolButtonHeight
-                    Layout.fillWidth:   true
-                    text:               qsTr("Vehicle Setup")
-                    imageColor:         qgcPal.text
-                    imageResource:      "/qmlimages/Gears.svg"
-                    onClicked: {
-                        if (!mainWindow.preventViewSwitch()) {
-                            toolSelectDialog.close()
-                            mainWindow.showSetupTool()
-                        }
-                    }
-                }
+            QGCPopupDialog {
+                id:         toolSelectDialog
+                title:      qsTr("Select Tool")
+                buttons:    StandardButton.Close
 
-                SubMenuButton {
-                    id:                 analyzeButton
-                    height:             toolSelectDialog._toolButtonHeight
-                    Layout.fillWidth:   true
-                    text:               qsTr("Analyze Tools")
-                    imageResource:      "/qmlimages/Analyze.svg"
-                    imageColor:         qgcPal.text
-                    visible:            true//QGroundControl.corePlugin.showAdvancedUI
-                    onClicked: {
-                        if (!mainWindow.preventViewSwitch()) {
-                            toolSelectDialog.close()
-                            mainWindow.showAnalyzeTool()
-                        }
-                    }
-                }
-
-                SubMenuButton {
-                    id:                 settingsButton
-                    height:             toolSelectDialog._toolButtonHeight
-                    Layout.fillWidth:   true
-                    text:               qsTr("Application Settings")
-                    imageResource:      "/res/QGCLogoFull"
-                    imageColor:         "transparent"
-                    visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
-                    onClicked: {
-                        if (!mainWindow.preventViewSwitch()) {
-                            toolSelectDialog.close()
-                            mainWindow.showSettingsTool()
-                        }
-                    }
-                }
+                property real _toolButtonHeight:    ScreenTools.defaultFontPixelHeight * 3
+                property real _margins:             ScreenTools.defaultFontPixelWidth
 
                 ColumnLayout {
-                    width:      innerLayout.width
-                    spacing:    0
+                    width:  innerLayout.width + (toolSelectDialog._margins * 2)
+                    height: innerLayout.height + (toolSelectDialog._margins * 2)
 
-                    QGCLabel {
-                        id:                     versionLabel
-                        text:                   qsTr("%1 Version").arg(QGroundControl.appName)
-                        font.pointSize:         ScreenTools.smallFontPointSize
-                        wrapMode:               QGCLabel.WordWrap
-                        Layout.maximumWidth:    parent.width
-                        Layout.alignment:       Qt.AlignHCenter
-                    }
+                    ColumnLayout {
+                        id:             innerLayout
+                        Layout.margins: toolSelectDialog._margins
+                        spacing:        ScreenTools.defaultFontPixelWidth
 
-                    QGCLabel {
-                        text:                   QGroundControl.qgcVersion
-                        font.pointSize:         ScreenTools.smallFontPointSize
-                        wrapMode:               QGCLabel.WrapAnywhere
-                        Layout.maximumWidth:    parent.width
-                        Layout.alignment:       Qt.AlignHCenter
-
-                        QGCMouseArea {
-                            id:                 easterEggMouseArea
-                            anchors.topMargin:  -versionLabel.height
-                            anchors.fill:       parent
-
+                        SubMenuButton {
+                            id:                 setupButton
+                            height:             toolSelectDialog._toolButtonHeight
+                            Layout.fillWidth:   true
+                            text:               qsTr("Vehicle Setup")
+                            imageColor:         qgcPal.text
+                            imageResource:      "/qmlimages/Gears.svg"
                             onClicked: {
-                                if (mouse.modifiers & Qt.ControlModifier) {
-                                    QGroundControl.corePlugin.showTouchAreas = !QGroundControl.corePlugin.showTouchAreas
-                                } else if (mouse.modifiers & Qt.ShiftModifier) {
-                                    if(!QGroundControl.corePlugin.showAdvancedUI) {
-                                        advancedModeConfirmation.open()
-                                    } else {
-                                        QGroundControl.corePlugin.showAdvancedUI = false
+                                if (!mainWindow.preventViewSwitch()) {
+                                    toolSelectDialog.close()
+                                    mainWindow.showSetupTool()
+                                }
+                            }
+                        }
+
+                        SubMenuButton {
+                            id:                 analyzeButton
+                            height:             toolSelectDialog._toolButtonHeight
+                            Layout.fillWidth:   true
+                            text:               qsTr("Analyze Tools")
+                            imageResource:      "/qmlimages/Analyze.svg"
+                            imageColor:         qgcPal.text
+                            visible:            QGroundControl.corePlugin.showAdvancedUI
+                            onClicked: {
+                                if (!mainWindow.preventViewSwitch()) {
+                                    toolSelectDialog.close()
+                                    mainWindow.showAnalyzeTool()
+                                }
+                            }
+                        }
+
+                        SubMenuButton {
+                            id:                 settingsButton
+                            height:             toolSelectDialog._toolButtonHeight
+                            Layout.fillWidth:   true
+                            text:               qsTr("Application Settings")
+                            imageResource:      "/res/QGCLogoFull"
+                            imageColor:         "transparent"
+                            visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
+                            onClicked: {
+                                if (!mainWindow.preventViewSwitch()) {
+                                    toolSelectDialog.close()
+                                    mainWindow.showSettingsTool()
+                                }
+                            }
+                        }
+
+                        ColumnLayout {
+                            width:                  innerLayout.width
+                            spacing:                0
+                            Layout.alignment:       Qt.AlignHCenter
+
+                            QGCLabel {
+                                id:                     versionLabel
+                                text:                   qsTr("%1 Version").arg(QGroundControl.appName)
+                                font.pointSize:         ScreenTools.smallFontPointSize
+                                wrapMode:               QGCLabel.WordWrap
+                                Layout.maximumWidth:    parent.width
+                                Layout.alignment:       Qt.AlignHCenter
+                            }
+
+                            QGCLabel {
+                                text:                   QGroundControl.qgcVersion
+                                font.pointSize:         ScreenTools.smallFontPointSize
+                                wrapMode:               QGCLabel.WrapAnywhere
+                                Layout.maximumWidth:    parent.width
+                                Layout.alignment:       Qt.AlignHCenter
+
+                                QGCMouseArea {
+                                    id:                 easterEggMouseArea
+                                    anchors.topMargin:  -versionLabel.height
+                                    anchors.fill:       parent
+
+                                    onClicked: {
+                                        if (mouse.modifiers & Qt.ControlModifier) {
+                                            QGroundControl.corePlugin.showTouchAreas = !QGroundControl.corePlugin.showTouchAreas
+                                        } else if (mouse.modifiers & Qt.ShiftModifier) {
+                                            if(!QGroundControl.corePlugin.showAdvancedUI) {
+                                                advancedModeConfirmation.open()
+                                            } else {
+                                                QGroundControl.corePlugin.showAdvancedUI = false
+                                            }
+                                        }
+                                    }
+
+                                    MessageDialog {
+                                        id:                 advancedModeConfirmation
+                                        title:              qsTr("Advanced Mode")
+                                        text:               QGroundControl.corePlugin.showAdvancedUIMessage
+                                        standardButtons:    StandardButton.Yes | StandardButton.No
+                                        onYes: {
+                                            QGroundControl.corePlugin.showAdvancedUI = true
+                                            advancedModeConfirmation.close()
+                                        }
                                     }
                                 }
                             }
-
-                            MessageDialog {
-                                id:                 advancedModeConfirmation
-                                title:              qsTr("Advanced Mode")
-                                text:               QGroundControl.corePlugin.showAdvancedUIMessage
-                                standardButtons:    StandardButton.Yes | StandardButton.No
-                                onYes: {
-                                    QGroundControl.corePlugin.showAdvancedUI = true
-                                    advancedModeConfirmation.close()
-                                }
-                            }
                         }
                     }
                 }
             }
         }
-    }
-
-    FlyView {
-        id:             flightView
-        anchors.fill:   parent
-    }
-
-    ParameterEditor {
-        id: tela_parametros
-        visible: false
-    }
-
-    MAVLinkInspectorPage {
-        id: controller1
-        visible: false
-    }
 
 
-    PlanView {
-        id:             planView
-        anchors.fill:   parent
-        visible:        false
-    }
-
-    Drawer {
-        id:             toolDrawer
-        width:          mainWindow.width
-        height:         mainWindow.height
-        edge:           Qt.LeftEdge
-        dragMargin:     0
-        closePolicy:    Drawer.NoAutoClose
-        interactive:    false
-        visible:        false
-
-        property alias backIcon:    backIcon.source
-        property alias toolTitle:   toolbarDrawerText.text
-        property alias toolSource:  toolDrawerLoader.source
-        property alias toolIcon:    toolIcon.source
-
-        Rectangle {
-            id:             toolDrawerToolbar
-            anchors.left:   parent.left
-            anchors.right:  parent.right
-            anchors.top:    parent.top
-            height:         ScreenTools.toolbarHeight
-            color:          qgcPal.toolbarBackground
-
-            RowLayout {
-                anchors.leftMargin: ScreenTools.defaultFontPixelWidth
-                anchors.left:       parent.left
-                anchors.top:        parent.top
-                anchors.bottom:     parent.bottom
-                spacing:            ScreenTools.defaultFontPixelWidth
-
-                QGCColoredImage {
-                    id:                     backIcon
-                    width:                  ScreenTools.defaultFontPixelHeight * 2
-                    height:                 ScreenTools.defaultFontPixelHeight * 2
-                    fillMode:               Image.PreserveAspectFit
-                    mipmap:                 true
-                    color:                  qgcPal.text
-                }
-
-                QGCLabel {
-                    id:     backTextLabel
-                    text:   qsTr("Back")
-                }
-
-                QGCLabel {
-                    font.pointSize: ScreenTools.largeFontPointSize
-                    text:           "<"
-                }
-
-                QGCColoredImage {
-                    id:                     toolIcon
-                    width:                  ScreenTools.defaultFontPixelHeight * 2
-                    height:                 ScreenTools.defaultFontPixelHeight * 2
-                    fillMode:               Image.PreserveAspectFit
-                    mipmap:                 true
-                    color:                  qgcPal.text
-                }
-
-                QGCLabel {
-                    id:             toolbarDrawerText
-                    font.pointSize: ScreenTools.largeFontPointSize
-                }
-            }
-
-            QGCMouseArea {
-                anchors.top:        parent.top
-                anchors.bottom:     parent.bottom
-                x:                  parent.mapFromItem(backIcon, backIcon.x, backIcon.y).x
-                width:              (backTextLabel.x + backTextLabel.width) - backIcon.x
-                onClicked: {
-                    toolDrawer.visible      = false
-                    toolDrawer.toolSource   = ""
-                }
-            }
-        }
-
-        Loader {
-            id:             toolDrawerLoader
-            anchors.left:   parent.left
-            anchors.right:  parent.right
-            anchors.top:    toolDrawerToolbar.bottom
-            anchors.bottom: parent.bottom
-
-            Connections {
-                target:                 toolDrawerLoader.item
-                ignoreUnknownSignals:   true
-                onPopout:               toolDrawer.visible = false
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    //-- Critical Vehicle Message Popup
-
-    property var    _vehicleMessageQueue:      []
-    property string _vehicleMessage:     ""
-
-    function showCriticalVehicleMessage(message) {
-        indicatorPopup.close()
-        if (criticalVehicleMessagePopup.visible || QGroundControl.videoManager.fullScreen) {
-            _vehicleMessageQueue.push(message)
-        } else {
-            _vehicleMessage = message
-            criticalVehicleMessagePopup.open()
-        }
-    }
-
-    Popup {
-        id:                 criticalVehicleMessagePopup
-        y:                  ScreenTools.defaultFontPixelHeight
-        x:                  Math.round((mainWindow.width - width) * 0.5)
-        width:              mainWindow.width  * 0.55
-        height:             ScreenTools.defaultFontPixelHeight * 6
-        modal:              false
-        focus:              true
-        closePolicy:        Popup.CloseOnEscape
-
-        background: Rectangle {
+        FlyView {
+            id:             flightView
             anchors.fill:   parent
-            color:          qgcPal.alertBackground
-            radius:         ScreenTools.defaultFontPixelHeight * 0.5
-            border.color:   qgcPal.alertBorder
-            border.width:   2
         }
 
-        onOpened: {
-            criticalVehicleMessageText.text = mainWindow._vehicleMessage
+        PlanView {
+            id:             planView
+            anchors.fill:   parent
+            visible:        false
         }
 
-        onClosed: {
-            //-- Are there messages in the waiting queue?
-            if(mainWindow._vehicleMessageQueue.length) {
-                mainWindow._vehicleMessage = ""
-                //-- Show all messages in queue
-                for (var i = 0; i < mainWindow._vehicleMessageQueue.length; i++) {
-                    var text = mainWindow._vehicleMessageQueue[i]
-                    if(i) mainWindow._vehicleMessage += "<br>"
-                    mainWindow._vehicleMessage += text
+        Drawer {
+            id:             toolDrawer
+            width:          mainWindow.width
+            height:         mainWindow.height
+            edge:           Qt.LeftEdge
+            dragMargin:     0
+            closePolicy:    Drawer.NoAutoClose
+            interactive:    false
+            visible:        false
+
+            property alias backIcon:    backIcon.source
+            property alias toolTitle:   toolbarDrawerText.text
+            property alias toolSource:  toolDrawerLoader.source
+            property alias toolIcon:    toolIcon.source
+
+            Rectangle {
+                id:             toolDrawerToolbar
+                anchors.left:   parent.left
+                anchors.right:  parent.right
+                anchors.top:    parent.top
+                height:         ScreenTools.toolbarHeight
+                color:          qgcPal.toolbarBackground
+
+                RowLayout {
+                    anchors.leftMargin: ScreenTools.defaultFontPixelWidth
+                    anchors.left:       parent.left
+                    anchors.top:        parent.top
+                    anchors.bottom:     parent.bottom
+                    spacing:            ScreenTools.defaultFontPixelWidth
+
+                    QGCColoredImage {
+                        id:                     backIcon
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        fillMode:               Image.PreserveAspectFit
+                        mipmap:                 true
+                        color:                  qgcPal.text
+                    }
+
+                    QGCLabel {
+                        id:     backTextLabel
+                        text:   qsTr("Back")
+                    }
+
+                    QGCLabel {
+                        font.pointSize: ScreenTools.largeFontPointSize
+                        text:           "<"
+                    }
+
+                    QGCColoredImage {
+                        id:                     toolIcon
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        fillMode:               Image.PreserveAspectFit
+                        mipmap:                 true
+                        color:                  qgcPal.text
+                    }
+
+                    QGCLabel {
+                        id:             toolbarDrawerText
+                        font.pointSize: ScreenTools.largeFontPointSize
+                    }
                 }
-                //-- Clear it
-                mainWindow._vehicleMessageQueue = []
-                criticalVehicleMessagePopup.open()
+
+                QGCMouseArea {
+                    anchors.top:        parent.top
+                    anchors.bottom:     parent.bottom
+                    x:                  parent.mapFromItem(backIcon, backIcon.x, backIcon.y).x
+                    width:              (backTextLabel.x + backTextLabel.width) - backIcon.x
+                    onClicked: {
+                        toolDrawer.visible      = false
+                        toolDrawer.toolSource   = ""
+                    }
+                }
+            }
+
+            Loader {
+                id:             toolDrawerLoader
+                anchors.left:   parent.left
+                anchors.right:  parent.right
+                anchors.top:    toolDrawerToolbar.bottom
+                anchors.bottom: parent.bottom
+
+                Connections {
+                    target:                 toolDrawerLoader.item
+                    ignoreUnknownSignals:   true
+                    onPopout:               toolDrawer.visible = false
+                }
+            }
+        }
+
+        //-------------------------------------------------------------------------
+        //-- Critical Vehicle Message Popup
+
+        property var    _vehicleMessageQueue:      []
+        property string _vehicleMessage:     ""
+
+        function showCriticalVehicleMessage(message) {
+            indicatorPopup.close()
+            if (criticalVehicleMessagePopup.visible || QGroundControl.videoManager.fullScreen) {
+                _vehicleMessageQueue.push(message)
             } else {
-                mainWindow._vehicleMessage = ""
+                _vehicleMessage = message
+                criticalVehicleMessagePopup.open()
             }
         }
 
-        Flickable {
-            id:                 criticalVehicleMessageFlick
-            anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
-            anchors.fill:       parent
-            contentHeight:      criticalVehicleMessageText.height
-            contentWidth:       criticalVehicleMessageText.width
-            boundsBehavior:     Flickable.StopAtBounds
-            pixelAligned:       true
-            clip:               true
-            TextEdit {
-                id:             criticalVehicleMessageText
-                width:          criticalVehicleMessagePopup.width - criticalVehicleMessageClose.width - (ScreenTools.defaultFontPixelHeight * 2)
-                anchors.centerIn: parent
-                readOnly:       true
-                textFormat:     TextEdit.RichText
-                font.pointSize: ScreenTools.defaultFontPointSize
-                font.family:    ScreenTools.demiboldFontFamily
-                wrapMode:       TextEdit.WordWrap
-                color:          qgcPal.alertText
-            }
-        }
+        Popup {
+            id:                 criticalVehicleMessagePopup
+            y:                  ScreenTools.defaultFontPixelHeight
+            x:                  Math.round((mainWindow.width - width) * 0.5)
+            width:              mainWindow.width  * 0.55
+            height:             ScreenTools.defaultFontPixelHeight * 6
+            modal:              false
+            focus:              true
+            closePolicy:        Popup.CloseOnEscape
 
-        //-- Dismiss Vehicle Message
-        QGCColoredImage {
-            id:                 criticalVehicleMessageClose
-            anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
-            anchors.top:        parent.top
-            anchors.right:      parent.right
-            width:              ScreenTools.isMobile ? ScreenTools.defaultFontPixelHeight * 1.5 : ScreenTools.defaultFontPixelHeight
-            height:             width
-            sourceSize.height:  width
-            source:             "/res/XDelete.svg"
-            fillMode:           Image.PreserveAspectFit
-            color:              qgcPal.alertText
-            MouseArea {
-                anchors.fill:       parent
-                anchors.margins:    -ScreenTools.defaultFontPixelHeight
-                onClicked: {
-                    criticalVehicleMessagePopup.close()
-                }
-            }
-        }
-
-        //-- More text below indicator
-        QGCColoredImage {
-            anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
-            anchors.bottom:     parent.bottom
-            anchors.right:      parent.right
-            width:              ScreenTools.isMobile ? ScreenTools.defaultFontPixelHeight * 1.5 : ScreenTools.defaultFontPixelHeight
-            height:             width
-            sourceSize.height:  width
-            source:             "/res/ArrowDown.svg"
-            fillMode:           Image.PreserveAspectFit
-            visible:            criticalVehicleMessageText.lineCount > 5
-            color:              qgcPal.alertText
-            MouseArea {
+            background: Rectangle {
                 anchors.fill:   parent
-                onClicked: {
-                    criticalVehicleMessageFlick.flick(0,-500)
+                color:          qgcPal.alertBackground
+                radius:         ScreenTools.defaultFontPixelHeight * 0.5
+                border.color:   qgcPal.alertBorder
+                border.width:   2
+            }
+
+            onOpened: {
+                criticalVehicleMessageText.text = mainWindow._vehicleMessage
+            }
+
+            onClosed: {
+                //-- Are there messages in the waiting queue?
+                if(mainWindow._vehicleMessageQueue.length) {
+                    mainWindow._vehicleMessage = ""
+                    //-- Show all messages in queue
+                    for (var i = 0; i < mainWindow._vehicleMessageQueue.length; i++) {
+                        var text = mainWindow._vehicleMessageQueue[i]
+                        if(i) mainWindow._vehicleMessage += "<br>"
+                        mainWindow._vehicleMessage += text
+                    }
+                    //-- Clear it
+                    mainWindow._vehicleMessageQueue = []
+                    criticalVehicleMessagePopup.open()
+                } else {
+                    mainWindow._vehicleMessage = ""
+                }
+            }
+
+            Flickable {
+                id:                 criticalVehicleMessageFlick
+                anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.fill:       parent
+                contentHeight:      criticalVehicleMessageText.height
+                contentWidth:       criticalVehicleMessageText.width
+                boundsBehavior:     Flickable.StopAtBounds
+                pixelAligned:       true
+                clip:               true
+                TextEdit {
+                    id:             criticalVehicleMessageText
+                    width:          criticalVehicleMessagePopup.width - criticalVehicleMessageClose.width - (ScreenTools.defaultFontPixelHeight * 2)
+                    anchors.centerIn: parent
+                    readOnly:       true
+                    textFormat:     TextEdit.RichText
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    font.family:    ScreenTools.demiboldFontFamily
+                    wrapMode:       TextEdit.WordWrap
+                    color:          qgcPal.alertText
+                }
+            }
+
+            //-- Dismiss Vehicle Message
+            QGCColoredImage {
+                id:                 criticalVehicleMessageClose
+                anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.top:        parent.top
+                anchors.right:      parent.right
+                width:              ScreenTools.isMobile ? ScreenTools.defaultFontPixelHeight * 1.5 : ScreenTools.defaultFontPixelHeight
+                height:             width
+                sourceSize.height:  width
+                source:             "/res/XDelete.svg"
+                fillMode:           Image.PreserveAspectFit
+                color:              qgcPal.alertText
+                MouseArea {
+                    anchors.fill:       parent
+                    anchors.margins:    -ScreenTools.defaultFontPixelHeight
+                    onClicked: {
+                        criticalVehicleMessagePopup.close()
+                    }
+                }
+            }
+
+            //-- More text below indicator
+            QGCColoredImage {
+                anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.bottom:     parent.bottom
+                anchors.right:      parent.right
+                width:              ScreenTools.isMobile ? ScreenTools.defaultFontPixelHeight * 1.5 : ScreenTools.defaultFontPixelHeight
+                height:             width
+                sourceSize.height:  width
+                source:             "/res/ArrowDown.svg"
+                fillMode:           Image.PreserveAspectFit
+                visible:            criticalVehicleMessageText.lineCount > 5
+                color:              qgcPal.alertText
+                MouseArea {
+                    anchors.fill:   parent
+                    onClicked: {
+                        criticalVehicleMessageFlick.flick(0,-500)
+                    }
                 }
             }
         }
-    }
 
-    //-------------------------------------------------------------------------
-    //-- Indicator Popups
+        //-------------------------------------------------------------------------
+        //-- Indicator Popups
 
-    function showIndicatorPopup(item, dropItem) {
-        indicatorPopup.currentIndicator = dropItem
-        indicatorPopup.currentItem = item
-        indicatorPopup.open()
-    }
-
-    function hideIndicatorPopup() {
-        indicatorPopup.close()
-        indicatorPopup.currentItem = null
-        indicatorPopup.currentIndicator = null
-    }
-
-
-
-    Popup {
-        id:             indicatorPopup
-        padding:        ScreenTools.defaultFontPixelWidth * 0.75
-        modal:          true
-        focus:          true
-        closePolicy:    Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        property var    currentItem:        null
-        property var    currentIndicator:   null
-        background: Rectangle {
-            width:  loader.width
-            height: loader.height
-            color:  Qt.rgba(0,0,0,0)
+        function showIndicatorPopup(item, dropItem) {
+            indicatorPopup.currentIndicator = dropItem
+            indicatorPopup.currentItem = item
+            indicatorPopup.open()
         }
-        Loader {
-            id:             loader
-            onLoaded: {
-                var centerX = mainWindow.contentItem.mapFromItem(indicatorPopup.currentItem, 0, 0).x - (loader.width * 0.5)
-                if((centerX + indicatorPopup.width) > (mainWindow.width - ScreenTools.defaultFontPixelWidth)) {
-                    centerX = mainWindow.width - indicatorPopup.width - ScreenTools.defaultFontPixelWidth
-                }
-                indicatorPopup.x = centerX
-            }
-        }
-        onOpened: {
-            loader.sourceComponent = indicatorPopup.currentIndicator
-        }
-        onClosed: {
-            loader.sourceComponent = null
+
+        function hideIndicatorPopup() {
+            indicatorPopup.close()
+            indicatorPopup.currentItem = null
             indicatorPopup.currentIndicator = null
         }
-    }
+
+        Popup {
+            id:             indicatorPopup
+            padding:        ScreenTools.defaultFontPixelWidth * 0.75
+            modal:          true
+            focus:          true
+            closePolicy:    Popup.CloseOnEscape | Popup.CloseOnPressOutside
+            property var    currentItem:        null
+            property var    currentIndicator:   null
+            background: Rectangle {
+                width:  loader.width
+                height: loader.height
+                color:  Qt.rgba(0,0,0,0)
+            }
+            Loader {
+                id:             loader
+                onLoaded: {
+                    var centerX = mainWindow.contentItem.mapFromItem(indicatorPopup.currentItem, 0, 0).x - (loader.width * 0.5)
+                    if((centerX + indicatorPopup.width) > (mainWindow.width - ScreenTools.defaultFontPixelWidth)) {
+                        centerX = mainWindow.width - indicatorPopup.width - ScreenTools.defaultFontPixelWidth
+                    }
+                    indicatorPopup.x = centerX
+                }
+            }
+            onOpened: {
+                loader.sourceComponent = indicatorPopup.currentIndicator
+            }
+            onClosed: {
+                loader.sourceComponent = null
+                indicatorPopup.currentIndicator = null
+            }
+        }
     onWidthChanged:
     {
 

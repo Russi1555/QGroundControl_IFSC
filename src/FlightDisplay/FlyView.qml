@@ -1358,15 +1358,6 @@ Item {
            console.log(parameters_vehicle._controller.currentCategory.name)*/
 
            //console.log(_parametro_custom_1)
-           console.log(controller3.activeSystem.messages.get(0).name)
-           console.log(controller3.activeSystem.messages.get(0).id)
-           console.log(controller3.activeSystem.messages.get(0).count)
-           console.log(controller3.activeSystem.messages.get(0).fields.get(0).name)
-           console.log(controller3.activeSystem.messages.get(0).fields.get(0).value)
-           console.log(controller3.activeSystem.messages.get(0).fields.get(0).type)
-           console.log(controller3.activeSystem.messages.get(1).fields.get(1).name)
-           console.log(controller3.activeSystem.messages.get(1).fields.get(1).value)
-           console.log(controller3.activeSystem.messages.get(0).fields.get(0).type)
 
 
            //controller3.systems.get(0).name

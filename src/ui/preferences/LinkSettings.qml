@@ -132,16 +132,7 @@ Rectangle {
             enabled:    _currentSelection && _currentSelection.link
             onClicked:  _currentSelection.link.disconnect()
         }
-        QGCButton {
-            text:       qsTr("MockLink Options")
-            visible:    _currentSelection && _currentSelection.link && _currentSelection.link.isMockLink
-            onClicked:  mockLinkOptionDialog.open()
 
-            MockLinkOptionsDlg {
-                id:     mockLinkOptionDialog
-                link:   _currentSelection ? _currentSelection.link : undefined
-            }
-        }
     }
 
     Loader {
