@@ -363,6 +363,7 @@ void Vehicle::_commonInit()
     connect(this, &Vehicle::hobbsMeterChanged,      this, &Vehicle::_updateHobbsMeter);
 
     connect(_toolbox->qgcPositionManager(), &QGCPositionManager::gcsPositionChanged, this, &Vehicle::_updateDistanceToGCS);
+    connect(_toolbox->qgcPositionManager(), &QGCPositionManager::gcsPositionChanged, this, &Vehicle::_updateHomepoint);
 
     _missionManager = new MissionManager(this);
     connect(_missionManager, &MissionManager::error,                    this, &Vehicle::_missionManagerError);
@@ -890,6 +891,15 @@ void Vehicle::_chunkedStatusTextCompleted(uint8_t compId)
     bool ardupilotPrearm = messageText.startsWith(QStringLiteral("PreArm"));
     bool px4Prearm = messageText.startsWith(QStringLiteral("preflight"), Qt::CaseInsensitive) && severity >= MAV_SEVERITY_CRITICAL;
     if (ardupilotPrearm || px4Prearm) {
+        // check if expected as event
+        auto eventData = _events.find(compId);
+        if (eventData != _events.end()) {
+            if (eventData->data()->healthAndArmingChecksSupported()) {
+                qCDebug(VehicleLog) << "Dropping preflight message (expected as event):" << messageText;
+                return;
+            }
+        }
+
         // Limit repeated PreArm message to once every 10 seconds
         if (_noisySpokenPrearmMap.contains(messageText) && _noisySpokenPrearmMap[messageText].msecsTo(QTime::currentTime()) < (10 * 1000)) {
             skipSpoken = true;
@@ -1560,7 +1570,6 @@ void Vehicle::_handleEvent(uint8_t comp_id, std::unique_ptr<events::parser::Pars
 
     // handle special groups & protocols
     if (event->group() == "health" || event->group() == "arming_check") {
-        _events[comp_id]->healthAndArmingChecks().handleEvent(*event.get());
         // these are displayed separately
         return;
     }
@@ -1575,6 +1584,36 @@ void Vehicle::_handleEvent(uint8_t comp_id, std::unique_ptr<events::parser::Pars
     if (event->group() == "default" && severity != -1) {
         std::string message = event->message();
         std::string description = event->description();
+
+        if (event->type() == "append_health_and_arming_messages" && event->numArguments() > 0) {
+            uint32_t customMode = event->argumentValue(0).value.val_uint32_t;
+            const QSharedPointer<EventHandler>& eventHandler = _events[comp_id];
+            int modeGroup = eventHandler->getModeGroup(customMode);
+            std::vector<events::HealthAndArmingChecks::Check> checks = eventHandler->healthAndArmingCheckResults().checks(modeGroup);
+            QList<std::string> messageChecks;
+            for (const auto& check : checks) {
+                if (events::externalLogLevel(check.log_levels) <= events::Log::Warning) {
+                    messageChecks.append(check.message);
+                }
+            }
+            if (messageChecks.empty()) {
+                // Add all
+                for (const auto& check : checks) {
+                    messageChecks.append(check.message);
+                }
+            }
+            if (!message.empty() && !messageChecks.empty()) {
+                message += "<br/>";
+            }
+            if (messageChecks.size() == 1) {
+                message += messageChecks[0];
+            } else {
+                for (const auto& messageCheck : messageChecks) {
+                    message += "- " + messageCheck + "<br/>";
+                }
+            }
+        }
+
         if (message.size() > 0) {
             // TODO: handle this properly in the UI (e.g. with an expand button to display the description, clickable URL's + params)...
             QString msg = QString::fromStdString(message);
@@ -1612,13 +1651,48 @@ EventHandler& Vehicle::_eventHandler(uint8_t compid)
                 sendRequestEventMessageCB,
                 _mavlink->getSystemId(), _mavlink->getComponentId(), _id, compid)};
         eventData = _events.insert(compid, eventHandler);
+
+        // connect health and arming check updates
+        connect(eventHandler.data(), &EventHandler::healthAndArmingChecksUpdated, this, [compid, this]() {
+            // TODO: use user-intended mode instead of currently set mode
+            const QSharedPointer<EventHandler>& eventHandler = _events[compid];
+            _healthAndArmingCheckReport.update(compid, eventHandler->healthAndArmingCheckResults(),
+                    eventHandler->getModeGroup(_custom_mode));
+        });
+        connect(this, &Vehicle::flightModeChanged, this, [compid, this]() {
+            const QSharedPointer<EventHandler>& eventHandler = _events[compid];
+            if (eventHandler->healthAndArmingCheckResultsValid()) {
+                _healthAndArmingCheckReport.update(compid, eventHandler->healthAndArmingCheckResults(),
+                                                   eventHandler->getModeGroup(_custom_mode));
+            }
+        });
     }
     return *eventData->data();
 }
 
 void Vehicle::setEventsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName)
 {
-    _eventHandler(compid).setMetadata(metadataJsonFileName, translationJsonFileName);
+    _eventHandler(compid).setMetadata(metadataJsonFileName);
+
+    // get the mode group for some well-known flight modes
+    int modeGroups[2]{-1, -1};
+    const QString modes[2]{"Takeoff", "Mission"};
+    for (size_t i = 0; i < sizeof(modeGroups)/sizeof(modeGroups[0]); ++i) {
+        uint8_t     base_mode;
+        uint32_t    custom_mode;
+        if (_firmwarePlugin->setFlightMode(modes[i], &base_mode, &custom_mode)) {
+            modeGroups[i] = _eventHandler(compid).getModeGroup(custom_mode);
+            if (modeGroups[i] == -1) {
+                qCDebug(VehicleLog) << "Failed to get mode group for mode" << modes[i] << "(Might not be in metadata)";
+            }
+        }
+    }
+    _healthAndArmingCheckReport.setModeGroups(modeGroups[0], modeGroups[1]);
+
+    // Request arming checks to be reported
+    sendMavCommand(_defaultComponentId,
+                   MAV_CMD_RUN_PREARM_CHECKS,
+                   false);
 }
 
 void Vehicle::setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName)
@@ -1808,12 +1882,12 @@ int Vehicle::motorCount()
     switch (_vehicleType) {
     case MAV_TYPE_HELICOPTER:
         return 1;
-    case MAV_TYPE_VTOL_DUOROTOR:
+    case MAV_TYPE_VTOL_TAILSITTER_DUOROTOR:
         return 2;
     case MAV_TYPE_TRICOPTER:
         return 3;
     case MAV_TYPE_QUADROTOR:
-    case MAV_TYPE_VTOL_QUADROTOR:
+    case MAV_TYPE_VTOL_TAILSITTER_QUADROTOR:
         return 4;
     case MAV_TYPE_HEXAROTOR:
         return 6;
@@ -2265,6 +2339,12 @@ void Vehicle::_parametersReady(bool parametersReady)
         _setupAutoDisarmSignalling();
         _initialConnectStateMachine->advance();
     }
+
+    _multirotor_speed_limits_available = _firmwarePlugin->mulirotorSpeedLimitsAvailable(this);
+    _fixed_wing_airspeed_limits_available = _firmwarePlugin->fixedWingAirSpeedLimitsAvailable(this);
+
+    emit haveMRSpeedLimChanged();
+    emit haveFWSpeedLimChanged();
 }
 
 void Vehicle::_sendQGCTimeToVehicle()
@@ -2424,11 +2504,11 @@ QString Vehicle::vehicleTypeName() const {
         { MAV_TYPE_FLAPPING_WING,   tr("Flapping wing")},
         { MAV_TYPE_KITE,            tr("Flapping wing")},
         { MAV_TYPE_ONBOARD_CONTROLLER, tr("Onboard companion controller")},
-        { MAV_TYPE_VTOL_DUOROTOR,   tr("Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter")},
-        { MAV_TYPE_VTOL_QUADROTOR,  tr("Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter")},
+        { MAV_TYPE_VTOL_TAILSITTER_DUOROTOR,   tr("Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter")},
+        { MAV_TYPE_VTOL_TAILSITTER_QUADROTOR,  tr("Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter")},
         { MAV_TYPE_VTOL_TILTROTOR,  tr("Tiltrotor VTOL")},
-        { MAV_TYPE_VTOL_RESERVED2,  tr("VTOL reserved 2")},
-        { MAV_TYPE_VTOL_RESERVED3,  tr("VTOL reserved 3")},
+        { MAV_TYPE_VTOL_FIXEDROTOR,  tr("VTOL Fixedrotor")},
+        { MAV_TYPE_VTOL_TAILSITTER,  tr("VTOL Tailsitter")},
         { MAV_TYPE_VTOL_RESERVED4,  tr("VTOL reserved 4")},
         { MAV_TYPE_VTOL_RESERVED5,  tr("VTOL reserved 5")},
         { MAV_TYPE_GIMBAL,          tr("Onboard gimbal")},
@@ -2541,6 +2621,23 @@ double Vehicle::minimumTakeoffAltitude()
     return _firmwarePlugin->minimumTakeoffAltitude(this);
 }
 
+double Vehicle::maximumHorizontalSpeedMultirotor()
+{
+    return _firmwarePlugin->maximumHorizontalSpeedMultirotor(this);
+}
+
+
+double Vehicle::maximumEquivalentAirspeed()
+{
+    return _firmwarePlugin->maximumEquivalentAirspeed(this);
+}
+
+
+double Vehicle::minimumEquivalentAirspeed()
+{
+    return _firmwarePlugin->minimumEquivalentAirspeed(this);
+}
+
 void Vehicle::startMission()
 {
     _firmwarePlugin->startMission(this);
@@ -2570,6 +2667,26 @@ void Vehicle::guidedModeChangeAltitude(double altitudeChange, bool pauseVehicle)
         return;
     }
     _firmwarePlugin->guidedModeChangeAltitude(this, altitudeChange, pauseVehicle);
+}
+
+void
+Vehicle::guidedModeChangeGroundSpeed(double groundspeed)
+{
+    if (!guidedModeSupported()) {
+        qgcApp()->showAppMessage(guided_mode_not_supported_by_vehicle);
+        return;
+    }
+    _firmwarePlugin->guidedModeChangeGroundSpeed(this, groundspeed);
+}
+
+void
+Vehicle::guidedModeChangeEquivalentAirspeed(double airspeed)
+{
+    if (!guidedModeSupported()) {
+        qgcApp()->showAppMessage(guided_mode_not_supported_by_vehicle);
+        return;
+    }
+    _firmwarePlugin->guidedModeChangeEquivalentAirspeed(this, airspeed);
 }
 
 void Vehicle::guidedModeOrbit(const QGeoCoordinate& centerCoord, double radius, double amslAltitude)
@@ -2825,6 +2942,7 @@ bool Vehicle::_sendMavCommandShouldRetry(MAV_CMD command)
     case MAV_CMD_REQUEST_PROTOCOL_VERSION:
     case MAV_CMD_REQUEST_MESSAGE:
     case MAV_CMD_PREFLIGHT_STORAGE:
+    case MAV_CMD_RUN_PREARM_CHECKS:
         return true;
 
     default:
@@ -2832,9 +2950,22 @@ bool Vehicle::_sendMavCommandShouldRetry(MAV_CMD command)
     }
 }
 
+bool Vehicle::_commandCanBeDuplicated(MAV_CMD command)
+{
+    // For some commands we don't care about response as much as we care about sending them regularly.
+    // This test avoids commands not being sent due to an ACK not being received yet.
+    // MOTOR_TEST in ardusub is a case where we need a constant stream of commands so it doesn't time out.
+    switch (command) {
+    case MAV_CMD_DO_MOTOR_TEST:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void Vehicle::_sendMavCommandWorker(bool commandInt, bool showError, MavCmdResultHandler resultHandler, void* resultHandlerData, int targetCompId, MAV_CMD command, MAV_FRAME frame, float param1, float param2, float param3, float param4, float param5, float param6, float param7)
 {
-    if ((targetCompId == MAV_COMP_ID_ALL) || isMavCommandPending(targetCompId, command)) {
+    if ((targetCompId == MAV_COMP_ID_ALL) || (isMavCommandPending(targetCompId, command) && !_commandCanBeDuplicated(command))) {
         bool    compIdAll       = targetCompId == MAV_COMP_ID_ALL;
         QString rawCommandName  = _toolbox->missionCommandTree()->rawName(command);
 
@@ -3305,6 +3436,9 @@ void Vehicle::startCalibration(Vehicle::CalibrationType calType)
             // Gyro cal for ArduCopter only
             param1 = 1;
         }
+    case CalibrationAPMAccelSimple:
+        param5 = 4;
+        break;
     }
 
     // We can't use sendMavCommand here since we have no idea how long it will be before the command returns a result. This in turn
@@ -3581,7 +3715,7 @@ void Vehicle::_handleADSBVehicle(const mavlink_message_t& message)
 
     mavlink_msg_adsb_vehicle_decode(&message, &adsbVehicleMsg);
     if ((adsbVehicleMsg.flags & ADSB_FLAGS_VALID_COORDS) && adsbVehicleMsg.tslc <= maxTimeSinceLastSeen) {
-        ADSBVehicle::VehicleInfo_t vehicleInfo;
+        ADSBVehicle::ADSBVehicleInfo_t vehicleInfo;
 
         vehicleInfo.availableFlags = 0;
         vehicleInfo.icaoAddress = adsbVehicleMsg.ICAO_address;
@@ -3657,6 +3791,24 @@ void Vehicle::_updateDistanceToGCS()
         _distanceToGCSFact.setRawValue(coordinate().distanceTo(gcsPosition));
     } else {
         _distanceToGCSFact.setRawValue(qQNaN());
+    }
+}
+
+void Vehicle::_updateHomepoint()
+{
+    const bool setHomeCmdSupported = firmwarePlugin()->supportedMissionCommands(vehicleClass()).contains(MAV_CMD_DO_SET_HOME);
+    const bool updateHomeActivated = _toolbox->settingsManager()->flyViewSettings()->updateHomePosition()->rawValue().toBool();
+    if(setHomeCmdSupported && updateHomeActivated){
+        QGeoCoordinate gcsPosition = _toolbox->qgcPositionManager()->gcsPosition();
+        if (coordinate().isValid() && gcsPosition.isValid()) {
+            sendMavCommand(defaultComponentId(),
+                           MAV_CMD_DO_SET_HOME, false,
+                           0,
+                           0, 0, 0,
+                           static_cast<float>(gcsPosition.latitude()) ,
+                           static_cast<float>(gcsPosition.longitude()),
+                           static_cast<float>(gcsPosition.altitude()));
+        }
     }
 }
 
@@ -3842,6 +3994,12 @@ void Vehicle::flashBootloader()
 
 void Vehicle::gimbalControlValue(double pitch, double yaw)
 {
+    if (apmFirmware()) {
+        // ArduPilot firmware treats this values as centi-degrees
+        pitch *= 100;
+        yaw *= 100;
+    }
+
     //qDebug() << "Gimbal:" << pitch << yaw;
     sendMavCommand(
                 _defaultComponentId,
