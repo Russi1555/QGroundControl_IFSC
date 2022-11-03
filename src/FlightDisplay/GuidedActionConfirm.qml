@@ -112,7 +112,7 @@ Rectangle {
                         altitudeSlider.visible = false
                     }
                     hideTrigger = false
-                    guidedController.executeAction(_root.action, _root.actionData, altitudeChange, _root.optionChecked)
+                    guidedController.executeAction(_root.action, _root.actionData, altitudeChange, _root.optionChecked) //OLHAR ESSE GUIDED ACTIONS CONTROLLER
                     if (mapIndicator) {
                         mapIndicator.actionConfirmed()
                         mapIndicator = undefined
