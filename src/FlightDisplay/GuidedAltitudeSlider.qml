@@ -39,6 +39,7 @@ Rectangle {
 
     /// Returns the user specified change in altitude from the current vehicle altitude
     function getAltitudeChangeValue() {
+        console.log(_vehicleAltitude)
         return altField.newAltitudeMeters - _vehicleAltitude
     }
 

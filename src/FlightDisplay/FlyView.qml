@@ -168,7 +168,7 @@ Item {
         altitudeSlider:     _guidedAltSlider
     }
 
-    /*GuidedActionConfirm {
+    GuidedActionConfirm {
         id:                         guidedActionConfirm
         anchors.margins:            _margins
         anchors.bottom:             parent.bottom
@@ -176,7 +176,7 @@ Item {
         z:                          QGroundControl.zOrderTopMost
         guidedController:           _guidedController
         altitudeSlider:             _guidedAltSlider
-    }*/
+    }
 
     GuidedActionList {
         id:                         guidedActionList
@@ -187,7 +187,7 @@ Item {
         guidedController:           _guidedController
     }
 
-    //-- Altitude slider
+    //-- Altitude slider DESCOBRIR COMO FUNCIONA: GUIDEDACTIONSLIDER.QML
     GuidedAltitudeSlider {
         id:                 guidedAltSlider
         anchors.margins:    _toolsMargin
