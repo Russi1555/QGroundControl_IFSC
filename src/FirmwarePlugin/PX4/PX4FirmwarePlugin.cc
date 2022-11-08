@@ -25,6 +25,13 @@
 
 #include "px4_custom_mode.h"
 
+/*
+ *
+ *  VOU MARCANDO ESSE ARQUIVO COM " INTERESSE! " PROS METÓDOS QUE PODEM SER INTERESSANTES.
+ *  SÓ METER UM CTRL+F QUE DEVE ACHAR ALGUNS
+ *
+*/
+
 PX4FirmwarePluginInstanceData::PX4FirmwarePluginInstanceData(QObject* parent)
     : QObject(parent)
     , versionNotified(false)
@@ -453,7 +460,7 @@ bool PX4FirmwarePlugin::fixedWingAirSpeedLimitsAvailable(Vehicle* vehicle)
             vehicle->parameterManager()->parameterExists(FactSystem::defaultComponentId, "FW_AIRSPD_MAX");
 }
 
-void PX4FirmwarePlugin::guidedModeGotoLocation(Vehicle* vehicle, const QGeoCoordinate& gotoCoord)
+void PX4FirmwarePlugin::guidedModeGotoLocation(Vehicle* vehicle, const QGeoCoordinate& gotoCoord) //INTERESSE! AQUI DA PRA MANDAR O DRONE DIRETO PRA UMA POSIÇÃO DE GPS.
 {
     if (qIsNaN(vehicle->altitudeAMSL()->rawValue().toDouble())) {
         qgcApp()->showAppMessage(tr("Unable to go to location, vehicle position not known."));
