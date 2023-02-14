@@ -19,6 +19,9 @@ import QGroundControl.Palette       1.0
 import QGroundControl.Controls      1.0
 import QGroundControl.Controllers   1.0
 import QGroundControl.ScreenTools   1.0
+import QGroundControl.FactControls  1.0
+import QGroundControl.FlightDisplay 1.0
+
 
 AnalyzePage {
     headerComponent:    headerComponent
@@ -32,6 +35,42 @@ AnalyzePage {
 
     MAVLinkInspectorController {
         id: controller
+    }
+
+
+
+
+    Timer {
+        interval: 5000; running: true; repeat: true
+        onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
+
+            console.log("Teste novo")
+            console.log(controller.activeSystem.messages.count)
+            for (var i = 0; i < controller.activeSystem.messages.count; i++){
+                if (controller.activeSystem.messages.get(i).name == "TUNNEL"){
+                    console.log(controller.activeSystem.messages.get(i).name)
+                }
+            }
+
+            curSystem.selected = 0
+            console.log(controller.activeSystem.messages.get(0).fields.get(0).name)
+            console.log(controller.activeSystem.messages.get(0).fields.get(0).value)
+            console.log(controller.activeSystem.messages.get(0).fields.get(0).type)
+            curSystem.selected = 1
+            console.log(controller.activeSystem.messages.get(1).fields.get(1).name)
+            console.log(controller.activeSystem.messages.get(1).fields.get(1).value)
+            console.log(controller.activeSystem.messages.get(1).fields.get(1).type)
+            curSystem.selected = 2
+            console.log(controller.activeSystem.messages.get(2).fields.get(1).name)
+            console.log(controller.activeSystem.messages.get(2).fields.get(1).value)
+            console.log(controller.activeSystem.messages.get(2).fields.get(1).type)
+            curSystem.selected = 12 //heartbeat
+            console.log("heartbeat " + controller.activeSystem.messages.get(10).count)
+
+            //_controller.currentGroupChanged()
+
+            //console.log(tela_parametros._controller.ParameterEditorGroup.groups)
+        }
     }
 
     Component {
@@ -130,6 +169,8 @@ AnalyzePage {
                 height:             parent.height
                 contentWidth:       width
                 contentHeight:      messageCol.height
+
+
                 Column {
                     id:                 messageCol
                     width:              parent.width
@@ -294,6 +335,7 @@ AnalyzePage {
                     }
                 }
             }
+
         }
     }
 }
