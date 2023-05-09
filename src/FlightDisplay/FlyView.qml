@@ -89,7 +89,7 @@ Item {
     property real _heading: Math.round(_activeVehicle.heading.value)
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
-    property real _parametro_custom_1: 0
+    property real _parametro_custom_1: controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -161,22 +161,24 @@ Item {
         visible:            false
     }
 
-   /* GuidedActionsController {
+    GuidedActionsController {
         id:                 guidedActionsController
         missionController:  _missionController
         actionList:         _guidedActionList
-        altitudeSlider:     _guidedAltSlider
-    }*/
+        guidedValueSlider:     _guidedAltSlider
+        visible:            false
+    }
 
-    /*GuidedActionConfirm {
+    GuidedActionConfirm {
         id:                         guidedActionConfirm
         anchors.margins:            _margins
         anchors.bottom:             parent.bottom
         anchors.horizontalCenter:   parent.horizontalCenter
         z:                          QGroundControl.zOrderTopMost
         guidedController:           _guidedController
-        altitudeSlider:             _guidedAltSlider
-    }*/
+        guidedValueSlider:             _guidedAltSlider
+        visible: false
+    }
 
     GuidedActionList {
         id:                         guidedActionList
@@ -185,10 +187,11 @@ Item {
         anchors.horizontalCenter:   parent.horizontalCenter
         z:                          QGroundControl.zOrderTopMost
         guidedController:           _guidedController
+        visible: false
     }
 
-   /* //-- Altitude slider
-    GuidedAltitudeSlider {
+    //-- Altitude slider (preciso pra debugar o simulador)
+    GuidedValueSlider {
         id:                 guidedAltSlider
         anchors.margins:    _toolsMargin
         anchors.right:      parent.right
@@ -200,7 +203,7 @@ Item {
         color:              qgcPal.window
         visible:            false
     }
-*/
+
   /* Rectangle {
          id: motores
          width: parent.width/10
@@ -1343,6 +1346,7 @@ Item {
        onClicked : {
 
            _informacao_central = !_informacao_central
+
            //mavlinkconsole.sendCommand("testando foda")
            //console.log("teste 2" + RadioComponentController.controller)
           // parameters_vehicle._controller.currentCategory = parameters_vehicle._controller.categories.get(0) //seta a categoria dos parametros como STANDARD
@@ -1360,7 +1364,8 @@ Item {
            console.log(parameters_vehicle._controller.currentCategory.name)*/
 
            //console.log(_parametro_custom_1)
-           console.log(controller3.activeSystem.messages.get(0).name)
+           console.log("TESTE, 1, 11, 1011, 1111,")
+          /* console.log(controller3.activeSystem.messages.get(0).name)
            console.log(controller3.activeSystem.messages.get(0).id)
            console.log(controller3.activeSystem.messages.get(0).count)
            console.log(controller3.activeSystem.messages.get(0).fields.get(0).name)
@@ -1368,7 +1373,7 @@ Item {
            console.log(controller3.activeSystem.messages.get(0).fields.get(0).type)
            console.log(controller3.activeSystem.messages.get(1).fields.get(1).name)
            console.log(controller3.activeSystem.messages.get(1).fields.get(1).value)
-           console.log(controller3.activeSystem.messages.get(0).fields.get(0).type)
+           console.log(controller3.activeSystem.messages.get(0).fields.get(0).type)*/
 
 
            //controller3.systems.get(0).name
@@ -1420,11 +1425,11 @@ Item {
 
            onClicked : {
 
-               console.log(_activeVehicle.cameraManager.currentCamera)
-               console.log(_activeVehicle.cameraManager.cameras.count)
+               //console.log(_activeVehicle.cameraManager.currentCamera)
+               //console.log(_activeVehicle.cameraManager.cameras.count)
                //console.log(QGroundControl.settingsManager.videoSettings.videoSource.rawValue)
                //console.log(QGroundControl.settingsManager.videoSettings.videoSource.enumString)
-               console.log(controller.channelCount.rawValue)
+              // console.log(controller.channelCount.rawValue)
                _selecao_camera = !_selecao_camera
 
                console.log("****************")

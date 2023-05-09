@@ -49,6 +49,7 @@ Item {
             rollAngle:          _rollAngle
             pitchAngle:         _pitchAngle
             anchors.fill:       parent
+            visible: false
         }
         //----------------------------------------------------
         //-- Pointer

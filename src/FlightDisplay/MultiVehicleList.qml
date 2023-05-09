@@ -132,16 +132,18 @@ Item {
                         }
                     }
 
-                    QGCCompassWidget {
+                   /* QGCCompassWidget {
                         size:       _widgetHeight
                         usedByMultipleVehicleList: true
                         vehicle:    _vehicle
-                    }
+                        visible: false
+                    }*/
 
-                    QGCAttitudeWidget {
+                    /*QGCAttitudeWidget {
                         size:       _widgetHeight
                         vehicle:    _vehicle
-                    }
+                        visible: false
+                    }*/
                 } // RowLayout
 
                 Row {
