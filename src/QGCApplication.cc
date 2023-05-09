@@ -1029,6 +1029,7 @@ bool QGCApplication::event(QEvent *e)
         if (!forceClose) {
             //
             _mainRootWindow->close();
+            QCoreApplication::instance()->quit();
             e->ignore();
             return true;
         }

@@ -22,6 +22,7 @@ Item {
     property real pitchAngle:   0
     clip:           true
     anchors.fill:   parent
+    visible: False
 
     property real angularScale: pitchAngle * root.height / 45
 
@@ -30,6 +31,7 @@ Item {
         width:  root.width  * 4
         height: root.height * 8
         anchors.centerIn: parent
+        visible: False
         Rectangle {
             id: sky
             anchors.fill: parent

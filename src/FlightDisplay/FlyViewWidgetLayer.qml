@@ -116,14 +116,14 @@ Item {
         guidedValueSlider:          _guidedValueSlider
     }
 
-    FlyViewInstrumentPanel {
+    FlyViewInstrumentPanel { //ESSA BOSTA AQUI = BUSSOLA E INDICADOR DE PITCH NO CANTO DIREITO (PADRÃO)
         id:                         instrumentPanel
         anchors.margins:            _toolsMargin
         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
         anchors.right:              parent.right
         width:                      _rightPanelWidth
         spacing:                    _toolsMargin
-        visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
+        visible:                    false//QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
         availableHeight:            parent.height - y - _toolsMargin
 
         property real rightInset: visible ? parent.width - x : 0
@@ -134,6 +134,7 @@ Item {
         anchors.margins:        _toolsMargin
         anchors.right:          parent.right
         width:                  _rightPanelWidth
+        visible: false
         state:                  _verticalCenter ? "verticalCenter" : "topAnchor"
         states: [
             State {
