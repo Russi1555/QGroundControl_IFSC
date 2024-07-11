@@ -1,9 +1,9 @@
 #ifndef AIRMAP_QT_STATUS_H_
 #define AIRMAP_QT_STATUS_H_
 
-#include <airmap/client.h>
+#include <Airmap/services/client.h>
 #include <Airmap/services/dispatcher.h>
-#include <airmap/status.h>
+#include <Airmap/services/status.h>
 
 #include <memory>
 

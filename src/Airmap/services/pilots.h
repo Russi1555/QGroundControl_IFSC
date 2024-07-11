@@ -1,9 +1,8 @@
 #ifndef AIRMAP_QT_PILOTS_H_
 #define AIRMAP_QT_PILOTS_H_
 
-#include <airmap/pilots.h>
+#include <Airmap/services/pilots.h>
 
-#include <airmap/pilots.h>
 #include <Airmap/services/dispatcher.h>
 
 #include <memory>

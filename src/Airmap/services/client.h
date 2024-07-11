@@ -1,12 +1,12 @@
 #ifndef AIRMAP_QT_CLIENT_H_
 #define AIRMAP_QT_CLIENT_H_
 
-#include <airmap/client.h>
-#include <airmap/context.h>
-#include <airmap/error.h>
-#include <airmap/logger.h>
-#include <airmap/outcome.h>
-#include <airmap/visibility.h>
+#include <Airmap/services/client.h>
+//#include <Airmap/services/context.h>
+//#include <airmap/error.h>
+#include <Airmap/services/logger.h>
+//#include <Airmap/services/outcome.h>
+//#include <airmap/visibility.h>
 
 #include <QObject>
 

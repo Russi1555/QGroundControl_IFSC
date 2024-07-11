@@ -1,7 +1,7 @@
 #ifndef AIRMAP_QT_TRAFFIC_H_
 #define AIRMAP_QT_TRAFFIC_H_
 
-#include <airmap/traffic.h>
+#include <Airmap/services/traffic.h>
 
 #include <Airmap/services/dispatcher.h>
 

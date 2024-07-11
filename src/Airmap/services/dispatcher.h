@@ -1,7 +1,7 @@
 #ifndef AIRMAP_QT_DISPATCHER_H_
 #define AIRMAP_QT_DISPATCHER_H_
 
-#include <airmap/context.h>
+//#include <airmap/context.h>
 
 #include <QEvent>
 #include <QObject>

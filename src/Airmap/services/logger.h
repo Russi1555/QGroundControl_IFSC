@@ -1,8 +1,8 @@
 #ifndef AIRMAP_QT_LOGGER_H_
 #define AIRMAP_QT_LOGGER_H_
 
-#include <airmap/logger.h>
-#include <airmap/visibility.h>
+#include <Airmap/services/logger.h>
+//#include <airmap/visibility.h>
 
 #include <QLoggingCategory>
 

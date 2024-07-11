@@ -90,7 +90,7 @@ Item {
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
     property real _parametro_custom_1: controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
-
+    property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue //Provavelmente vai ser isso aqui pra GASOLINA 11/06/2024
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
    // property real    min_tamanho_tela: Screen.devicePixelRatio
@@ -792,7 +792,7 @@ Item{
 
         Text{
 
-           text: "litros"
+           text: +"litros"
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"

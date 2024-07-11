@@ -1,24 +1,24 @@
 #ifndef AIRMAP_QT_TYPES_H_
 #define AIRMAP_QT_TYPES_H_
 
-#include <airmap/aircraft.h>
-#include <airmap/airspace.h>
-#include <airmap/credentials.h>
-#include <airmap/date_time.h>
-#include <airmap/flight.h>
-#include <airmap/flight_plan.h>
-#include <airmap/geometry.h>
-#include <airmap/optional.h>
-#include <airmap/outcome.h>
-#include <airmap/pilot.h>
-#include <airmap/rule.h>
-#include <airmap/ruleset.h>
-#include <airmap/status.h>
-#include <airmap/telemetry.h>
-#include <airmap/token.h>
-#include <airmap/traffic.h>
-#include <airmap/version.h>
-#include <airmap/visibility.h>
+#include <Airmap/services/aircrafts.h>
+#include <Airmap/services/airspaces.h>
+//#include <airmap/credentials.h>
+//#include <airmap/date_time.h>
+//#include <airmap/flight.h>
+#include <Airmap/services/flight_plans.h>
+//#include <Airmap/servicesS/geometry.h>
+//#include <Airmap/servicesS/optional.h>
+//#include <Airmap/servicesS/outcome.h>
+//#include <Airmap/services/pilot.h>
+//#include <Airmap/servicesS/rule.h>
+#include <Airmap/services/rulesets.h>
+#include <Airmap/services/status.h>
+#include <Airmap/services/telemetry.h>
+//#include <airmap/token.h>
+//#include <airmap/traffic.h>
+//#include <airmap/version.h>
+//#include <airmap/visibility.h>
 
 #include <QMetaType>
 

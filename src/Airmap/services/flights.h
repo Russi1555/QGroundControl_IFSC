@@ -1,8 +1,8 @@
 #ifndef AIRMAP_QT_FLIGHTS_H_
 #define AIRMAP_QT_FLIGHTS_H_
 
-#include <airmap/client.h>
-#include <airmap/flights.h>
+#include <Airmap/services/client.h>
+#include <Airmap/services/flights.h>
 #include <Airmap/services/dispatcher.h>
 
 #include <memory>

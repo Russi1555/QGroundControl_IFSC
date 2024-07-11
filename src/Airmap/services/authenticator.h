@@ -1,8 +1,8 @@
 #ifndef AIRMAP_QT_AUTHENTICATOR_H_
 #define AIRMAP_QT_AUTHENTICATOR_H_
 
-#include <airmap/authenticator.h>
-#include <airmap/client.h>
+#include <Airmap/services/authenticator.h>
+#include <Airmap/services/client.h>
 #include <Airmap/services/dispatcher.h>
 
 #include <memory>
