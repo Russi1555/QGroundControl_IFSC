@@ -235,8 +235,71 @@ void sigHandler(int s)
  * @return exit code, 0 for normal exit and !=0 for error cases
  */
 
+
+
+/**
+ *
+ *      SOCKETS - RELATORIO DE VOO
+ *
+*/
+
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QTcpSocket>
+#include <QObject>
+
+class SocketHandler : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
+
+public:
+    explicit SocketHandler(QObject *parent = nullptr) : QObject(parent), m_sendSocket(new QTcpSocket(this)), m_receiveSocket(new QTcpSocket(this)) {
+        connect(m_receiveSocket, &QTcpSocket::readyRead, this, &SocketHandler::readMessage);
+        m_receiveSocket->connectToHost("localhost", 5632);
+    }
+
+    QString message() const {
+        return m_message;
+    }
+
+    void setMessage(const QString &message) {
+        if (message != m_message) {
+            m_message = message;
+            emit messageChanged();
+        }
+    }
+
+public slots:
+    void connectToServer() {
+        m_sendSocket->connectToHost("localhost", 5630);
+    }
+
+    void sendMessage(const QString &message) {
+        if (m_sendSocket->state() == QAbstractSocket::ConnectedState) {
+            m_sendSocket->write(message.toUtf8());
+        }
+    }
+
+    void readMessage() {
+        while (m_receiveSocket->canReadLine()) {
+            QString line = QString::fromUtf8(m_receiveSocket->readLine()).trimmed();
+            setMessage(line);
+        }
+    }
+
+signals:
+    void messageChanged();
+
+private:
+    QTcpSocket *m_sendSocket;
+    QTcpSocket *m_receiveSocket;
+    QString m_message;
+};
+
 int main(int argc, char *argv[])
 {
+
 #ifndef __mobile__
     // We make the runguard key different for custom and non custom
     // builds, so they can be executed together in the same device.

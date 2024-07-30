@@ -42,20 +42,36 @@ ApplicationWindow {
 
     }
 
-    /*Timer {
+
+
+
+    Timer {
         interval: 10000; running: true; repeat: true
         onTriggered: {
-            console.log("Atualizando valor customizado...")
-            //flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
-            console.log(tela_parametros._controller.currentCategory.name)
-            console.log(tela_parametros._controller.currentGroup.name )
-            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).name)
-            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).value)
-            console.log(controller1.controller.activeSystem.messages.get(1).fields.get(1).type)
+            //controller4.controller.activeSystem.selected = 0
+            //console.log("Atualizando valor customizado...")
+           // flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
+            //console.log(tela_parametros._controller.currentCategory.name)
+            //console.log(tela_parametros._controller.currentGroup.name )
+            //console.log(controller4.controller.activeSystem.messages.get(1).fields.get(1).name)
+            //console.log(controller4.controller.activeSystem.messages.get(1).fields.get(1).value)
+           // console.log(controller4.controller.activeSystem.messages.get(1).fields.get(1).type)
             //_controller.currentGroupChanged()
             //console.log(tela_parametros._controller.ParameterEditorGroup.groups)
+          /*  console.log("TESTE GERAL")
+            console.log(controller4)
+            controller4.curSystem=0
+           // console.log(controller4.controller.messages.get(5))
+            //console.log(controller4.controller.messages.get(5).fields.get(1).name)
+
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).name) //breach status
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).type)
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).value)
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).rawValue)
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).valueString)
+            console.log(controller4.controller.activeSystem.messages.get(5).fields.get(1).get(1))*/
         }
-    }*/
+    }
 
 
     Component.onCompleted: {
@@ -230,6 +246,7 @@ ApplicationWindow {
             firstRunPromptManager.clearNextPromptSignal()
             QGroundControl.linkManager.shutdown()
             QGroundControl.videoManager.stopVideo();
+            console.log("Quit event false");
             mainWindow.close()
         }
 
@@ -390,11 +407,20 @@ ApplicationWindow {
             }
         }
 
-
+        MAVLinkInspectorPage{
+            id: controller4
+            visible: true
+            anchors.top: mainWindow.bottom
+            width:1
+            height:1
+            z: mainWindow.z - 1
+        }
         FlyView {
             id:             flightView
             anchors.fill:   parent
         }
+
+
 
         PlanView {
             id:             planView

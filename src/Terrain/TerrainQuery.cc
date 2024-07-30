@@ -428,22 +428,22 @@ bool TerrainTileManager::getAltitudesForCoordinates(const QList<QGeoCoordinate>&
 
     for (const QGeoCoordinate& coordinate: coordinates) {
         QString tileHash = _getTileHash(coordinate);
-        qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates hash:coordinate" << tileHash << coordinate;
+       // qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates hash:coordinate" << tileHash << coordinate;
 
         _tilesMutex.lock();
         if (_tiles.contains(tileHash)) {
             double elevation = _tiles[tileHash].elevation(coordinate);
             if (qIsNaN(elevation)) {
                 error = true;
-                qCWarning(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates Internal Error: missing elevation in tile cache";
+              //  qCWarning(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates Internal Error: missing elevation in tile cache";
             } else {
-                qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates returning elevation from tile cache" << elevation;
+               // qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates returning elevation from tile cache" << elevation;
             }
             altitudes.push_back(elevation);
         } else {
             if (_state != State::Downloading) {
                 QNetworkRequest request = getQGCMapEngine()->urlFactory()->getTileURL("Airmap Elevation", getQGCMapEngine()->urlFactory()->long2tileX("Airmap Elevation",coordinate.longitude(), 1), getQGCMapEngine()->urlFactory()->lat2tileY("Airmap Elevation", coordinate.latitude(), 1), 1, &_networkManager);
-                qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates query from database" << request.url();
+               // qCDebug(TerrainQueryLog) << "TerrainTileManager::getAltitudesForCoordinates query from database" << request.url();
                 QGeoTileSpec spec;
                 spec.setX(getQGCMapEngine()->urlFactory()->long2tileX("Airmap Elevation", coordinate.longitude(), 1));
                 spec.setY(getQGCMapEngine()->urlFactory()->lat2tileY("Airmap Elevation", coordinate.latitude(), 1));
@@ -483,7 +483,7 @@ void TerrainTileManager::_terrainDone(QByteArray responseBytes, QNetworkReply::N
     _state = State::Idle;
 
     if (!reply) {
-        qCWarning(TerrainQueryLog) << "Elevation tile fetched but invalid reply data type.";
+        //qCWarning(TerrainQueryLog) << "Elevation tile fetched but invalid reply data type.";
         return;
     }
 
@@ -493,19 +493,19 @@ void TerrainTileManager::_terrainDone(QByteArray responseBytes, QNetworkReply::N
 
     // handle potential errors
     if (error != QNetworkReply::NoError) {
-        qCWarning(TerrainQueryLog) << "Elevation tile fetching returned error (" << error << ")";
+       // qCWarning(TerrainQueryLog) << "Elevation tile fetching returned error (" << error << ")";
         _tileFailed();
         reply->deleteLater();
         return;
     }
     if (responseBytes.isEmpty()) {
-        qCWarning(TerrainQueryLog) << "Error in fetching elevation tile. Empty response.";
+        //qCWarning(TerrainQueryLog) << "Error in fetching elevation tile. Empty response.";
         _tileFailed();
         reply->deleteLater();
         return;
     }
 
-    qCDebug(TerrainQueryLog) << "Received some bytes of terrain data: " << responseBytes.size();
+    //qCDebug(TerrainQueryLog) << "Received some bytes of terrain data: " << responseBytes.size();
 
     TerrainTile* terrainTile = new TerrainTile(responseBytes);
     if (terrainTile->isValid()) {
@@ -518,7 +518,7 @@ void TerrainTileManager::_terrainDone(QByteArray responseBytes, QNetworkReply::N
         _tilesMutex.unlock();
     } else {
         delete terrainTile;
-        qCWarning(TerrainQueryLog) << "Received invalid tile";
+        //qCWarning(TerrainQueryLog) << "Received invalid tile";
     }
     reply->deleteLater();
 
@@ -532,19 +532,19 @@ void TerrainTileManager::_terrainDone(QByteArray responseBytes, QNetworkReply::N
             if (requestInfo.queryMode == QueryMode::QueryModeCoordinates) {
                 if (error) {
                     QList<double> noAltitudes;
-                    qCWarning(TerrainQueryLog) << "_terrainDone(coordinateQuery): signalling failure due to internal error";
+                   // qCWarning(TerrainQueryLog) << "_terrainDone(coordinateQuery): signalling failure due to internal error";
                     requestInfo.terrainQueryInterface->_signalCoordinateHeights(false, noAltitudes);
                 } else {
-                    qCDebug(TerrainQueryLog) << "_terrainDone(coordinateQuery): All altitudes taken from cached data";
+                 //   qCDebug(TerrainQueryLog) << "_terrainDone(coordinateQuery): All altitudes taken from cached data";
                     requestInfo.terrainQueryInterface->_signalCoordinateHeights(requestInfo.coordinates.count() == altitudes.count(), altitudes);
                 }
             } else if (requestInfo.queryMode == QueryMode::QueryModePath) {
                 if (error) {
                     QList<double> noAltitudes;
-                    qCWarning(TerrainQueryLog) << "_terrainDone(coordinateQuery): signalling failure due to internal error";
+                   // qCWarning(TerrainQueryLog) << "_terrainDone(coordinateQuery): signalling failure due to internal error";
                     requestInfo.terrainQueryInterface->_signalPathHeights(false, requestInfo.distanceBetween, requestInfo.finalDistanceBetween, noAltitudes);
                 } else {
-                    qCDebug(TerrainQueryLog) << "_terrainDone(coordinateQuery): All altitudes taken from cached data";
+                  //  qCDebug(TerrainQueryLog) << "_terrainDone(coordinateQuery): All altitudes taken from cached data";
                     requestInfo.terrainQueryInterface->_signalPathHeights(requestInfo.coordinates.count() == altitudes.count(), requestInfo.distanceBetween, requestInfo.finalDistanceBetween, altitudes);
                 }
             }

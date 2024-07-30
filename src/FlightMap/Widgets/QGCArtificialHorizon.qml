@@ -31,7 +31,7 @@ Item {
         width:  root.width  * 4
         height: root.height * 8
         anchors.centerIn: parent
-        visible: False
+        visible: false
         Rectangle {
             id: sky
             anchors.fill: parent

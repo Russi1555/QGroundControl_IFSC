@@ -41,6 +41,8 @@ import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.SettingsManager       1.0
 import QtGraphicalEffects 1.12
 
+import QtWebSockets 1.1
+
 Item {
     id: _root
 
@@ -60,6 +62,7 @@ Item {
     property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
+
     property var    _missionController:     _planController.missionController
     property var    _geoFenceController:    _planController.geoFenceController
     property var    _rallyPointController:  _planController.rallyPointController
@@ -75,13 +78,15 @@ Item {
     property bool   _informacao_central :  false //booleano que define se a camera ou o mapa fica no foco central
     property bool   _selecao_camera: false //booleano que decide se a tabela de cameras esta visivel ou não.
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
-    property bool   _idle: _activeVehicle.readyToFly //retorna se o veículo esta pronto para voar
+    property bool   _idle: _activeVehicle.healthAndArmingCheckReport.canArm//retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
     property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
     property int _tamanho_fonte_FPV: 12* (Screen.width/Screen.height)/1.88 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
     property int _tamanho_fonte_dados_legenda: 14* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_dados_numero: 20* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
+    property int _communication_lost: _activeVehicle.vehicleLinkManager.communicationLost
+
 
     property int valor_teste: 0
     property real _pitch: Math.round(_activeVehicle.pitch.value * 10) / 10 //operação matemática para arredondar o número para 1 casa decimal...
@@ -91,6 +96,7 @@ Item {
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
     property real _parametro_custom_1: controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue //Provavelmente vai ser isso aqui pra GASOLINA 11/06/2024
+
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
    // property real    min_tamanho_tela: Screen.devicePixelRatio
@@ -110,6 +116,7 @@ Item {
     }
 
     function _terminal_de_alertas(){
+        socketHandler.connectToServer()
         var retorno = "";
         //talvez fazer um contador pra cada alerta e se tiver mais de x alertas, retorno = "POUSE IMEDIATAMENTE. CONDIÇÕES PERIGOSAS PARA VOO"
         if(_activeVehicle.gps.hdop.rawValue >= 1){
@@ -125,6 +132,31 @@ Item {
 
         return  retorno;
     }
+
+    function getStatusText() {
+        var resposta;
+            if (_conexaoinicial && _activeVehicle != null) {
+                if (_idle) {
+                    _armed=_activeVehicle.armed
+                    if(_activeVehicle===null){
+                        _conexaoinicial = false;
+                    }
+                    if (_armed) {
+                        resposta = "ARMED";
+                    } else {
+                        resposta = "READY TO FLY";
+                    }
+                } else {
+                    resposta = "PRE-FLIGHT CHECK";
+                }
+            } else {
+                resposta = "DISCONNECTED";
+
+            }
+
+
+        return resposta;
+        }
    /* MouseArea { //Se a tela for clickada em qualquer posição, a tabela de cameras some.
        anchors.fill: _root
        hoverEnabled: true
@@ -255,7 +287,7 @@ Item {
         y: 0
         width: parent.width*1/8
         height: parent.height*5/6
-        color: "#0A283F"
+        color: qgcPal.window //"#0A283F"
     }
 
 
@@ -558,7 +590,7 @@ Item{
 
             Text{
 
-               text: _conexaoinicial ? (_idle ? (_armed ? "ARMED": "READY TO FLY"): "PRE-FLIGHT CHECK") : "DISCONNECTED"
+               text: getStatusText()
                font.family: "Helvetica"
                font.pointSize: _tamanho_fonte_dados_legenda
                color: "#FFFFFF"
@@ -578,7 +610,7 @@ Item{
                radius: width* 0.5
                border.color: parent.color
                border.width: 1
-               color: _conexaoinicial ? (_idle ? (_armed ? "green": "yellow"): "red") : "black"
+               color: _conexaoinicial && _activeVehicle!=null ? (_idle ? (_armed ? "green": "yellow"): "red") : "black"
             }
         }
    }
@@ -627,7 +659,7 @@ Item{
         z:1
         width: parent.width
         height: parent.height*1/5
-        color: "#0A283F"
+        color: qgcPal.window //"#0A283F"
     }
     Rectangle{ //area para alertas e informações. Estilo painel de carro
             id: area_alertas
@@ -635,7 +667,7 @@ Item{
             y: parent.height*4/5
             width: parent.width*0.3
             height: parent.height*1/5
-            color: "#0A283F"
+            color: qgcPal.window //"#0A283F"
             z: area_info_bottom.z +3
         }
 
@@ -792,7 +824,7 @@ Item{
 
         Text{
 
-           text: +"litros"
+           text: socketHandler.message + " litros"
            font.family: "Helvetica"
            font.pointSize: _tamanho_fonte_dados_numero
            color: "#FFFFFF"
@@ -1211,6 +1243,7 @@ Item {
                     visible: _activeVehicle.altitudeRelative === 0 ?   false:true
                 }
 
+
                 Rectangle{
                     width: 10
                     height: 5
@@ -1365,6 +1398,15 @@ Item {
 
            //console.log(_parametro_custom_1)
            console.log("TESTE, 1, 11, 1011, 1111,")
+           console.log(_armed)
+           console.log(_idle)
+           if(_activeVehicle===null){
+                console.log("sem veiculo")
+           }
+
+            controller3.activeSystem.selected = 0
+            //TODO: TEM QUE ITERAR SOBRE TODOS PRA ENCONTRAR OS QUE EU QUERO. MUITO PROVAVELMENTE NÃO ESTARÃO ORDENADOS ASSIM SEMPRE
+           console.log(controller3.activeSystem.messages.get(5).fields.get(1).name," ", controller3.activeSystem.messages.get(5).fields.get(1).value) //breach status
           /* console.log(controller3.activeSystem.messages.get(0).name)
            console.log(controller3.activeSystem.messages.get(0).id)
            console.log(controller3.activeSystem.messages.get(0).count)
@@ -1472,6 +1514,66 @@ Item {
         }
     }
 */
+
+    WebSocket {
+        id: webSocket
+        url: "ws://localhost:8765"  // Adjusted to port 8767 for receiving messages
+        active: true
+
+        onStatusChanged: {
+            if (webSocket.status === WebSocket.Open) {
+                console.log("WebSocket connected!")
+            } else if (webSocket.status === WebSocket.Closed) {
+                console.log("WebSocket closed")
+            }
+        }
+
+        onTextMessageReceived: {
+            console.log("Received message: " + message)
+            receivedMessage.text = "Received message: " + message
+        }
+
+    }
+
+
+
+    Column {
+        spacing: 10
+        anchors.centerIn: parent
+
+        Button {
+            text: "Connect"
+            onClicked: {
+                webSocket.active = true
+            }
+        }
+
+        TextField {
+            id: messageField
+            placeholderText: "Message"
+        }
+
+        Button {
+            text: "Send"
+            onClicked: {
+                webSocket.active = true
+                if (webSocket.status === WebSocket.Open) {
+                    webSocket.sendTextMessage(messageField.text)
+                    console.log("Sent message: " + messageField.text)
+                    messageField.text = ""  // Clear the input field after sending
+                } else {
+                    console.error("WebSocket is not open.")
+                    //webSocket.status = WebSocket.Open
+
+                }
+            }
+        }
+
+        Text {
+            id: receivedMessage
+            text: "Received message: "
+        }
+    }
 
 
 
