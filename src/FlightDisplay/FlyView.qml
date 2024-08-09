@@ -80,12 +80,15 @@ Item {
     property bool   _conexaoinicial: _activeVehicle.initialConnectComplete //retorna se a conexão inicial com o drone foi realizada
     property bool   _idle: _activeVehicle.healthAndArmingCheckReport.canArm//retorna se o veículo esta pronto para voar
     property bool  _armed: _activeVehicle.armed //retorna se o veículo esta armado
+    property bool  _flying: _activeVehicle.flying //autoexplicativo
+    property bool _wasFlying: false //indica se ele estava voando até o momento de checagem. Usado pra indicar quando pousou.
     property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.rawValue
     property int _tamanho_fonte_FPV: 12* (Screen.width/Screen.height)/1.88 //valor padrão pra fonte na FPV dimensionada pro monitor do laboratório
     property int _tamanho_fonte_dados_legenda: 14* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_dados_numero: 20* (Screen.width/Screen.height)/1.88
     property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
     property int _communication_lost: _activeVehicle.vehicleLinkManager.communicationLost
+    property bool _recording_report: false
 
 
     property int valor_teste: 0
@@ -97,6 +100,10 @@ Item {
     property real _parametro_custom_1: controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue //Provavelmente vai ser isso aqui pra GASOLINA 11/06/2024
 
+
+    property real _temperatura_motor: _pitch //PLACEHOLDER
+    property real _temperatura_bateria: _pitch //PLACEHOLDER
+    property real _temperatura_motor_eletrico_1 : _pitch //PLACEHOLDER
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
    // property real    min_tamanho_tela: Screen.devicePixelRatio
@@ -110,22 +117,33 @@ Item {
     }
 
     function _resize_fonts(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
-        console.log("x da tela: " + mainWindow.width);
-        console.log("y da tela: " + mainWindow.height);
+        //console.log("x da tela: " + mainWindow.width);
+        //console.log("y da tela: " + mainWindow.height);
         return 12 * (mainWindow.width/mainWindow.height)/1.88 //atualiza valor da fonte para 1 * (razão atual da tela/razão da tela do laboratório)
     }
 
     function _terminal_de_alertas(){
-        socketHandler.connectToServer()
+        //socketHandler.connectToServer()
+        if(!_flying && _wasFlying){
+            console.log("Pousou");
+            _wasFlying = false;
+        }
+        if(_flying && !_wasFlying){
+            console.log("Levantou Voo");
+            _wasFlying = true;
+        }
         var retorno = "";
         //talvez fazer um contador pra cada alerta e se tiver mais de x alertas, retorno = "POUSE IMEDIATAMENTE. CONDIÇÕES PERIGOSAS PARA VOO"
         if(_activeVehicle.gps.hdop.rawValue >= 1){
+            console.log("GPS_LOW_PRECISION",_activeVehicle.coordinate)
             retorno = retorno + "- ATENÇÃO: GPS COM BAIXA PRECISÃO\n";
         }
         if(_activeVehicle.rcRSSI > 115){
+            console.log("RC_LOW_SIGNAL")
             retorno = retorno + "- ATENÇÃO: SINAL FRACO DE RADIOCONTROLE\n";
         }
         if(_pct_bateria < 15){
+            console.log("LOW_BATTERY_POWER")
             retorno = retorno + "- ATENÇÃO: BATERIA BAIXA\n";
         }
         //espaço para alertas futuros. se necessário, fazer função para reajustar tamanho da fonte de acordo com o numero de alertas simultâneos.
@@ -146,11 +164,40 @@ Item {
                     } else {
                         resposta = "READY TO FLY";
                     }
+                    if(_flying){
+                        resposta = "FLYING"
+                    }
                 } else {
                     resposta = "PRE-FLIGHT CHECK";
                 }
             } else {
                 resposta = "DISCONNECTED";
+
+            }
+        return resposta;
+        }
+
+    function getStatuscolor() {
+        var resposta;
+            if (_conexaoinicial && _activeVehicle != null) {
+                if (_idle) {
+                    _armed=_activeVehicle.armed
+                    if(_activeVehicle===null){
+                        _conexaoinicial = false;
+                    }
+                    if (_armed) {
+                        resposta = "green";
+                    } else {
+                        resposta = "darkgreen";
+                    }
+                    if(_flying){
+                        resposta = "lime"
+                    }
+                } else {
+                    resposta = "yellow";
+                }
+            } else {
+                resposta = "black";
 
             }
 
@@ -276,7 +323,7 @@ Item {
        // text: _pitch
         font.family: "Helvetica"
         font.pointSize: 24
-        color: "red"
+        color: qgcPal.colorRed//"red"
     }
 
 
@@ -420,7 +467,7 @@ Item {
                                  }
 
                                 Text{
-                                    text: "CORRENTE EM CADA MOTOR"
+                                    text: "TEMPERATURA EM CADA MOTOR"
                                     font.family: "Helvetica"
                                     font.pointSize: _tamanho_fonte_dados_legenda * 0.8
                                     color: "white"
@@ -448,23 +495,23 @@ Item{
         width: area_info_right.width
         height: area_info_right.height/8
 
-        Rectangle{
+       /* Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width*0.9
             height: parent.height/5
             color: "green"
-        }
+        }*/
 
     }
-    Text {
+    /*Text {
         x: area_info_sliders.x + 30
         y: area_info_sliders.y - 40
         text: "TENSÃO DE BARRAMENTO"
         font.family: "Clearview"
         font.pointSize: _tamanho_fonte_dados_legenda * 0.8
         color: "white"
-    }
+    }*/
 
 }
 
@@ -478,8 +525,29 @@ Item{
         border.width: 2
         width: area_info_right.width
         height: area_info_right.height/3
+        //visible: _activeVehicle? true: false
 
-        Text{
+        Button {
+                visible: _activeVehicle && !_recording_report
+                text: "Start Report"
+                anchors.centerIn: parent
+                onClicked: {
+                    console.log("COMEÇAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = true
+                }
+        }
+        Button {
+                visible: _activeVehicle && _recording_report
+                text: "End Report"
+                anchors.centerIn: parent
+                onClicked: {
+                    console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = false
+                }
+        }
+
+
+        /*Text{
 
            text: "ESTIMATIVA DE VOO"
            font.family: "Clearview"
@@ -488,7 +556,7 @@ Item{
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
            verticalAlignment: Text.AlignVCenter
-        }
+        }*/
     }
 }
 
@@ -608,9 +676,9 @@ Item{
                y: parent.height/2 - height/2
                z: parent.z +1
                radius: width* 0.5
-               border.color: parent.color
+               border.color: "white"//parent.color
                border.width: 1
-               color: _conexaoinicial && _activeVehicle!=null ? (_idle ? (_armed ? "green": "yellow"): "red") : "black"
+               color: getStatuscolor()
             }
         }
    }
@@ -682,7 +750,7 @@ Item{
 
         Text{
             id: alerta_textual
-            text: _terminal_de_alertas()//chama função que retorna todos os alertas em forma textual.
+            text: _activeVehicle ? _terminal_de_alertas() : " "//chama função que retorna todos os alertas em forma textual.
             font.family: "Clearview"
             font.pointSize: _tamanho_fonte_terminal_alertas
             color: "#FFFFFF"
@@ -1397,16 +1465,16 @@ Item {
            console.log(parameters_vehicle._controller.currentCategory.name)*/
 
            //console.log(_parametro_custom_1)
-           console.log("TESTE, 1, 11, 1011, 1111,")
-           console.log(_armed)
-           console.log(_idle)
-           if(_activeVehicle===null){
+           //console.log("TESTE, 1, 11, 1011, 1111,")
+           //console.log(_armed)
+           //console.log(_idle)
+           /*if(_activeVehicle===null){
                 console.log("sem veiculo")
-           }
+           }*/
 
-            controller3.activeSystem.selected = 0
+            //controller3.activeSystem.selected = 0
             //TODO: TEM QUE ITERAR SOBRE TODOS PRA ENCONTRAR OS QUE EU QUERO. MUITO PROVAVELMENTE NÃO ESTARÃO ORDENADOS ASSIM SEMPRE
-           console.log(controller3.activeSystem.messages.get(5).fields.get(1).name," ", controller3.activeSystem.messages.get(5).fields.get(1).value) //breach status
+           //console.log(controller3.activeSystem.messages.get(5).fields.get(1).name," ", controller3.activeSystem.messages.get(5).fields.get(1).value) //breach status
           /* console.log(controller3.activeSystem.messages.get(0).name)
            console.log(controller3.activeSystem.messages.get(0).id)
            console.log(controller3.activeSystem.messages.get(0).count)

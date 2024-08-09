@@ -41,37 +41,46 @@ AnalyzePage {
 
 
     Timer {
-        interval: 5000; running: true; repeat: true
+        interval: 1000; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
-            console.log("Teste novo")
+            //console.log("Teste novo")
             //console.log(controller.activeSystem.messages.count)
             for (var i = 0; i < controller.activeSystem.messages.count; i++){
+
+                //PEGAR VIOLAÇÕES DE ESPAÇO AEREO
                 if (controller.activeSystem.messages.get(i).name === "FENCE_STATUS"){
-                    console.log("found");
-                    console.log(i)
+                //    console.log("found");
+                //    console.log(i)
                     curSystem.selected = i
                     var breach_count = controller.activeSystem.messages.get(5).fields.get(1).name
                     var breach_count_number = controller.activeSystem.messages.get(5).fields.get(1).value
-                    console.log(controller.activeSystem.messages.get(5).fields.get(1).value)
+                //    console.log(controller.activeSystem.messages.get(5).fields.get(1).value)
 
 
                     for (var j = 0; j < controller.activeSystem.messages.count; j++){
                         if (controller.activeSystem.messages.get(j).name === "GLOBAL_POSITION_INT"){
                             curSystem.selected = j
-                            console.log(controller.activeSystem.messages.get(j).fields.get(1).name)
-                            console.log(controller.activeSystem.messages.get(j).fields.get(2).name)
+                    //        console.log(controller.activeSystem.messages.get(j).fields.get(1).name)
+                    //        console.log(controller.activeSystem.messages.get(j).fields.get(2).name)
                             var current_lat = controller.activeSystem.messages.get(j).fields.get(1).value
                             var current_lon = controller.activeSystem.messages.get(j).fields.get(2).value
                             console.log("breach_count", breach_count_number, "pos: ",current_lat, current_lon," " ) //breach status
                         }
                     }
+                }
+
+                if (controller.activeSystem.messages.get(i).name === "BATTERY_STATUS"){
+                    curSystem.selected = i
+                    console.log("ID: ", controller.activeSystem.messages.get(i).fields.get(0).value,controller.activeSystem.messages.get(i).fields.get(4).value)
+
+                }
 
                    /* console.log(controller.activeSystem.messages.get(5).fields.get(1).type);
                     console.log(controller.activeSystem.messages.get(5).fields.get(1).value);
                     console.log(controller.activeSystem.messages.get(5).fields.get(1).rawValue);
                     console.log(controller.activeSystem.messages.get(5).fields.get(1).valueString);*/
-                }
+
             }
 
            /* curSystem.selected = 5

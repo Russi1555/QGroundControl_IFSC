@@ -60,6 +60,9 @@
         <file alias="bussola_fpv">resources/bussola_fpv.png</file>
         <file alias="camera">resources/camera.svg</file>
         <file alias="spin_icon">resources/spin_icon.png</file>
+        <file alias="gas_can_icon">resources/gas_can.svg</file>
+        <file alias="motor_temperature_icon">resources/motor_temp.svg</file>
+        <file alias="propeller_icon">resources/propeller.svg</file>
     </qresource>
     <qresource prefix="/res/firmware">
         <file alias="3drradio.png">resources/firmware/3drradio.png</file>
@@ -111,5 +114,8 @@
     </qresource>
     <qresource prefix="/">
         <file>resources/Quadrotor_layout.svg</file>
+        <file>resources/gas_can.svg</file>
+        <file>resources/motor_temp.svg</file>
+        <file>resources/propeller.svg</file>
     </qresource>
 </RCC>
