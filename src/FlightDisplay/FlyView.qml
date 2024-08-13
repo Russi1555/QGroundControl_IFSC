@@ -104,6 +104,21 @@ Item {
     property real _temperatura_motor: _pitch //PLACEHOLDER
     property real _temperatura_bateria: _pitch //PLACEHOLDER
     property real _temperatura_motor_eletrico_1 : _pitch //PLACEHOLDER
+
+    property real _tensao_cell_1: 50 //PLACEHOLDER
+    property real _tensao_cell_2: 45 //PLACEHOLDER
+    property real _tensao_cell_3: 70 //PLACEHOLDER
+    property real _tensao_cell_4: 20 //PLACEHOLDER
+    property real _tensao_cell_5: 80 //PLACEHOLDER
+    property real _tensao_cell_6: 50 //PLACEHOLDER
+    property real _tensao_cell_7: 60 //PLACEHOLDER
+    property real _tensao_cell_8: 28 //PLACEHOLDER
+    property real _tensao_cell_9: 100 //PLACEHOLDER
+    property real _tensao_cell_10: 130 //PLACEHOLDER
+    property real _tensao_cell_11: 40 //PLACEHOLDER
+    property real _tensao_cell_12: 90 //PLACEHOLDER
+
+
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
    // property real    min_tamanho_tela: Screen.devicePixelRatio
@@ -495,6 +510,25 @@ Item{
         width: area_info_right.width
         height: area_info_right.height/8
 
+        Button {
+                visible: _activeVehicle && !_recording_report
+                text: "Start Report"
+                anchors.centerIn: parent
+                onClicked: {
+                    console.log("COMEÇAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = true
+                }
+        }
+        Button {
+                visible: _activeVehicle && _recording_report
+                text: "End Report"
+                anchors.centerIn: parent
+                onClicked: {
+                    console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = false
+                }
+        }
+
        /* Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
@@ -517,6 +551,7 @@ Item{
 
 Item{
     Rectangle{
+        id:area_temperaturas
         x:area_info_right.x
         y:area_slider_tensão.y - height
         z:area_slider_tensão.z+1
@@ -526,25 +561,30 @@ Item{
         width: area_info_right.width
         height: area_info_right.height/3
         //visible: _activeVehicle? true: false
+    }
 
-        Button {
-                visible: _activeVehicle && !_recording_report
-                text: "Start Report"
-                anchors.centerIn: parent
-                onClicked: {
-                    console.log("COMEÇAR_RELATÓRIO", _activeVehicle.coordinate)
-                    _recording_report = true
-                }
+        QGCColoredImage { //Icone para tensão da bateria
+                id: icon_temp_motor
+                x: area_temperaturas.x
+                y: area_temperaturas.y
+                width: area_temperaturas.width/2
+                height: area_temperaturas.height/2
+                color: white
+                source: "/res/motor_temperature_icon"
+                z: area_temperaturas.z+10
         }
-        Button {
-                visible: _activeVehicle && _recording_report
-                text: "End Report"
-                anchors.centerIn: parent
-                onClicked: {
-                    console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
-                    _recording_report = false
-                }
+
+        QGCColoredImage { //Icone para tensão da bateria
+                id: icon_temp_elec_motors
+                x: area_temperaturas.x
+                y: area_temperaturas.y + icon_temp_motor.height
+                width: area_temperaturas.width/2
+                height: area_temperaturas.height/2
+                color: white
+                source: "/res/eletric_motor_temperature_icon"
+                z: area_temperaturas.z+10
         }
+
 
 
         /*Text{
@@ -557,7 +597,6 @@ Item{
            anchors.verticalCenter: parent.verticalCenter
            verticalAlignment: Text.AlignVCenter
         }*/
-    }
 }
 
 
@@ -733,7 +772,7 @@ Item{
             id: area_alertas
             x: parent.width*0.3
             y: parent.height*4/5
-            width: parent.width*0.3
+            width: parent.width*0.4
             height: parent.height*1/5
             color: qgcPal.window //"#0A283F"
             z: area_info_bottom.z +3
@@ -766,7 +805,7 @@ Item{
         x: area_alertas.x
         y: area_alertas.y
         z: area_alertas.z+1
-        width: area_alertas.width/4
+        width: area_alertas.width/2
         height: area_alertas.height
         color: "transparent"
         border.width: 1
@@ -774,7 +813,7 @@ Item{
 
 
 
-        Text{
+        /*Text{
 
            text: "BATTERY"
            font.family: "Clearview"
@@ -783,7 +822,7 @@ Item{
            anchors.horizontalCenter: parent.horizontalCenter
            anchors.verticalCenter: parent.verticalCenter
            verticalAlignment: Text.AlignVCenter
-        }
+        }*/
 
         Text{
 
@@ -798,8 +837,211 @@ Item{
         }
 
     }
+    QGCColoredImage { //Icone para carga da bateria
+            id: icon_bateria
+            x: alerta_bateria.x - icon_bateria.width/5
+            y: alerta_bateria.y + alerta_bateria.height*0.1
+            width: alerta_bateria.width/3
+            height: alerta_bateria.height/2
+            color: white
+            source: "/qmlimages/Battery.svg"
+            z: alerta_bateria.z+10
+    }
+
+    QGCColoredImage { //Icone para tensão da bateria
+            id: icon_tensao
+            x: icon_bateria.x + icon_bateria.width*(2/3)
+            y: icon_bateria.y
+            width: alerta_bateria.width/3
+            height: alerta_bateria.height/2
+            color: white
+            source: "/res/lighting_icon"
+            z: alerta_bateria.z+10
+    }
+
+    Rectangle { //Espaço para barras de tensão de células de bateria
+        id: area_slider_tensão_celulas
+        x: icon_tensao.x + icon_tensao.width/4 + icon_bateria.width*(2/3)
+        y: icon_tensao.y
+        z:11
+        color: "black"
+        border.color: "black"
+        border.width: 2
+        width: alerta_bateria.width/2
+        height: alerta_bateria.height*0.8
+
+        Rectangle{
+            x: 0
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_1
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width/12
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_2
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(2/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_3
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(3/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_4
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(4/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_5
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(5/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_6
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(6/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_7
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(7/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_8
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(8/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_9
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(9/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_10
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(10/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_11
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+        Rectangle{
+            x: parent.width*(11/12)
+            anchors.bottom: parent.bottom
+            width: parent.width/12
+            height:  _tensao_cell_12
+            z:parent.z+1
+            color:"green"
+            border.color: "black"
+            border.width: 1
+        }
+
+        }
 
     Rectangle{
+        id: alertas_misc
+        x: area_alertas.x+area_alertas.width/2
+        y: area_alertas.y
+        z: area_alertas.z+1
+        width: area_alertas.width/2
+        height: area_alertas.height
+        color: "transparent"
+        border.width: 1
+        border.color: "black"
+
+    }
+
+    QGCColoredImage { //Icone para carga da bateria
+            id: icon_gasolina
+            x: alertas_misc.x
+            y: alertas_misc.y + alertas_misc.height*0.1
+            width: alertas_misc.width/3
+            height: alertas_misc.height/2
+            color: white
+            source: "/res/gas_can_icon"
+            z: alertas_misc.z+10
+    }
+
+    QGCColoredImage { //Icone para tensão da bateria
+            id: icon_satelite
+            x: icon_gasolina.x + icon_gasolina.width//*(2/3)
+            y: icon_gasolina.y
+            width: alertas_misc.width/3
+            height: alertas_misc.height/2
+            color: white
+            source: "/qmlimages/Gps.svg"
+            z: alertas_misc.z+10
+    }
+
+    QGCColoredImage { //Icone para tensão da bateria
+            id: icon_RC
+            x: icon_satelite.x + icon_gasolina.width//*(2/3)
+            y: icon_gasolina.y
+            width: alertas_misc.width/3
+            height: alertas_misc.height/2
+            color: white
+            source: "/qmlimages/RC.svg"
+            z: alertas_misc.z+10
+    }
+
+
+
+    /*Rectangle{
         id: alerta_gps
         x: area_alertas.x + area_alertas.width/4
         y: area_alertas.y
@@ -832,11 +1074,11 @@ Item{
            verticalAlignment: Text.AlignVCenter
         }
 
-    }
+    }*/
 
-    Rectangle{
+    /*Rectangle{
         id: alerta_RC
-        x: area_alertas.x + area_alertas.width*2/4
+        x: area_alertas.x + area_alertas.width*0.6
         y: area_alertas.y
         z: area_alertas.z+1
         width: area_alertas.width/4
@@ -900,9 +1142,9 @@ Item{
            anchors.bottom: parent.bottom
            verticalAlignment: Text.AlignVCenter
         }
-    }
+    }*/
 
-    Rectangle{
+    /*Rectangle{
         id: alerta_texto
         x: area_alertas.x + area_alertas.width
         y: area_alertas.y
@@ -954,7 +1196,7 @@ Item{
            anchors.top: txt_vel.bottom
         }
 
-    }
+    }*/
 
 
     /* VERSÃO ANTIGA DOS ALERTAS. USAR COMO REFERÊNCIA E DEPOIS DELETAR.
@@ -1608,6 +1850,7 @@ Item {
     Column {
         spacing: 10
         anchors.centerIn: parent
+        visible:false
 
         Button {
             text: "Connect"
