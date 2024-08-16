@@ -33,6 +33,8 @@ AnalyzePage {
     property int    curCompID:          0
     property real   maxButtonWidth:     0
 
+    property real battery_tension: 0
+
     MAVLinkInspectorController {
         id: controller
     }
@@ -41,7 +43,7 @@ AnalyzePage {
 
 
     Timer {
-        interval: 1000; running: true; repeat: true
+        interval: 10000; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
             //console.log("Teste novo")
@@ -68,6 +70,11 @@ AnalyzePage {
                             console.log("breach_count", breach_count_number, "pos: ",current_lat, current_lon," " ) //breach status
                         }
                     }
+                }
+
+                if (controller.activeSystem.messages.get(i).name ==="POWER_STATUS"){
+                    curSystem.selected = i
+                    battery_tension = controller.activeSystem.messages.get(i).fields.get(0).value
                 }
 
                 if (controller.activeSystem.messages.get(i).name === "BATTERY_STATUS"){

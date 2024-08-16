@@ -50,7 +50,8 @@ ApplicationWindow {
         onTriggered: {
             //controller4.controller.activeSystem.selected = 0
             //console.log("Atualizando valor customizado...")
-           // flightView._parametro_custom_1 =_variavel_intermediaria //FUNCIONA!!!!!
+            _variavel_intermediaria = controller4.battery_tension
+            flightView._tensao_bateria = _variavel_intermediaria //FUNCIONA!!!!!
             //console.log(tela_parametros._controller.currentCategory.name)
             //console.log(tela_parametros._controller.currentGroup.name )
             //console.log(controller4.controller.activeSystem.messages.get(1).fields.get(1).name)

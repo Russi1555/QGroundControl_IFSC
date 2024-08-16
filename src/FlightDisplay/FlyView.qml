@@ -97,13 +97,18 @@ Item {
     property real _heading: Math.round(_activeVehicle.heading.value)
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
-    property real _parametro_custom_1: controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
+    property real _parametro_custom_1: 1//controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue //Provavelmente vai ser isso aqui pra GASOLINA 11/06/2024
+
+    property bool motor1_selected: false
 
 
     property real _temperatura_motor: _pitch //PLACEHOLDER
     property real _temperatura_bateria: _pitch //PLACEHOLDER
     property real _temperatura_motor_eletrico_1 : _pitch //PLACEHOLDER
+
+    property real _max_tensao_bateria: 49 //utilizado para cálculo de porcentagem
+    property real _tensao_bateria: 1 //recebe valor em MainRootWindow
 
     property real _tensao_cell_1: 50 //PLACEHOLDER
     property real _tensao_cell_2: 45 //PLACEHOLDER
@@ -563,7 +568,7 @@ Item{
         //visible: _activeVehicle? true: false
     }
 
-        QGCColoredImage { //Icone para tensão da bateria
+        QGCColoredImage { //Icone para temperatura da motor
                 id: icon_temp_motor
                 x: area_temperaturas.x
                 y: area_temperaturas.y
@@ -574,7 +579,8 @@ Item{
                 z: area_temperaturas.z+10
         }
 
-        QGCColoredImage { //Icone para tensão da bateria
+
+        QGCColoredImage { //Icone para temperatura do motor eletrico
                 id: icon_temp_elec_motors
                 x: area_temperaturas.x
                 y: area_temperaturas.y + icon_temp_motor.height
@@ -633,6 +639,22 @@ Item{
                 border.color: monitor_motores.color
                 border.width: 1
                 color: "green"
+                MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: {
+                            motor1.border.color = "yellow"  // Change color or any other action when hovered
+                            motor1.border.width = 3
+                            motor1_selected = true
+                        }
+
+                        onExited: {
+                            motor1.border.color = monitor_motores.color  // Change color or any other action when hovered
+                            motor1.border.width = 1
+                            motor1_selected = false
+                        }
+                    }
             }
 
             Rectangle {
@@ -847,6 +869,19 @@ Item{
             source: "/qmlimages/Battery.svg"
             z: alerta_bateria.z+10
     }
+    Text{
+        property int porcentagem_bateria : (_tensao_bateria/_max_tensao_bateria)
+        x: icon_bateria.x + icon_bateria.width/3
+        y: icon_bateria.y + icon_bateria.height
+        z: alerta_bateria.z +11
+        text: porcentagem_bateria < 10? "0"+porcentagem_bateria + "%" : porcentagem_bateria + "%"
+        font.family: "Clearview"
+        font.pointSize: _tamanho_fonte_dados_legenda
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+    }
 
     QGCColoredImage { //Icone para tensão da bateria
             id: icon_tensao
@@ -857,6 +892,19 @@ Item{
             color: white
             source: "/res/lighting_icon"
             z: alerta_bateria.z+10
+    }
+
+    Text{
+        x: icon_tensao.x + icon_tensao.width/4
+        y: icon_tensao.y + icon_tensao.height
+        z: alerta_bateria.z +11
+        text: (_tensao_bateria/100) + " V"
+        font.family: "Clearview"
+        font.pointSize: _tamanho_fonte_dados_legenda
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
     }
 
     Rectangle { //Espaço para barras de tensão de células de bateria
@@ -877,8 +925,8 @@ Item{
             height:  _tensao_cell_1
             z:parent.z+1
             color:"green"
-            border.color: "black"
-            border.width: 1
+            border.color: motor1_selected ? "yellow":"black"
+            border.width: motor1_selected ? 3 : 1
         }
         Rectangle{
             x: parent.width/12
