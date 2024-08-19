@@ -579,6 +579,27 @@ Item{
                 z: area_temperaturas.z+10
         }
 
+        Rectangle { //Espaço para barra temperatura do motor a combustão
+                id: area_slider_temp_motor
+                x: icon_temp_motor.x + icon_temp_motor.width
+                y: icon_temp_motor.y + icon_temp_motor.height/2 - area_slider_temp_motor.height/2
+                z:11
+                color: "black"
+                border.color: "black"
+                border.width: 2
+                width: area_temperaturas.width*4/10
+                height: area_temperaturas.height/10
+
+                Rectangle{
+                    x: 0
+                    anchors.bottom: parent.left
+                    width: parent.width/3
+                    height:  parent.height
+                    z:parent.z+1
+                    color:"green"
+                }
+        }
+
 
         QGCColoredImage { //Icone para temperatura do motor eletrico
                 id: icon_temp_elec_motors
@@ -589,6 +610,79 @@ Item{
                 color: white
                 source: "/res/eletric_motor_temperature_icon"
                 z: area_temperaturas.z+10
+        }
+
+        Rectangle { //Espaço para barra temperatura do motor a combustão
+                id: area_slider_temp_motores_eletricos
+                x: icon_temp_elec_motors.x + icon_temp_elec_motors.width
+                y: icon_temp_elec_motors.y + icon_temp_elec_motors.height/20
+                z:11
+                color: "black"
+                border.color: "black"
+                border.width: 2
+                width: area_temperaturas.width*4/10
+                height: icon_temp_elec_motors.height*9/10
+
+                Rectangle{
+                    x: 0
+                    y: 0
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
+                Rectangle{
+                    x: 0
+                    y: 0 + parent.height/6
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
+                Rectangle{
+                    x: 0
+                    y: 0 + parent.height*2/6
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
+                Rectangle{
+                    x: 0
+                    y: 0 + parent.height*3/6
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
+                Rectangle{
+                    x: 0
+                    y:0 + parent.height*4/6
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
+                Rectangle{
+                    x: 0
+                    y:0 + parent.height*5/6
+                    width: parent.width/3
+                    height:  parent.height/6
+                    z:parent.z+1
+                    color:"green"
+                    border.color: "black"
+                    border.width: 2
+                }
         }
 
 
@@ -1054,7 +1148,7 @@ Item{
 
     }
 
-    QGCColoredImage { //Icone para carga da bateria
+    QGCColoredImage { //Icone para nivel de gasolina
             id: icon_gasolina
             x: alertas_misc.x
             y: alertas_misc.y + alertas_misc.height*0.1
@@ -1065,7 +1159,20 @@ Item{
             z: alertas_misc.z+10
     }
 
-    QGCColoredImage { //Icone para tensão da bateria
+    Text{
+        x: icon_gasolina.x + icon_gasolina.width/3
+        y: icon_gasolina.y + icon_gasolina.height
+        z: alerta_bateria.z +11
+        text: _gasolina//(_tensao_bateria/100) + " V"
+        font.family: "Clearview"
+        font.pointSize: _tamanho_fonte_dados_legenda
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+    }
+
+    QGCColoredImage { //Icone para HDOP do GPS
             id: icon_satelite
             x: icon_gasolina.x + icon_gasolina.width//*(2/3)
             y: icon_gasolina.y
@@ -1075,8 +1182,20 @@ Item{
             source: "/qmlimages/Gps.svg"
             z: alertas_misc.z+10
     }
+    Text{
+        x: icon_satelite.x + icon_satelite.width/3
+        y: icon_satelite.y + icon_satelite.height
+        z: alerta_bateria.z +11
+        text: _activeVehicle.gps.hdop.rawValue//(_tensao_bateria/100) + " V"
+        font.family: "Clearview"
+        font.pointSize: _tamanho_fonte_dados_legenda
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
 
-    QGCColoredImage { //Icone para tensão da bateria
+    }
+
+    QGCColoredImage { //Icone para qualidade de enlace RC
             id: icon_RC
             x: icon_satelite.x + icon_gasolina.width//*(2/3)
             y: icon_gasolina.y
@@ -1085,6 +1204,19 @@ Item{
             color: white
             source: "/qmlimages/RC.svg"
             z: alertas_misc.z+10
+    }
+
+    Text{
+        x: icon_RC.x + icon_RC.width/3
+        y: icon_RC.y + icon_RC.height
+        z: alerta_bateria.z +11
+        text: _activeVehicle.rcRSSI//(_tensao_bateria/100) + " V"
+        font.family: "Clearview"
+        font.pointSize: _tamanho_fonte_dados_legenda
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
     }
 
 
