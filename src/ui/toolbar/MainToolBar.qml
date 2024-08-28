@@ -29,6 +29,9 @@ Rectangle {
     readonly property int planViewToolbar:  1
     readonly property int simpleToolbar:    2
 
+    property string statusText: mainstatusindicator_id.main_status_text
+    property color statusColor: main_status_color
+
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
     property color  _mainStatusBGColor: qgcPal.brandingPurple
@@ -73,6 +76,7 @@ Rectangle {
         }
 
         MainStatusIndicator {
+            id: mainstatusindicator_id
             Layout.preferredHeight: viewButtonRow.height
             visible:                currentToolbar === flyViewToolbar
         }

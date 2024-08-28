@@ -31,7 +31,9 @@ ApplicationWindow {
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
     property var _variavel_intermediaria
+    property var _status_indicator_vehicle : toolbar.flyViewToolbar.MainStatusIndicator.main_status_text
     property var _teste_1
+
 
     function _resize_fonts_FPV(){//essa função deve ajustar os tamanho das fonts de texto de acordo com o tamanho da tela.
 
@@ -46,11 +48,17 @@ ApplicationWindow {
 
 
     Timer {
-        interval: 10000; running: true; repeat: true
+        interval: 1; running: true; repeat: true
         onTriggered: {
             //controller4.controller.activeSystem.selected = 0
             //console.log("Atualizando valor customizado...")
             _variavel_intermediaria = controller4.battery_tension
+            //console.log("teste mainstatus:", toolbar.statusText)
+           // console.log(_status_indicator_vehicle)
+            //console.log(toolbar.statusText)
+            flightView._status_indicator_vehicle_flyview = toolbar.statusText
+            flightView._status_indicator_color = toolbar.statusColor
+            //console.log(toolbar.statusColor)
             flightView._tensao_bateria = _variavel_intermediaria //FUNCIONA!!!!!
             //console.log(tela_parametros._controller.currentCategory.name)
             //console.log(tela_parametros._controller.currentGroup.name )

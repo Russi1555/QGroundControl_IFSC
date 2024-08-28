@@ -16,6 +16,7 @@ import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.ScreenTools           1.0
 import QGroundControl.Palette               1.0
 import QGroundControl.FactSystem            1.0
+import QtWebSockets 1.1
 
 RowLayout {
     id:         _root
@@ -28,6 +29,10 @@ RowLayout {
     property real   _margins:           ScreenTools.defaultFontPixelWidth
     property real   _spacing:           ScreenTools.defaultFontPixelWidth / 2
     property bool   _healthAndArmingChecksSupported: _activeVehicle ? _activeVehicle.healthAndArmingCheckReport.supported : false
+
+    property string main_status_text: mainStatusLabel.text
+    property color main_status_color: "black"
+
 
     QGCLabel {
         id:             mainStatusLabel
@@ -43,6 +48,8 @@ RowLayout {
         property string _landingText:       qsTr("Landing")
 
         function mainStatusText() {
+            //console.log("TESTANDO MSI: ", main_status_text)
+            //main_status_text = mainStatusLabel.text
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
@@ -104,6 +111,13 @@ RowLayout {
             } else {
                 _mainStatusBGColor = qgcPal.brandingPurple
                 return mainStatusLabel._disconnectedText
+            }
+        }
+        Timer {
+            interval: 10; running: true; repeat: true
+            onTriggered: {
+                main_status_text =  mainStatusText()
+                main_status_color = _mainStatusBGColor
             }
         }
 

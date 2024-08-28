@@ -89,6 +89,8 @@ Item {
     property int _tamanho_fonte_terminal_alertas: 14 * (Screen.width/Screen.height)/1.88
     property int _communication_lost: _activeVehicle.vehicleLinkManager.communicationLost
     property bool _recording_report: false
+    property string _status_indicator_vehicle_flyview
+    property color _status_indicator_color
 
 
     property int valor_teste: 0
@@ -96,6 +98,7 @@ Item {
     property real _roll:  Math.round(_activeVehicle.roll.rawValue * 10) / 10 //... provavelmente melhora desempenho poupando a CPU de calcular posição de itens na tela com 10 casas decimais de subpixel
     property real _heading: Math.round(_activeVehicle.heading.value)
     property real _altitude_relative: Math.round(_activeVehicle.altitudeRelative.value* 10) / 10
+    property real _altitude_AMSL: Math.round(_activeVehicle.altitudeAMSL.value * 10) / 10
     property real _climb_rate : Math.round(_activeVehicle.climbRate.value* 10) / 10
     property real _parametro_custom_1: 1//controller3.activeSystem.messages.get(0).name //vai ser algo assim, com aquelas coisas de separar por virgula e conversão binária também
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue //Provavelmente vai ser isso aqui pra GASOLINA 11/06/2024
@@ -173,7 +176,7 @@ Item {
 
     function getStatusText() {
         var resposta;
-            if (_conexaoinicial && _activeVehicle != null) {
+            if (_activeVehicle != null) {
                 if (_idle) {
                     _armed=_activeVehicle.armed
                     if(_activeVehicle===null){
@@ -812,8 +815,7 @@ Item{
             }
 
             Text{
-
-               text: getStatusText()
+               text: _status_indicator_vehicle_flyview//getStatusText()
                font.family: "Helvetica"
                font.pointSize: _tamanho_fonte_dados_legenda
                color: "#FFFFFF"
@@ -905,7 +907,7 @@ Item{
 
         Text{
             id: alerta_textual
-            text: _activeVehicle ? _terminal_de_alertas() : " "//chama função que retorna todos os alertas em forma textual.
+            text: "Offline para testes"//_activeVehicle ? _terminal_de_alertas() : " "//chama função que retorna todos os alertas em forma textual.
             font.family: "Clearview"
             font.pointSize: _tamanho_fonte_terminal_alertas
             color: "#FFFFFF"
@@ -1718,7 +1720,7 @@ Item {
                     color: coluna_altitude_rel.color
                     text: "MIN_ALT"
                     x: coluna_altitude_rel.x + 10
-                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize/2
+                    y: coluna_altitude_rel.y + coluna_altitude_rel.height + font.pointSize
 
                 }
 
@@ -1727,7 +1729,7 @@ Item {
                     font.family: "Helvetica"
                     font.pointSize: _tamanho_fonte_FPV
                     color: coluna_altitude_rel.color
-                    y: coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _altitude_relative/20) //assumindo MAX_ALT = 50
+                    y: _altitude_relative > 0 ? coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize - (coluna_altitude_rel.height * _altitude_relative/20) : coluna_altitude_rel.y + coluna_altitude_rel.height - font.pointSize //assumindo MAX_ALT = 50
                     x: coluna_altitude_rel.x + font.pointSize
                     text: _activeVehicle.altitudeRelative.valueString + "m"
                     visible: _activeVehicle.altitudeRelative === 0 ?   false:true
@@ -2027,10 +2029,11 @@ Item {
 
 
 
+
     Column {
         spacing: 10
         anchors.centerIn: parent
-        visible:false
+        visible:true
 
         Button {
             text: "Connect"
@@ -2052,8 +2055,10 @@ Item {
                     webSocket.sendTextMessage(messageField.text)
                     console.log("Sent message: " + messageField.text)
                     messageField.text = ""  // Clear the input field after sending
+                    console.log("teste supremo:" , toolbar.MainStatusIndicator)
                 } else {
                     console.error("WebSocket is not open.")
+                    console.log("teste supremo:" , toolbar.MainStatusIndicator)
                     //webSocket.status = WebSocket.Open
 
                 }
