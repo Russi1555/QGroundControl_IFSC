@@ -815,9 +815,10 @@ Item{
             }
 
             Text{
-               text: _status_indicator_vehicle_flyview//getStatusText()
+               text: _status_indicator_vehicle_flyview ? _status_indicator_vehicle_flyview.toUpperCase() : "Disconnected"//getStatusText()
                font.family: "Helvetica"
                font.pointSize: _tamanho_fonte_dados_legenda
+               font.capitalization: AllUppercase
                color: "#FFFFFF"
                anchors.horizontalCenter: parent.horizontalCenter
                anchors.top: parent.bottom

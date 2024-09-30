@@ -12,6 +12,8 @@ QMAKE_PROJECT_DEPTH = 0 # undocumented qmake flag to force absolute paths in mak
 # These are disabled until proven correct
 DEFINES += QGC_GST_TAISYNC_DISABLED
 DEFINES += QGC_GST_MICROHARD_DISABLED
+CONFIG += c++17
+
 
 exists($${OUT_PWD}/qgroundcontrol.pro) {
     error("You must use shadow build (e.g. mkdir build; cd build; qmake ../qgroundcontrol.pro).")
@@ -42,10 +44,12 @@ MacBuild {
     ICON                = $${SOURCE_DIR}/resources/icons/macx.icns
     OTHER_FILES        += Custom-Info.plist
     LIBS               += -framework ApplicationServices
+    CONFIG += c++17
 }
 
 LinuxBuild {
     CONFIG += qesp_linux_udev
+    CONFIG += c++17
     system("$$QMAKE_LINK -fuse-ld=gold -Wl,--version &>/dev/null") {
         CONFIG += use_gold_linker
     }
@@ -54,6 +58,7 @@ LinuxBuild {
 WindowsBuild {
     RC_ICONS = resources/icons/qgroundcontrol.ico
     CONFIG += resources_big
+    CONFIG += c++17
 }
 
 #
@@ -109,6 +114,7 @@ contains (CONFIG, QGC_DISABLE_CUSTOM_BUILD) {
 
 WindowsBuild {
     # Sets up application properties
+    CONFIG += c++17
     QMAKE_TARGET_COMPANY        = "$${QGC_ORG_NAME}"
     QMAKE_TARGET_DESCRIPTION    = "$${QGC_APP_DESCRIPTION}"
     QMAKE_TARGET_COPYRIGHT      = "$${QGC_APP_COPYRIGHT}"

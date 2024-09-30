@@ -947,7 +947,8 @@ void Vehicle::_handleStatusText(mavlink_message_t& message)
     uint8_t compId = message.compid;
 
     b.resize(MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1);
-    strncpy(b.data(), statustext.text, MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN);
+    strncpy(b.data(), statustext.text, std::min(b.size(), MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN));
+
     b[b.length()-1] = '\0';
     messageText = QString(b);
     bool includesNullTerminator = messageText.length() < MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN;
