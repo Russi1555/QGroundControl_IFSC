@@ -9,6 +9,8 @@
 
 import QtQuick          2.11
 import QtQuick.Layouts  1.11
+import QtQuick                  2.12
+import QtQuick.Controls         2.4
 
 import QGroundControl                       1.0
 import QGroundControl.Controls              1.0
@@ -32,6 +34,7 @@ RowLayout {
 
     property string main_status_text: mainStatusLabel.text
     property color main_status_color: "black"
+
 
 
     QGCLabel {
@@ -136,6 +139,7 @@ RowLayout {
         height:                 1
     }
 
+
     QGCColoredImage {
         id:         flightModeIcon
         width:      ScreenTools.defaultFontPixelWidth * 2
@@ -165,6 +169,7 @@ RowLayout {
         height:                 1
         visible:                vtolModeLabel.visible
     }
+
 
     QGCLabel {
         id:                     vtolModeLabel
@@ -413,5 +418,13 @@ RowLayout {
             }
         }
     }
+
+
+
+
+
+
+
+
 }
 

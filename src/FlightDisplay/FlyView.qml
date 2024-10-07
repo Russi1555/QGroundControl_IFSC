@@ -518,7 +518,7 @@ Item{
         width: area_info_right.width
         height: area_info_right.height/8
 
-        Button {
+        /*Button {
                 visible: _activeVehicle && !_recording_report
                 text: "Start Report"
                 anchors.centerIn: parent
@@ -535,7 +535,7 @@ Item{
                     console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
                     _recording_report = false
                 }
-        }
+        }*/
 
        /* Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter

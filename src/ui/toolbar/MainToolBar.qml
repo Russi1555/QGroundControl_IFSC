@@ -35,10 +35,12 @@ Rectangle {
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
     property color  _mainStatusBGColor: qgcPal.brandingPurple
+    property bool _recording_report: false
 
     QGCPalette { id: qgcPal }
 
     /// Bottom single pixel divider
+
     Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
@@ -81,11 +83,39 @@ Rectangle {
             visible:                currentToolbar === flyViewToolbar
         }
 
+
+
         QGCButton {
             id:                 disconnectButton
             text:               qsTr("Disconnect")
             onClicked:          _activeVehicle.closeVehicle()
             visible:            _activeVehicle && _communicationLost && currentToolbar === flyViewToolbar
+        }
+
+        Rectangle {
+            width: 100
+            height: parent.height*0.6
+            color: "transparent"
+
+            Button {
+                visible: _activeVehicle && !_recording_report
+                text: "Start Report"
+                anchors.fill: parent   // Fill the rectangle for better sizing
+                onClicked: {
+                    console.log("COMEÇAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = true
+                }
+            }
+
+            Button {
+                visible: _activeVehicle && _recording_report
+                text: "End Report"
+                anchors.fill: parent   // Fill the rectangle for better sizing
+                onClicked: {
+                    console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
+                    _recording_report = false
+                }
+            }
         }
     }
 
