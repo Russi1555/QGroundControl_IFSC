@@ -908,7 +908,7 @@ Item{
 
         Text{
             id: alerta_textual
-            text: "Offline para testes"//_activeVehicle ? _terminal_de_alertas() : " "//chama função que retorna todos os alertas em forma textual.
+            text: _activeVehicle ? _terminal_de_alertas() : " "//chama função que retorna todos os alertas em forma textual.
             font.family: "Clearview"
             font.pointSize: _tamanho_fonte_terminal_alertas
             color: "#FFFFFF"
@@ -2031,10 +2031,10 @@ Item {
 
 
 
-    Column {
+   /* Column {
+        visible:false
         spacing: 10
         anchors.centerIn: parent
-        visible:true
 
         Button {
             text: "Connect"
@@ -2070,7 +2070,7 @@ Item {
             id: receivedMessage
             text: "Received message: "
         }
-    }
+    }*/
 
 
 

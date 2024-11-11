@@ -92,7 +92,26 @@ Rectangle {
             visible:            _activeVehicle && _communicationLost && currentToolbar === flyViewToolbar
         }
 
-        Rectangle {
+        QGCButton{
+            id: reportRecordButton
+            text : qsTr("Start Report")
+            onClicked: {
+                console.log("COMEÇAR_RELATÓRIO", _activeVehicle.coordinate)
+                _recording_report = true
+            }
+            visible: false//_activeVehicle || !_recording_report
+        }
+        QGCButton{
+            id: reportRecordButtonEnd
+            text : qsTr("End Report")
+            onClicked: {
+                console.log("FINALIZAR_RELATÓRIO", _activeVehicle.coordinate)
+                _recording_report = false
+            }
+            visible:false// _activeVehicle || _recording_report
+        }
+
+        /*Rectangle {
             width: 100
             height: parent.height*0.6
             color: "transparent"
@@ -116,7 +135,7 @@ Rectangle {
                     _recording_report = false
                 }
             }
-        }
+        }*/
     }
 
     QGCFlickable {
