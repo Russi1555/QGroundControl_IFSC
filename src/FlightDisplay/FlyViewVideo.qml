@@ -102,4 +102,9 @@ Item {
         id: obstacleDistance
         showText: pipState.state === pipState.fullState
     }
+    /*QGCOptionsComboBox { //DESCOMENTAR PARA TESTAR SUPORTE A CAMERA SIYI
+        id: siyiController
+        anchors.fill: parent
+        visible: !_mainWindowIsMap
+    }*/
 }

@@ -444,6 +444,11 @@ HEADERS += \
     src/api/QGCSettings.h \
     src/api/QmlComponentInfo.h \
     src/GPS/Drivers/src/base_station.h \
+    src/SiYi/SiYi.h \
+    src/SiYi/SiYiCamera.h \
+    src/SiYi/SiYiCrcApi.h \
+    src/SiYi/SiYiTcpClient.h \
+    src/SiYi/SiYiTransmitter.h \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     HEADERS += \
@@ -456,6 +461,11 @@ SOURCES += \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \
     src/api/QmlComponentInfo.cc \
+    src/SiYi/SiYi.cc \
+    src/SiYi/SiYiCamera.cc \
+    src/SiYi/SiYiCrcApi.cc \
+    src/SiYi/SiYiTcpClient.cc \
+    src/SiYi/SiYiTransmitter.cc \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     SOURCES += \
