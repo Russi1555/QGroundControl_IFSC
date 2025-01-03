@@ -159,6 +159,7 @@ Item {
         //talvez fazer um contador pra cada alerta e se tiver mais de x alertas, retorno = "POUSE IMEDIATAMENTE. CONDIÇÕES PERIGOSAS PARA VOO"
         if(_activeVehicle.gps.hdop.rawValue >= 1){
             console.log("GPS_LOW_PRECISION",_activeVehicle.coordinate)
+            console.log(QGroundControl.videoManager.isGStreamer)
             retorno = retorno + "- ATENÇÃO: GPS COM BAIXA PRECISÃO\n";
         }
         if(_activeVehicle.rcRSSI > 115){

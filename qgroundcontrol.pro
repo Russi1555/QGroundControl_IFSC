@@ -12,8 +12,9 @@ QMAKE_PROJECT_DEPTH = 0 # undocumented qmake flag to force absolute paths in mak
 # These are disabled until proven correct
 DEFINES += QGC_GST_TAISYNC_DISABLED
 DEFINES += QGC_GST_MICROHARD_DISABLED
+DEFINES += DISABLE_AIRMAP
+DEFINES += QGC_GST_STREAMING
 CONFIG += c++17
-
 
 exists($${OUT_PWD}/qgroundcontrol.pro) {
     error("You must use shadow build (e.g. mkdir build; cd build; qmake ../qgroundcontrol.pro).")
@@ -1493,7 +1494,7 @@ contains (CONFIG, DISABLE_VIDEOSTREAMING) {
     include(src/VideoReceiver/VideoReceiver.pri)
 }
 
-!VideoEnabled {
+VideoEnabled {
     INCLUDEPATH += \
         src/VideoReceiver
 

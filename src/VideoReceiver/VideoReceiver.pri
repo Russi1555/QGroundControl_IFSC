@@ -14,8 +14,10 @@
 LinuxBuild {
     QT += x11extras waylandclient
     CONFIG += link_pkgconfig
+    DEFINES += QGC_GST_STREAMING
     packagesExist(gstreamer-1.0) {
         PKGCONFIG   += gstreamer-1.0  gstreamer-video-1.0 gstreamer-gl-1.0 egl
+
         CONFIG      += VideoEnabled
     }
 } else:MacBuild {
@@ -143,7 +145,8 @@ VideoEnabled {
         $$PWD/gstqgcvideosinkbin.c \
         $$PWD/gstqgc.c \
         $$PWD/GStreamer.cc \
-        $$PWD/GstVideoReceiver.cc
+        $$PWD/GstVideoReceiver.cc \
+
 
     include($$PWD/../../qmlglsink.pri)
 } else {

@@ -88,9 +88,7 @@ endif()
 find_package(PkgConfig)
 
 set(GST_DEPENDENCIES
-	gstreamer-1.0>=1.14
-	gstreamer-video-1.0>=1.14
-	gstreamer-gl-1.0>=1.14
+        gstreamer-launch-1.0>=1.0
 	)
 
 if (MSVC)
@@ -105,6 +103,7 @@ else()
 endif()
 
 if (GST_FOUND)
+    message("GST FOUND")
     add_definitions(
         -DQGC_GST_STREAMING
     )
